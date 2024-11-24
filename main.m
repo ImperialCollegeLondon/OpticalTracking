@@ -29,5 +29,8 @@ for i = 1:numel(data_raw)
     data(i).name = data_sanitised(i).name;
     data(i).tibia = extract_from_label(data_sanitised(i).probes, label.tibia);
     data(i).femur = extract_from_label(data_sanitised(i).probes, label.femur);
-    run_data(data(i), landmarks, right)
+    output(i).name = data_sanitised(i).name;
+    output(i).data = run_data(data(i), landmarks, right);
+
+    plot_all(output(i).data)
 end

@@ -1,4 +1,4 @@
-function run_data(data, landmarks, Right)
+function output = run_data(data, landmarks, Right)
 [transform_tibia, transform_femur] = bone_to_tracker_transform(landmarks.tibia, landmarks.femur, Right);
 
 angle = @(u_,v_) acosd(dot(u_,v_)/(norm(u_,2)*norm(v_,2))); %define a function to calculate the angle between two vectors
@@ -112,54 +112,15 @@ Pin6_r_tc = transform_femur.Pin6_r_tc;
          AntPost(i,1)=dot(H_(i,:),e2_);%projected onto the anterior posterior axis e2
          DistComp(i,1)=-dot(H_(i,:),e3_);%projected onto the compression distraction axis e3, minus sign to make distraction +ve
 
-         TFangles(i,:) = [TFMatrixangles(i,1) Varus(i,1)  ExtRotation(i,1)];
-         TFtranslations(i,:) = [LatMed(i,1)  AntPost(i,1)  DistComp(i,1)];
+         output(i).flexion = TFMatrixangles(i,1);
+         output(i).varus = Varus(i,1);
+         output(i).external = ExtRotation(i,1);
+         output(i).lateral = LatMed(i,1);
+         output(i).anterior = AntPost(i,1);
+         output(i).superior = DistComp(i,1);
 
      end
 
  end
-
-MinFlex = min(TFangles(:,1))
-MaxFlex = max(TFangles(:,1))
-
-
-
-%% PlotsFMed
-% 
-% 
-figure
-subplot(3, 1, 1)
-plot(TFangles(:,1))
-ylabel('Flexion')
-subplot(3, 1, 2)
-plot(TFangles(:,2))
-ylabel('Tibial Varus')
-subplot(3, 1, 3)
-plot(TFangles(:,3))
-ylabel('Tibial Ext Rotation')
-sgtitle('Tibia angles relative to femur')
-
-figure
-subplot(3, 1, 1)
-plot(TFtranslations(:,1))
-ylabel('Lateral/medial')
-subplot(3, 1, 2)
-plot(TFtranslations(:,2))
-ylabel('Anterior/posterior')
-subplot(3, 1, 3)
-plot(TFtranslations(:,3))
-ylabel('DistComp')
-sgtitle('Tibia translations relative to femur')
-% 
-% % Write output files
-% OutputPath = [pwd,'\',char(Knee), '\OutputFiles\' Test '.csv'];
-% Output = [TFangles TFtranslations];
-% % Output = fillmissing(Output,'spline');
-% % csvwrite(OutputPath, Output);
-% 
-
-
-
-
 end
 
