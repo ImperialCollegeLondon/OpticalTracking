@@ -1,18 +1,32 @@
-function output = sanitise_data(landmarks, probe_labels)
+function output = sanitise_data(landmarks, probe_labels, is_quaternion)
 for i = 1:numel(landmarks)
     lmk_name = {landmarks.name};
     output(i).name = lmk_name{i};
     n_probes = landmarks.probes;
     for j = 1:numel(n_probes)
         probe_data = landmarks(i).probes(j).data;
-        rx = probe_data.Rx;
-        ry = probe_data.Ry;
-        rz = probe_data.Rz;
+        if is_quaternion
+            % Requires double checking.
+            [rx, ry, rz] = quaternion2euler([probe_data.Q0 probe_data.QX probe_data.QX probe_data.QZ]);
+        else
+            rx = probe_data.Rx;
+            ry = probe_data.Ry;
+            rz = probe_data.Rz;
+        end
 
         header = probe_data.Properties.VariableNames;
-        tx = mean(probe_data{:, contains(header, "Tx")}, 2);
-        ty = mean(probe_data{:, contains(header, "Ty")}, 2);
-        tz = mean(probe_data{:, contains(header, "Tz")}, 2);
+
+        if width(probe_data{:, contains(header, "Tx")}) == 4
+            % Use the centroid of the 3 markers
+            tx = mean(probe_data{:, contains(header, "Tx")}(:, 2:4), 2); 
+            ty = mean(probe_data{:, contains(header, "Ty")}(:,2:4), 2);
+            tz = mean(probe_data{:, contains(header, "Tz")}(:,2:4), 2);
+        else
+            % Assumes the first Tx, Ty, Tz is the origin of the tracker.
+            tx = probe_data{:, contains(header, "Tx")}(:,1);
+            ty = probe_data{:, contains(header, "Ty")}(:,1);
+            tz = probe_data{:, contains(header, "Tz")}(:,1);
+        end
         % tx = probe_data{:, contains(header, "Tx")}(:,1);
         % ty = probe_data{:, contains(header, "Ty")}(:,1);
         % tz = probe_data{:, contains(header, "Tz")}(:,1);

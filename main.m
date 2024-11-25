@@ -3,6 +3,7 @@ right = 1; % true if right knee; false if left knee.
 label.probe = "Probe";
 label.tibia = "T";
 label.femur = "Y";
+use_quaternion = false;
 
 %% Create calibration files
 disp("Choose the calibration folder");
@@ -13,7 +14,7 @@ calibration = load_data(fp_calibration);
 % if label_probe_landmarks and label_tracker_... don't match them, the code will not run.
 probe_labels = get_probe_labels(calibration, fp_calibration);
 
-landmark_raw_data = sanitise_data(calibration, probe_labels);
+landmark_raw_data = sanitise_data(calibration, probe_labels, use_quaternion);
 
 % Assign the rigid body landmarks using the probe, and create their respective trackers
 landmarks = create_rigid_bodies(landmark_raw_data, label);
@@ -24,7 +25,7 @@ fp_data = uigetdir(".", "Choose the data folder");
 disp("Done");
 data_raw = load_data(fp_data);
 %% Sanitise data
-data_sanitised = sanitise_data(data_raw, probe_labels);
+data_sanitised = sanitise_data(data_raw, probe_labels, use_quaternion);
 for i = 1:numel(data_raw)
     data(i).name = data_sanitised(i).name;
     data(i).tibia = extract_from_label(data_sanitised(i).probes, label.tibia);
