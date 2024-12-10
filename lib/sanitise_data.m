@@ -16,22 +16,10 @@ for i = 1:numel(landmarks)
 
         header = probe_data.Properties.VariableNames;
 
-        if width(probe_data{:, contains(header, "Tx")}) == 4
-            % Use the centroid of the 3 markers
-            tx = mean(probe_data{:, contains(header, "Tx")}(:,2:4), 2); 
-            ty = mean(probe_data{:, contains(header, "Ty")}(:,2:4), 2);
-            tz = mean(probe_data{:, contains(header, "Tz")}(:,2:4), 2);
-        else
-            % Assumes the first Tx, Ty, Tz is the origin of the tracker.
-            tx = probe_data{:, contains(header, "Tx")}(:,1);
-            ty = probe_data{:, contains(header, "Ty")}(:,1);
-            tz = probe_data{:, contains(header, "Tz")}(:,1);
-        end
-        % tx = probe_data{:, contains(header, "Tx")}(:,1);
-        % ty = probe_data{:, contains(header, "Ty")}(:,1);
-        % tz = probe_data{:, contains(header, "Tz")}(:,1);
+        tx = probe_data{:, contains(header, "Tx")}(:,1);
+        ty = probe_data{:, contains(header, "Ty")}(:,1);
+        tz = probe_data{:, contains(header, "Tz")}(:,1);
 
-        % output.name(i).probes(j) = landmarks(i)
         probes(j).probe = landmarks(i).probes(j).probe{:};
         labels = {probe_labels.label};
 
