@@ -7,7 +7,7 @@ for i = 1:numel(landmarks)
         probe_data = landmarks(i).probes(j).data;
         if is_quaternion
             % Requires double checking.
-            [rx, ry, rz] = quaternion2euler([probe_data.Q0 probe_data.QX probe_data.QX probe_data.QZ]);
+            [rx, ry, rz] = quaternion2euler(probe_data.Q0, probe_data.Qx, probe_data.Qy, probe_data.Qz);
         else
             rx = probe_data.Rx;
             ry = probe_data.Ry;
@@ -18,7 +18,7 @@ for i = 1:numel(landmarks)
 
         if width(probe_data{:, contains(header, "Tx")}) == 4
             % Use the centroid of the 3 markers
-            tx = mean(probe_data{:, contains(header, "Tx")}(:, 2:4), 2); 
+            tx = mean(probe_data{:, contains(header, "Tx")}(:,2:4), 2); 
             ty = mean(probe_data{:, contains(header, "Ty")}(:,2:4), 2);
             tz = mean(probe_data{:, contains(header, "Tz")}(:,2:4), 2);
         else
@@ -33,9 +33,9 @@ for i = 1:numel(landmarks)
 
         % output.name(i).probes(j) = landmarks(i)
         probes(j).probe = landmarks(i).probes(j).probe{:};
-        labels = [probe_labels.label];
+        labels = {probe_labels.label};
 
-        probes(j).label = labels{strcmp([probe_labels.name], probes(j).probe)};
+        probes(j).label = labels(strcmp([probe_labels.name], probes(j).probe));
         probes(j).Rx = rx;
         probes(j).Ry = ry;
         probes(j).Rz = rz;

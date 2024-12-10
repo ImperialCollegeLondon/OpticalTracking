@@ -1,41 +1,32 @@
-function plot_all(data)
-
-MinFlex = min([data.flexion])
-MaxFlex = max([data.flexion])
-
-
-
-%% PlotsFMed
-% 
-% 
+function plot_all(input)
 figure
-subplot(3, 1, 1)
-plot([data.flexion])
-ylabel('Flexion')
-subplot(3, 1, 2)
-plot([data.varus])
-ylabel('Tibial Varus')
-subplot(3, 1, 3)
-plot([data.external])
-ylabel('Tibial Ext Rotation')
-sgtitle('Tibia angles relative to femur')
 
-figure
-subplot(3, 1, 1)
-plot([data.lateral])
-ylabel('Lateral/medial')
-subplot(3, 1, 2)
-plot([data.anterior])
-ylabel('Anterior/posterior')
-subplot(3, 1, 3)
-plot([data.superior])
-ylabel('DistComp')
-sgtitle('Tibia translations relative to femur')
-% 
-% % Write output files
-% OutputPath = [pwd,'\',char(Knee), '\OutputFiles\' Test '.csv'];
-% Output = [TFangles TFtranslations];
-% % Output = fillmissing(Output,'spline');
-% % csvwrite(OutputPath, Output);
-% 
+subplot(3, 2, 1);
+plot([input.data.flexion]);
+ylabel('Flexion');
+title('Angles');
+
+subplot(3, 2, 3);
+plot([input.data.varus]);
+ylabel('Tibial Varus');
+
+subplot(3, 2, 5);
+plot([input.data.external]);
+ylabel('Tibial Ext Rotation');
+
+subplot(3, 2, 2);
+plot([input.data.lateral]);
+ylabel('Lateral/medial');
+title('Translations');
+
+subplot(3, 2, 4);
+plot([input.data.anterior]);
+ylabel('Anterior/posterior');
+
+subplot(3, 2, 6);
+plot([input.data.superior]);
+ylabel('DistComp');
+
+name = strrep(input.name, '_', ' ');
+sgtitle([name "Tibia motion relative to Femur"]);
 end

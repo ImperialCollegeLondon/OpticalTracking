@@ -14,6 +14,10 @@
 %     end
 % end
 function output = extract_from_label(landmark, label)
-idx = strcmp({landmark.label}, label);
+idx = strcmp([landmark.label], label);
+if ~any(idx)
+disp("Could not extract any data given the labels");
+end
 output = landmark(idx);
+output.label = output.label{:};
 end

@@ -1,5 +1,7 @@
 function [ gTt0 ] = defineTrackerFixedFrame(eulerAngles,XYZ)
-%
+% To be improved
+% > euler angles => Rx, Ry, Rz as arguments
+% > XYZ => x, y, z as arguments
 
 i=1;
 
