@@ -1,5 +1,5 @@
 clc;clear;
-right = true; % true if right knee; false if left knee.
+right = false; % true if right knee; false if left knee.
 label.probe = 'Probe';
 label.tibia = 'T';
 label.femur = 'Y';
