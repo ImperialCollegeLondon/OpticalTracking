@@ -30,6 +30,10 @@ tempK_= uvector(origin,prox)'; %the proximal point is approximate and thus this 
 J_ = ucross(tempK_,I_); % Y-axis
 K_ = ucross(I_,J_);%%recalculate K so perpendicular to give orthogonal coordinate system.
 
+if all(cross(tempK_, I_) == zeros(3,1)) || all(cross(I_, J_) == zeros(3,1))
+error("Cross product in Femur is zero. Double check femoral digitisation!!")
+end
+
 rot=[I_,J_,K_];
 rot=[rot,[0 0 0]';0 0 0 1];
 

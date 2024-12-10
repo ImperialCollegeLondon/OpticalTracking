@@ -30,6 +30,10 @@ tempk_= uvector(dist,origin)'; %the distal point is approximate and thus this ax
 j_ = ucross(tempk_,i_); % y-axis
 k_ = ucross(i_,j_); %recalculate k so perpendicular to give orthogonal coordinate system.
 
+if all(cross(tempk_, i_) == zeros(3,1)) || all(cross(i_, j_) == zeros(3,1))
+error("Cross product in Tibia is zero. Double check tibial digitisation!!")
+end
+
 rot=[i_,j_,k_];
 
 rot=[rot,[0 0 0]';0 0 0 1];
