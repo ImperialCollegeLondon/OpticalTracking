@@ -1,5 +1,5 @@
-clc;clear;
-right = true; % true if right knee; false if left knee.
+clc;clear; close all;
+right = false; % true if right knee; false if left knee.
 label.probe = 'Probe';
 label.tibia = 'T';
 label.femur = 'Y';
@@ -38,4 +38,61 @@ for i = 1:numel(data_raw)
     flex = num2cell([output(i).data.flexion] - min([output(i).data.flexion]));
     [output(i).data.flexion] = flex{:};
     plot_all(output(i))
+end
+
+%%
+N = length(g_transforms.tibia);
+
+figure; 
+
+filename = 'tibia_rotation.gif'; % Output GIF file
+for i = 1:N
+    [x_t, y_t, z_t, t_t] = unit_vectors(g_transforms.tibia(i));
+    [x_f, y_f, z_f, t_f] = unit_vectors(g_transforms.femur(i));
+
+   clf;
+   grid on;
+xlabel('X');
+ylabel('Y');
+zlabel('Z');
+axis equal;
+title("Bones");
+legend({'X-axis', 'Y-axis', 'Z-axis'});
+   hold on;
+   %% Plot
+   t = plotter(x_t, y_t, z_t, 'r-', 'r');
+    f = plotter(x_f, y_f, z_f, 'b-', 'b');
+    legend([t f], {"Tibia", "Femur"})
+    %%
+hold off
+    % Capture the plot as a frame for the GIF
+    frame = getframe(gcf);
+    im = frame2im(frame);
+    [imind, cm] = rgb2ind(im, 256);
+    
+    % Write to GIF file
+    if i == 1
+        imwrite(imind, cm, filename, 'gif', 'Loopcount', inf, 'DelayTime', 0.1);
+    else
+        imwrite(imind, cm, filename, 'gif', 'WriteMode', 'append', 'DelayTime', 0.1);
+    end
+end
+
+function [x, y, z, t] = unit_vectors(transform)
+    T = transform{:};
+    x = T(1:3, 1);
+    y = T(1:3, 2);
+    z = T(1:3, 3);
+    t = T(1:3, 4);
+end
+
+function plot_x = plotter(x, y, z, colour, tip)
+origin = [0; 0; 0];
+    plot_x = plot3([origin(1), x(1)], [origin(2), x(2)], [origin(3), x(3)], colour); % X-axis
+    plot3([origin(1), y(1)], [origin(2), y(2)], [origin(3), y(3)], colour); % Y-axis
+    plot3([origin(1), z(1)], [origin(2), z(2)], [origin(3), z(3)], colour); % Z-axis
+
+    scatter3(x(1), x(2), x(3), 50, tip, 'filled', 'v');
+    scatter3(y(1), y(2), y(3), 50, tip, 'filled', 'v'); 
+    scatter3(z(1), z(2), z(3), 50, tip, 'filled', 'v');
 end
