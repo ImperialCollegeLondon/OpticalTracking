@@ -39,3 +39,27 @@ for i = 1:numel(data_raw)
     [output(i).data.flexion] = flex{:};
     plot_all(output(i))
 end
+
+%% Visualise transformation
+N = length(g_transforms.tibia);
+local_point = [0; 0; 1; 0];
+for i = 1:N
+t = g_transforms.tibia(i);
+t = t{:};
+v = t * local_point;
+point_t(:,i) = v(1:3);
+
+f = g_transforms.femur(i);
+f = f{:};
+w = f * local_point;
+point_f(:,i) = w(1:3);
+end
+figure;hold on;
+
+plot3(point_t(1,:), point_t(2,:), point_t(3,:), 'b-o', 'LineWidth', 1.5);
+
+plot3(point_f(1,:), point_f(2,:), point_f(3,:), 'r-o', 'LineWidth', 1.5);
+xlabel('X'); ylabel('Y'); zlabel('Z');
+grid on;
+legend('Tibia', 'Femur');
+hold off;
