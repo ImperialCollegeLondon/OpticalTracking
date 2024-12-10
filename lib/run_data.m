@@ -26,8 +26,7 @@ for i = 1:length(gTfti)
     gTfi{i,1}=gTfti{i,1}*ftTfc;%multiply here instead of multiply by inverse as detailed in Pam's method
     gTti{i,1}=gTtti{i,1}*ttTtc;%multiply here instead of divide in Pam's method
     
-    transforms_global(i).femur = gTfi;
-    transforms_global(i).tibia = gTti;
+
     
     %calculate the motion relative to each other
     fTt{i,1}=gTfi{i,1}\gTti{i,1}; % Transformation of Tibia relative to the femur
@@ -89,18 +88,13 @@ for i = 1:length(gTfti)
     q(i,3)=-(B(1,3)*B(1,4)+B(2,3)*B(2,4)+B(3,3)*B(3,4));
 
     
-    fRtCheck{i,1}=[dot(I_,i_) dot(I_,j_) dot(I_,k_)
-        dot(J_,i_) dot(J_,j_) dot(J_,k_)
-        dot(K_,i_) dot(K_,j_) dot(K_,k_)];
-    
-    fRt{i,1}-fRtCheck{i,1};
+    % fRtCheck{i,1}=[dot(I_,i_) dot(I_,j_) dot(I_,k_)
+    %     dot(J_,i_) dot(J_,j_) dot(J_,k_)
+    %     dot(K_,i_) dot(K_,j_) dot(K_,k_)];
+    % 
+    % fRt{i,1}-fRtCheck{i,1};
 
-    difference(i).flexion = angles(1) - flexion;
-    difference(i).varus = angles(2) - varus;
-    difference(i).external = angles(3) - external;
-    difference(i).lateral = q(1) - lateral;
-    difference(i).anterior = q(2) - anterior;
-    difference(i).superior = q(3) - distal;
+
     
     output(i).flexion = flexion;
     output(i).varus = varus;
@@ -110,5 +104,14 @@ for i = 1:length(gTfti)
     output(i).superior = distal;
     
 end
+    transforms_global.femur = gTfi;
+    transforms_global.tibia = gTti;
+
+    difference(i).flexion = angles(:,1) - output(i).flexion;
+    difference(i).varus = angles(:,2) - output(i).varus;
+    difference(i).external = angles(:,3) - output(i).external;
+    difference(i).lateral = q(:,1) - output(i).lateral;
+    difference(i).anterior = q(:,2) - output(i).anterior;
+    difference(i).superior = q(:,3) - output(i).superior;
 
 end
