@@ -1,4 +1,4 @@
-function output = sanitise_data(landmarks, probe_labels, is_quaternion)
+function output = organise_data(landmarks, probe_labels, is_quaternion)
 for i = 1:numel(landmarks)
     lmk_name = {landmarks.name};
     output(i).name = lmk_name{i};
