@@ -19,7 +19,9 @@ gTfti = findTrackerFixedFrames(data.femur.rotations, data.femur.translations);
 
 %% Calculate transformation matricies from body fixed to global fixed frames and motion relative to initial position
 
-output(length(gTfti)) = struct('flexion', [], 'varus', [], 'external', [], 'lateral', [], 'anterior', [], 'superior', []);
+result(length(gTfti)) = struct('flexion', [], 'varus', [], 'external', [], 'lateral', [], 'anterior', [], 'superior', []);
+
+diff = repmat(struct('flexion', [], 'varus', [], 'external', [], 'lateral', [], 'anterior', [], 'superior', []), numel(result), 1);
 
 for i = 1:length(gTfti)
     %calculate the body fixed motion relative to the global coordinates
@@ -96,22 +98,40 @@ for i = 1:length(gTfti)
 
 
     
-    output(i).flexion = flexion;
-    output(i).varus = varus;
-    output(i).external = external;
-    output(i).lateral = lateral;
-    output(i).anterior = anterior;
-    output(i).superior = distal;
+    result(i).flexion = flexion;
+    result(i).varus = varus;
+    result(i).external = external;
+    result(i).lateral = lateral;
+    result(i).anterior = anterior;
+    result(i).superior = distal;
+
+
     
 end
+    output.data = struct2table(result);
+    output.name = strrep(data.name, '_', ' ');
     transforms_global.femur = gTfi;
     transforms_global.tibia = gTti;
 
-    difference(i).flexion = angles(:,1) - output(i).flexion;
-    difference(i).varus = angles(:,2) - output(i).varus;
-    difference(i).external = angles(:,3) - output(i).external;
-    difference(i).lateral = q(:,1) - output(i).lateral;
-    difference(i).anterior = q(:,2) - output(i).anterior;
-    difference(i).superior = q(:,3) - output(i).superior;
+    
+    diff_flex = num2cell(angles(:,1) - [result.flexion]');
+    [diff.flexion] = diff_flex{:};
 
+    diff_varus =  num2cell(angles(:,2) - [result.varus]');
+    [diff.varus] = diff_varus{:};
+
+    diff_external = num2cell(angles(:,3) - [result.external]');
+    [diff.external] = diff_external{:};
+
+    diff_lateral =  num2cell(q(:,1) - [result.lateral]');
+    [diff.lateral] = diff_lateral{:};
+
+    diff_anterior = num2cell(q(:,2) - [result.anterior]');
+    [diff.anterior] = diff_anterior{:};
+
+    diff_superior = num2cell(q(:,3) - [result.superior]');
+    [diff.superior] = diff_superior{:};
+
+    difference.data = struct2table(diff);
+    difference.name = data.name;
 end

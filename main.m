@@ -27,44 +27,47 @@ disp("Done");
 data_raw = load_data(fp_data);
 %% Sanitise data
 data_sanitised = sanitise_data(data_raw, probe_labels, use_quaternion);
+% g_transforms = repmat(struct('tibia', [], 'femur', []), numel(data_sanitised), 1);
+% difference = repmat(struct('name', '', 'data', []), numel(output), 1);
 for i = 1:numel(data_raw)
     data(i).name = data_sanitised(i).name;
     data(i).tibia = extract_from_label(data_sanitised(i).probes, label.tibia);
     data(i).femur = extract_from_label(data_sanitised(i).probes, label.femur);
-    output(i).name = data_sanitised(i).name;
-    [output(i).data, difference, g_transforms]= run_data(data(i), trackers, right);
+
+    [output(i), difference(i), g_transforms(i)]= run_data(data(i), trackers, right);
+
 
     % Shift flexion so max extension is 0:
-    flex = num2cell([output(i).data.flexion] - min([output(i).data.flexion]));
-    [output(i).data.flexion] = flex{:};
+    output(i).data.flexion = [output(i).data.flexion] - min([output(i).data.flexion]);
     plot_all(output(i))
 end
+[g_transforms.name] = deal(output.name);
 
 %%
 N = length(g_transforms.tibia);
 
-figure; 
+figure;
 
 filename = 'tibia_rotation.gif'; % Output GIF file
 for i = 1:N
     [x_t, y_t, z_t, t_t] = unit_vectors(g_transforms.tibia(i));
     [x_f, y_f, z_f, t_f] = unit_vectors(g_transforms.femur(i));
-
-   clf;
-   grid on;
-xlabel('X');
-ylabel('Y');
-zlabel('Z');
-axis equal;
-title("Bones");
-legend({'X-axis', 'Y-axis', 'Z-axis'});
-   hold on;
-   %% Plot
-   t = plotter(x_t, y_t, z_t, 'r-', 'r');
-    f = plotter(x_f, y_f, z_f, 'b-', 'b');
+    
+    clf;
+    grid on;
+    xlabel('X');
+    ylabel('Y');
+    zlabel('Z');
+    axis equal;
+    title("Bones");
+    legend({'X-axis', 'Y-axis', 'Z-axis'});
+    hold on;
+    %% Plot
+    t = plotter(x_t, y_t, z_t, t_t, 'r');
+    f = plotter(-x_f, -y_f, z_f, t_f, 'b');
     legend([t f], {"Tibia", "Femur"})
     %%
-hold off
+    hold off
     % Capture the plot as a frame for the GIF
     frame = getframe(gcf);
     im = frame2im(frame);
@@ -79,20 +82,16 @@ hold off
 end
 
 function [x, y, z, t] = unit_vectors(transform)
-    T = transform{:};
-    x = T(1:3, 1);
-    y = T(1:3, 2);
-    z = T(1:3, 3);
-    t = T(1:3, 4);
+T = transform{:};
+x = T(1:3, 1);
+y = T(1:3, 2);
+z = T(1:3, 3);
+t = T(1:3, 4);
 end
 
-function plot_x = plotter(x, y, z, colour, tip)
+function plot_x = plotter(x, y, z, t, colour)
 origin = [0; 0; 0];
-    plot_x = plot3([origin(1), x(1)], [origin(2), x(2)], [origin(3), x(3)], colour); % X-axis
-    plot3([origin(1), y(1)], [origin(2), y(2)], [origin(3), y(3)], colour); % Y-axis
-    plot3([origin(1), z(1)], [origin(2), z(2)], [origin(3), z(3)], colour); % Z-axis
-
-    scatter3(x(1), x(2), x(3), 50, tip, 'filled', 'v');
-    scatter3(y(1), y(2), y(3), 50, tip, 'filled', 'v'); 
-    scatter3(z(1), z(2), z(3), 50, tip, 'filled', 'v');
+plot_x = quiver3(origin(1), origin(2), origin(3), x(1), x(2), x(3), colour);
+quiver3(origin(1), origin(2), origin(3), y(1), y(2), y(3), 0.5, colour);
+quiver3(origin(1), origin(2), origin(3), z(1), z(2), z(3), 0.3, colour);
 end
