@@ -56,8 +56,8 @@ fig = figure;
 
 filename = 'tibia_rotation.gif'; % Output GIF file
 for i = 1:N
-    [x_t, y_t, z_t, t_t] = unit_vectors(transf.tibia(i));
-    [x_f, y_f, z_f, t_f] = unit_vectors(transf.femur(i));
+    [tib] = unit_vectors(transf.tibia(i));
+    [fem] = unit_vectors(transf.femur(i));
     
     clf(fig);
     grid on;
@@ -68,39 +68,39 @@ for i = 1:N
     title(["Rotations only. No correction for translations. Frame: " i]);
     hold on;
     %% Plot
-    t = plotter(-x_t, -y_t, -z_t, t_t, 'b');
-    f = plotter(x_f, y_f, z_f, t_f, 'r');
+    t = plotter(tib.x, tib.y, tib.z, tib.t, 'b');
+    f = plotter(-fem.x, -fem.y, -fem.z, fem.t, 'r');
     legend([t f], {"Tibia", "Femur"})
-    view(20+i/5,20);
+    view(90+i/5,30);
     %%
     hold off
-    % % Capture the plot as a frame for the GIF
+    % Capture the plot as a frame for the GIF
     frame = getframe(fig);
-    % im = frame2im(frame);
-    % [imind, cm] = rgb2ind(im, 256);
-    % 
-    % % Write to GIF file
-    % if i == 1
-    %     imwrite(imind, cm, filename, 'gif', 'Loopcount', inf, 'DelayTime', 0.1);
-    % else
-    %     imwrite(imind, cm, filename, 'gif', 'WriteMode', 'append', 'DelayTime', 0.1);
-    % end
+    im = frame2im(frame);
+    [imind, cm] = rgb2ind(im, 256);
+
+    % Write to GIF file
+    if i == 1
+        imwrite(imind, cm, filename, 'gif', 'Loopcount', inf, 'DelayTime', 0.1);
+    else
+        imwrite(imind, cm, filename, 'gif', 'WriteMode', 'append', 'DelayTime', 0.1);
+    end
 end
 
-function [x, y, z, t] = unit_vectors(transform)
+function rb = unit_vectors(transform)
 T = transform{:};
-x = T(1:3, 1);
-y = T(1:3, 2);
-z = T(1:3, 3);
-t = T(1:3, 4)/norm(T(1:3, 4));
+rb.x = T(1:3, 1);
+rb.y = T(1:3, 2);
+rb.z = T(1:3, 3);
+rb.t = T(1:3, 4)/norm(T(1:3, 4));
 end
 
 function plot_x = plotter(x, y, z, t, colour)
 origin = [0; 0; 0];
-plot_x = quiver3(t(1), t(2), t(3), x(1), x(2), x(3), 0.2, colour);
-quiver3(t(1), t(2), t(3), y(1), y(2), y(3), 0.2, colour);
-quiver3(t(1), t(2), t(3), z(1), z(2), z(3), 0.2, colour);
-quiver3(t(1), t(2), t(3), x(1), y(2), z(3), 1, 'k');
+plot_x = quiver3(t(1,:), t(2,:), t(3,:), x(1,:), x(2,:), x(3,:), 0.2, colour);
+quiver3(t(1,:), t(2,:), t(3,:), y(1,:), y(2,:), y(3,:), 0.2, colour);
+quiver3(t(1,:), t(2,:), t(3,:), z(1,:), z(2,:), z(3,:), 0.2, colour);
+quiver3(t(1,:), t(2,:), t(3,:), x(1,:), y(2,:), z(3,:), 1, 'k');
 
 axis([-1 1 -1 1 -2.5 0])
 end
