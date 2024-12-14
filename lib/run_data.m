@@ -6,14 +6,17 @@ ucross=@(u_,v_) cross(u_,v_)/norm(cross(u_,v_),2); %define function to find unit
 uvector=@(a,b) (b-a)/norm(b-a,2); %define a function to find a unit vector from a to b
 
 % Use RvA nomenclature for all transforms and references (origins)
-ttTtc = trackers.tibia;
-ttrtc = trackers.tibia(:,4);
-ftTfc = trackers.femur;
-ftrfc = trackers.femur(:,4);
+ttTtc = trackers.tibia.transform;
+ttrtc = trackers.tibia.origin;
+ftTfc = trackers.femur.transform;
+ftrfc = trackers.femur.origin;
+ptTtc = trackers.patella.transform;
+ptrpc = trackers.patella.origin;
 
 %% Load how tracker moves with time
 gTtti = findTrackerFixedFrames(data.tibia.rotations, data.tibia.translations);
 gTfti = findTrackerFixedFrames(data.femur.rotations, data.femur.translations);
+gTpti = findTrackerFixedFrames(data.patella.rotations, data.patella.translations);
 % Create matrices of tracker marker position and rotations in time
 
 
@@ -26,21 +29,37 @@ for i = 1:length(gTfti)
     gTfi{i,1}=gTfti{i,1}*ftTfc;%multiply here instead of multiply by inverse as detailed in Pam's method
     gTti{i,1}=gTtti{i,1}*ttTtc;%multiply here instead of divide in Pam's method
     
-
-    
     %calculate the motion relative to each other
     fTt{i,1}=gTfi{i,1}\gTti{i,1}; % Transformation of Tibia relative to the femur
     fRt{i,1}=fTt{i,1}(1:3,1:3); %Rotations of tibia relative to femur
-    
     
     %calculate the position vectors of the origin in the global frame of
     %reference
     grfi{i,1}=gTfti{i,1}*ftrfc; %femur origin in global reference frame
     grti{i,1}=gTtti{i,1}*ttrtc; %tibia origin in global reference frame
-    
-    %convert the points to the femoral reference plane
     frti{i,1}=gTfi{i,1}\(grti{i,1}-grfi{i,1}); %tibial origin point in the femoral reference frame, note this also equals gTfi{i,1}(1:3,1:3)'*(grti{i,1}(1:3)-grfi{i,1}(1:3); as in Woltring et al. It also equals fTt{i,1}(:,4) and equals gTfi{i,1}\grti{i,1} as gTfi{1,1}\grfi{1,1} = [0,0,0,1]' which makes sense as the femoral origin in the femoral reference frame is 0,0,0;
+
+    % Patella
+    if isempty(gTpti) || isempty(ptTtc)
+        gTpi = [];
+        fTp = [];
+        grpi = [];
+        frpi = [];
+        frti = [];
+    else
+        gTpi{i,1}=gTpti{i,1}*ptTtc;%multiply here instead of divide in Pam's method
+        fTp{i,1}=gTfi{i,1}\gTpi{i,1}; % Patella relative to the femur
+        grpi{i,1}=gTpti{i,1}*ptrpc; % Patellar origin (patellar tendon insertion) in the global frame of reference
+        %convert the points to the femoral reference plane
+        % grtPTi{i,1}=gTtti{i,1}*ttrtPTc; %tibial patella tendon insertion point in global frame of reference
+        % frtPTi{i,1}=gTfi{i,1}\grtPTi{i,1}; %tibial patella tendon insertion point in femoral frame of reference
+        frpi{i,1}=gTfi{i,1}\grpi{i,1}; %patella patella tendon insertion point in femoral frame of reference (equals fTp{i,1}(1:4,4))
+    end
+
+
     
+    
+
     I_=gTfi{i,1}(1:3,1);%Femoral X axis unit vector, Grood and Suntay definition
     J_=gTfi{i,1}(1:3,2);%Femoral Y axis unit vector, Grood and Suntay definition
     K_=gTfi{i,1}(1:3,3);%Femoral Z axis unit vector, Grood and Suntay definition

@@ -19,7 +19,7 @@ for i = 1:numel(names)
             error("Could not determine tracker labels. Make sure they have a label in the tbr file or the name contains a single word that matches the assigned label in main.")
         end
     end
-    fprintf("Probe %s given label %s\n", name, label);
+    % fprintf("Probe %s given label %s\n", name, label);
     probe(i).label = label;
 end
 end

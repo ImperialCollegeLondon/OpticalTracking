@@ -1,4 +1,4 @@
-function [ gTt0, origin] = defineBodyFixedFrameTibia(med,lat,dist,right)
+function gTt0 = defineBodyFixedFrameTibia(med,lat,dist,right)
 %defines a body fixed frame for the tibia.  
 %my notation, _ implies it is a vector e.g. xa_ is the direction vector of
 %the x-axis
