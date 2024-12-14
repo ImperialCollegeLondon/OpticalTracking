@@ -22,22 +22,26 @@ gTpti = findTrackerFixedFrames(data.patella.rotations, data.patella.translations
 
 %% Calculate transformation matricies from body fixed to global fixed frames and motion relative to initial position
 
-output(length(gTfti)) = struct('flexion', [], 'varus', [], 'external', [], 'lateral', [], 'anterior', [], 'superior', []);
-
+result(length(gTfti)) = struct('flexion', [], 'varus', [], 'external', [], 'lateral', [], 'anterior', [], 'superior', []);
+%% Preallocate
+gTfi = cell(size(gTfti));
+gTti = cell(size(gTfti));
+gTpi = cell(size(gTfti));
+%%
 for i = 1:length(gTfti)
     %calculate the body fixed motion relative to the global coordinates
     gTfi{i,1}=gTfti{i,1}*ftTfc;%multiply here instead of multiply by inverse as detailed in Pam's method
     gTti{i,1}=gTtti{i,1}*ttTtc;%multiply here instead of divide in Pam's method
     
     %calculate the motion relative to each other
-    fTt{i,1}=gTfi{i,1}\gTti{i,1}; % Transformation of Tibia relative to the femur
-    fRt{i,1}=fTt{i,1}(1:3,1:3); %Rotations of tibia relative to femur
+    fTt=gTfi{i,1}\gTti{i,1}; % Transformation of Tibia relative to the femur
+    fRt=fTt(1:3,1:3); %Rotations of tibia relative to femur
     
     %calculate the position vectors of the origin in the global frame of
     %reference
-    grfi{i,1}=gTfti{i,1}*ftrfc; %femur origin in global reference frame
-    grti{i,1}=gTtti{i,1}*ttrtc; %tibia origin in global reference frame
-    frti{i,1}=gTfi{i,1}\(grti{i,1}-grfi{i,1}); %tibial origin point in the femoral reference frame, note this also equals gTfi{i,1}(1:3,1:3)'*(grti{i,1}(1:3)-grfi{i,1}(1:3); as in Woltring et al. It also equals fTt{i,1}(:,4) and equals gTfi{i,1}\grti{i,1} as gTfi{1,1}\grfi{1,1} = [0,0,0,1]' which makes sense as the femoral origin in the femoral reference frame is 0,0,0;
+    grfi=gTfti{i,1}*ftrfc; %femur origin in global reference frame
+    grti=gTtti{i,1}*ttrtc; %tibia origin in global reference frame
+    frti=gTfi{i,1}\(grti-grfi); %tibial origin point in the femoral reference frame, note this also equals gTfi{i,1}(1:3,1:3)'*(grti{i,1}(1:3)-grfi{i,1}(1:3); as in Woltring et al. It also equals fTt{i,1}(:,4) and equals gTfi{i,1}\grti{i,1} as gTfi{1,1}\grfi{1,1} = [0,0,0,1]' which makes sense as the femoral origin in the femoral reference frame is 0,0,0;
 
     % Patella
     if isempty(gTpti) || isempty(ptTtc)
@@ -45,20 +49,15 @@ for i = 1:length(gTfti)
         fTp = [];
         grpi = [];
         frpi = [];
-        frti = [];
     else
         gTpi{i,1}=gTpti{i,1}*ptTtc;%multiply here instead of divide in Pam's method
-        fTp{i,1}=gTfi{i,1}\gTpi{i,1}; % Patella relative to the femur
-        grpi{i,1}=gTpti{i,1}*ptrpc; % Patellar origin (patellar tendon insertion) in the global frame of reference
+        fTp=gTfi{i,1}\gTpi{i,1}; % Patella relative to the femur
+        grpi=gTpti{i,1}*ptrpc; % Patellar origin (patellar tendon insertion) in the global frame of reference
         %convert the points to the femoral reference plane
         % grtPTi{i,1}=gTtti{i,1}*ttrtPTc; %tibial patella tendon insertion point in global frame of reference
         % frtPTi{i,1}=gTfi{i,1}\grtPTi{i,1}; %tibial patella tendon insertion point in femoral frame of reference
-        frpi{i,1}=gTfi{i,1}\grpi{i,1}; %patella patella tendon insertion point in femoral frame of reference (equals fTp{i,1}(1:4,4))
+        frpi=gTfi{i,1}\grpi; %patella patella tendon insertion point in femoral frame of reference (equals fTp{i,1}(1:4,4))
     end
-
-
-    
-    
 
     I_=gTfi{i,1}(1:3,1);%Femoral X axis unit vector, Grood and Suntay definition
     J_=gTfi{i,1}(1:3,2);%Femoral Y axis unit vector, Grood and Suntay definition
@@ -73,32 +72,32 @@ for i = 1:length(gTfti)
     e2_=ucross(e3_,e1_);%Floating axis in global reference frame, Grood and Suntay definition
     
     flexion = asind(dot(-e2_,K_));
-    beta(i,1) = acosd(dot(I_,k_));
+    beta = acosd(dot(I_,k_));
     if right
         external = asind(dot(-e2_,i_));
-        varus = 90-beta(i,1);
+        varus = 90-beta;
     else
         external = asind(dot(e2_,i_));
-        varus = -(90-beta(i,1));
+        varus = -(90-beta);
     end
     
     %     H_=tibiaOrigin-femurOrigin;
-    H_(i,:)=[grti{i,1}(1:3)-grfi{i,1}(1:3)]';%translation vector of from femoral origin to tibial origin (in global coordinate frame)
+    H_ = [grti(1:3)-grfi(1:3)]';%translation vector of from femoral origin to tibial origin (in global coordinate frame)
     if right
-        lateral = dot(H_(i,:),e1_);%projected onto the medial lateral axis e1
+        lateral = dot(H_,e1_);%projected onto the medial lateral axis e1
     else
-        lateral = dot(H_(i,:),-e1_);
+        lateral = dot(H_,-e1_);
     end
-    anterior = dot(H_(i,:),e2_);%projected onto the anterior posterior axis e2
-    distal = -dot(H_(i,:),e3_);%projected onto the compression distraction axis e3, minus sign to make distraction +ve
+    anterior = dot(H_,e2_);%projected onto the anterior posterior axis e2
+    distal = -dot(H_,e3_);%projected onto the compression distraction axis e3, minus sign to make distraction +ve
     
     
     %Code to check between different notations
-    [angles(i,:),trfi{i,1}(1,:)]=rotationsAndTranslations(fTt{i},right);
+    [angles(i,:),trfi(1,:)]=rotationsAndTranslations(fTt,right);
 
-    trfi{i,1}(1,:)=-trfi{i,1}(1,:);%which also equals gTti{i,1}\(grfi{i,1}-grti{i,1})
+    trfi(1,:)=-trfi(1,:);%which also equals gTti{i,1}\(grfi{i,1}-grti{i,1})
 
-    B=fTt{i};%B notation used in equations 18-20 in grood and suntay, note they use a matrix with translation rows 2-4 in column 1, here it is column 4 rows 1-3, and rotations are similarly mapped
+    B=fTt;%B notation used in equations 18-20 in grood and suntay, note they use a matrix with translation rows 2-4 in column 1, here it is column 4 rows 1-3, and rotations are similarly mapped
     q(i,1)=B(1,4);
     if ~right
         q(i,1)=-q(i,1);
@@ -115,22 +114,27 @@ for i = 1:length(gTfti)
 
 
     
-    output(i).flexion = flexion;
-    output(i).varus = varus;
-    output(i).external = external;
-    output(i).lateral = lateral;
-    output(i).anterior = anterior;
-    output(i).superior = distal;
-    
+    result(i).flexion = flexion;
+    result(i).varus = varus;
+    result(i).external = external;
+    result(i).lateral = lateral;
+    result(i).anterior = anterior;
+    result(i).superior = distal;
+
 end
+output.data = struct2table(result);
+output.name = strrep(data.name, '_', ' ');
+
     transforms_global.femur = gTfi;
     transforms_global.tibia = gTti;
+    diff = table();
+    diff.flexion = angles(:,1) - [result.flexion]';
+    diff.varus = angles(:,2) - [result.varus]';
+    diff.external = angles(:,3) - [result.external]';
+    diff.lateral = q(:,1) - [result.lateral]';
+    diff.anterior = q(:,2) - [result.anterior]';
+    diff.superior = q(:,3) - [result.superior]';
 
-    difference(i).flexion = angles(:,1) - output(i).flexion;
-    difference(i).varus = angles(:,2) - output(i).varus;
-    difference(i).external = angles(:,3) - output(i).external;
-    difference(i).lateral = q(:,1) - output(i).lateral;
-    difference(i).anterior = q(:,2) - output(i).anterior;
-    difference(i).superior = q(:,3) - output(i).superior;
-
+    difference.data = diff;
+    difference.name = data.name;
 end

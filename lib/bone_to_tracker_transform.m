@@ -41,7 +41,7 @@ end
 
 % Display results
 if ~isempty(empty_fields)
-    fprintf('%s tracker data is empty. Is this expected?\n', empty_fields{:});
+    warning('%s tracker data is empty. If this is correct, ignore this message.\n', empty_fields{:});
 end
 end
 

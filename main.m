@@ -29,7 +29,7 @@ fp_data = uigetdir(".", "Choose the data folder");
 data_raw = load_data(fp_data, label);
 
 if is_polaris
-    disp("Detected Polaris data. If this is wrong, remove the word 'Port' from your probe name");
+    disp("Detected Polaris data.");
     label_f = label.polaris;
 else
     disp("Detected Certus data.")
@@ -51,13 +51,16 @@ for i = 1:numel(data_raw)
     data(i).tibia = extract_from_label(data_sanitised(i).probes, label_f.tibia);
     data(i).femur = extract_from_label(data_sanitised(i).probes, label_f.femur);
     data(i).patella = extract_from_label(data_sanitised(i).probes, label_f.patella);
-    output(i).name = data_sanitised(i).name;
-    [output(i).data, difference, g_transforms]= run_data(data(i), trackers, right);
 
+    [output(i), difference(i), g_transforms(i)]= run_data(data(i), trackers, right);
     % Shift flexion so max extension is 0:
     % flex = num2cell([output(i).data.flexion] - min([output(i).data.flexion]));
     % Shift max flexion to be 120 deg
-    flex = num2cell([output(i).data.flexion] + 120 - max([output(i).data.flexion]));
-    [output(i).data.flexion] = flex{:};
-    plot_all(output(i))
+    [output(i).data.flexion] = output(i).data.flexion + 120 - max(output(i).data.flexion);
+end
+[g_transforms.name] = deal(output.name);
+
+%% Plot
+for i = 1:numel(data_sanitised)
+plot_all(output(i))
 end
