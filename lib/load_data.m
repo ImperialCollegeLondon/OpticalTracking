@@ -1,4 +1,4 @@
-function [landmarks, use_quaternion, probe_labels] = load_data(filepath, labels)
+function [landmarks, use_quaternion, probe_labels, is_polaris] = load_data(filepath, labels)
 csv_files = dir(fullfile(filepath, "*.csv"));
 tsv_files = dir(fullfile(filepath, "*.tsv"));
 files = [csv_files; tsv_files];
@@ -22,10 +22,11 @@ for i = 1:numel(files)
 end
 
 if is_polaris
-    probe_labels = get_probe_labels(labels, landmarks, filepath);
-    disp("Detected a Polaris camera. If it's not, remove the word 'Port' from your probe!")
+    probe_labels = get_probe_labels(labels.polaris, landmarks, filepath);
+    disp("Detected Polaris data. If it's not, remove the word 'Port' from your probe!")
 else
-    l = struct2array(labels);
+    disp("Assuming this is a Certus...")
+    l = struct2array(labels.certus);
     for i = 1:numel(l)
         probe_labels(i).label = l(i);
         probe_labels(i).name = l(i);

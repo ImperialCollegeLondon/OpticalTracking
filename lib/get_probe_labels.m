@@ -16,8 +16,7 @@ for i = 1:numel(names)
         if any(label_idx)
             label = labels_cell{label_idx};
         else
-            disp("Could not determine tracker labels. Make sure they a label or the name contains a single word that matches matlab label and probe.")
-            break;
+            error("Could not determine tracker labels. Make sure they have a label in the tbr file or the name contains a single word that matches the assigned label in main.")
         end
     end
     fprintf("Probe %s given label %s\n", name, label);

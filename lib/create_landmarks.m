@@ -1,4 +1,5 @@
 function landmarks = create_landmarks(landmark_raw_data, label)
+
 %% Tibia
 id = find_landmark(landmark_raw_data, {'tibia', 'medial'});
 landmarks.tibia.medial = extract_from_label(landmark_raw_data(id).probes, label.probe);

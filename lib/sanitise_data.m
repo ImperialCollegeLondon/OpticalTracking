@@ -1,4 +1,5 @@
 function output = sanitise_data(landmarks, probe_labels, is_quaternion)
+warning = false;
 for i = 1:numel(landmarks)
     lmk_name = {landmarks.name};
     output(i).name = lmk_name{i};
@@ -23,6 +24,8 @@ for i = 1:numel(landmarks)
         probe_name = landmarks(i).probes(j).probe;
         if ischar(probe_name) || isstring(probe_name)
             probes(j).probe = probe_name;
+        else
+            probes(j).probe = probe_name{:};
         end
         % probes(j).probe = landmarks(i).probes(j).probe{:};
         labels = {probe_labels.label};
