@@ -124,7 +124,7 @@ if isempty(x)
     return;
 end
 y_cell = repmat({y}, size(x));
-product = cellfun(@times, x, y_cell, 'UniformOutput', false);
+product = cellfun(@(a,b) a*b, x, y_cell, 'UniformOutput', false);
 end
 function product = mdivide(x, y)
 if isempty(x) || isempty(y)
