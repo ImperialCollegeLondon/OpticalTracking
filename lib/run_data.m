@@ -24,62 +24,46 @@ gTpti = findTrackerFixedFrames(data.patella.rotations, data.patella.translations
 
 output(length(gTfti)) = struct('flexion', [], 'varus', [], 'external', [], 'lateral', [], 'anterior', [], 'superior', []);
 
-for i = 1:length(gTfti)
+%% All elements at once
+
     %calculate the body fixed motion relative to the global coordinates
-    gTfi{i,1}=gTfti{i,1}*ftTfc;%multiply here instead of multiply by inverse as detailed in Pam's method
-    gTti{i,1}=gTtti{i,1}*ttTtc;%multiply here instead of divide in Pam's method
+gTfi = multiply(gTfti, ftTfc); %multiply here instead of multiply by inverse as detailed in Pam's method
+gTti = multiply(gTtti, ttTtc); %multiply here instead of divide in Pam's method
+gTpi = multiply(gTpti, ptTtc); %multiply here instead of divide in Pam's method
     
     %calculate the motion relative to each other
-    fTt{i,1}=gTfi{i,1}\gTti{i,1}; % Transformation of Tibia relative to the femur
-    fRt{i,1}=fTt{i,1}(1:3,1:3); %Rotations of tibia relative to femur
+fTt = mdivide(gTfi, gTti);  % Transformation of Tibia relative to the femur
+fRt = cellfun(@(a) a(1:3, 1:3), fTt, 'UniformOutput', false); %Rotations of tibia relative to femur
+fTp = mdivide(gTfi, gTpi);  % Patella relative to the femur
     
     %calculate the position vectors of the origin in the global frame of
     %reference
-    grfi{i,1}=gTfti{i,1}*ftrfc; %femur origin in global reference frame
-    grti{i,1}=gTtti{i,1}*ttrtc; %tibia origin in global reference frame
-    frti{i,1}=gTfi{i,1}\(grti{i,1}-grfi{i,1}); %tibial origin point in the femoral reference frame, note this also equals gTfi{i,1}(1:3,1:3)'*(grti{i,1}(1:3)-grfi{i,1}(1:3); as in Woltring et al. It also equals fTt{i,1}(:,4) and equals gTfi{i,1}\grti{i,1} as gTfi{1,1}\grfi{1,1} = [0,0,0,1]' which makes sense as the femoral origin in the femoral reference frame is 0,0,0;
+grfi = multiply(gTfti, ftrfc);  %femur origin in global reference frame
+grti = multiply(gTtti, ttrtc);  %tibia origin in global reference frame
+grpi = multiply(gTpti, ptrpc);  % Patellar origin (patellar tendon insertion) in the global frame of reference
+frpi = mdivide(gTfi, grpi);  %patella patella tendon insertion point in femoral frame of reference (equals fTp(1:4,4))
+diff = cellfun(@minus, grti, grfi, 'UniformOutput', false);
+frti = mdivide(gTfi, diff); %tibial origin point in the femoral reference frame, note this also equals gTfi(1:3,1:3)'*(grti(1:3)-grfi(1:3); as in Woltring et al. It also equals fTt(:,4) and equals gTfi\grti as gTfi{1,1}\grfi{1,1} = [0,0,0,1]' which makes sense as the femoral origin in the femoral reference frame is 0,0,0;
 
-    % Patella
-    if isempty(gTpti) || isempty(ptTtc)
-        gTpi = [];
-        fTp = [];
-        grpi = [];
-        frpi = [];
-        frti = [];
-    else
-        gTpi{i,1}=gTpti{i,1}*ptTtc;%multiply here instead of divide in Pam's method
-        fTp{i,1}=gTfi{i,1}\gTpi{i,1}; % Patella relative to the femur
-        grpi{i,1}=gTpti{i,1}*ptrpc; % Patellar origin (patellar tendon insertion) in the global frame of reference
-        %convert the points to the femoral reference plane
-        % grtPTi{i,1}=gTtti{i,1}*ttrtPTc; %tibial patella tendon insertion point in global frame of reference
-        % frtPTi{i,1}=gTfi{i,1}\grtPTi{i,1}; %tibial patella tendon insertion point in femoral frame of reference
-        frpi{i,1}=gTfi{i,1}\grpi{i,1}; %patella patella tendon insertion point in femoral frame of reference (equals fTp{i,1}(1:4,4))
-    end
+I_ = take_unit_vec(gTfi, 1);%Femoral X axis unit vector, Grood and Suntay definition
+J_ = take_unit_vec(gTfi, 2);%Femoral Y axis unit vector, Grood and Suntay definition
+K_ = take_unit_vec(gTfi, 3);%Femoral Z axis unit vector, Grood and Suntay definition
 
+i_ = take_unit_vec(gTti, 1);%Tibial x axis unit vector, Grood and Suntay definition
+j_ = take_unit_vec(gTti, 2);%Tibial y axis unit vector, Grood and Suntay definition
+k_ = take_unit_vec(gTti, 3);%Tibial z axis unit vector, Grood and Suntay definition
+e3_=k_;%Tibial z axis in global reference frame, Grood and Suntay definition
+e1_=I_;%Femoral X axis in global reference frame, Grood and Suntay definition
+e2_= bycell(e3_, e1_, ucross);%Floating axis in global reference frame, Grood and Suntay definition
+flexion = asind(cellfun(@(e, k) dot(-e, k), e2_,K_));
+beta = acosd(cellfun(@(i, k) dot(i, k), I_,k_));
 
-    
-    
-
-    I_=gTfi{i,1}(1:3,1);%Femoral X axis unit vector, Grood and Suntay definition
-    J_=gTfi{i,1}(1:3,2);%Femoral Y axis unit vector, Grood and Suntay definition
-    K_=gTfi{i,1}(1:3,3);%Femoral Z axis unit vector, Grood and Suntay definition
-    
-    i_=gTti{i,1}(1:3,1);%Tibial x axis unit vector, Grood and Suntay definition
-    j_=gTti{i,1}(1:3,2);%Tibial y axis unit vector, Grood and Suntay definition
-    k_=gTti{i,1}(1:3,3);%Tibial z axis unit vector, Grood and Suntay definition
-    
-    e1_=I_;%Femoral X axis in global reference frame, Grood and Suntay definition
-    e3_=k_;%Tibial z axis in global reference frame, Grood and Suntay definition
-    e2_=ucross(e3_,e1_);%Floating axis in global reference frame, Grood and Suntay definition
-    
-    flexion = asind(dot(-e2_,K_));
-    beta(i,1) = acosd(dot(I_,k_));
     if right
-        external = asind(dot(-e2_,i_));
-        varus = 90-beta(i,1);
+        external = asind(cellfun(@(e,i) dot(-e, i), e2_, i_));
+        varus = 90-beta;
     else
-        external = asind(dot(e2_,i_));
-        varus = -(90-beta(i,1));
+        external = asind(cellfun(@(e,i) dot(e, i), e2_, i_));
+        varus = -(90-beta);
     end
     
     %     H_=tibiaOrigin-femurOrigin;
@@ -122,7 +106,6 @@ for i = 1:length(gTfti)
     output(i).anterior = anterior;
     output(i).superior = distal;
     
-end
     transforms_global.femur = gTfi;
     transforms_global.tibia = gTti;
 
@@ -133,4 +116,27 @@ end
     difference(i).anterior = q(:,2) - output(i).anterior;
     difference(i).superior = q(:,3) - output(i).superior;
 
+end
+
+function product = multiply(x, y)
+if isempty(x)
+    product = [];
+    return;
+end
+y_cell = repmat({y}, size(x));
+product = cellfun(@times, x, y_cell, 'UniformOutput', false);
+end
+function product = mdivide(x, y)
+if isempty(x) || isempty(y)
+    product = [];
+    return;
+end
+product = cellfun(@mldivide, x, y, 'UniformOutput', false);
+end
+
+function vec = take_unit_vec(matrix, index)
+vec = cellfun(@(x) x(1:3, index), matrix, 'UniformOutput', false);
+end
+function result = bycell(a, b, func)
+result = cellfun(@(x, y) func(x,y), a, b, 'UniformOutput', false);
 end
