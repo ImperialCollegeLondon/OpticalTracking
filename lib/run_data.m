@@ -22,8 +22,9 @@ gTpti = findTrackerFixedFrames(data.patella.rotations, data.patella.translations
 
 %% Calculate transformation matricies from body fixed to global fixed frames and motion relative to initial position
 
-output(length(gTfti)) = struct('flexion', [], 'varus', [], 'external', [], 'lateral', [], 'anterior', [], 'superior', []);
-
+% output(length(gTfti)) = struct('flexion', [], 'varus', [], 'external', [], 'lateral', [], 'anterior', [], 'superior', []);
+output = table();
+difference = table();
 %% All elements at once
 
     %calculate the body fixed motion relative to the global coordinates
@@ -58,37 +59,34 @@ e2_= bycell(e3_, e1_, ucross);%Floating axis in global reference frame, Grood an
 flexion = asind(cellfun(@(e, k) dot(-e, k), e2_,K_));
 beta = acosd(cellfun(@(i, k) dot(i, k), I_,k_));
 
+H_ = cellfun(@(t, f) (t(1:3) - f(1:3))', grti(:,1), grfi(:,1), 'UniformOutput', false);%translation vector of from femoral origin to tibial origin (in global coordinate frame)
     if right
         external = asind(cellfun(@(e,i) dot(-e, i), e2_, i_));
         varus = 90-beta;
+        lateral = cellfun(@dot, H_,e1_);%projected onto the medial lateral axis e1
     else
         external = asind(cellfun(@(e,i) dot(e, i), e2_, i_));
         varus = -(90-beta);
+        lateral = cellfun(@(h,e) dot(h, -e), H_, e1_);
     end
     
     %     H_=tibiaOrigin-femurOrigin;
-    H_(i,:)=[grti{i,1}(1:3)-grfi{i,1}(1:3)]';%translation vector of from femoral origin to tibial origin (in global coordinate frame)
-    if right
-        lateral = dot(H_(i,:),e1_);%projected onto the medial lateral axis e1
-    else
-        lateral = dot(H_(i,:),-e1_);
-    end
-    anterior = dot(H_(i,:),e2_);%projected onto the anterior posterior axis e2
-    distal = -dot(H_(i,:),e3_);%projected onto the compression distraction axis e3, minus sign to make distraction +ve
+    anterior = cellfun(@dot, H_,e2_);%projected onto the anterior posterior axis e2
+    distal = cellfun(@(h,e) -dot(h, e), H_, e3_);%projected onto the compression distraction axis e3, minus sign to make distraction +ve
     
     
     %Code to check between different notations
-    [angles(i,:),trfi{i,1}(1,:)]=rotationsAndTranslations(fTt{i},right);
-
-    trfi{i,1}(1,:)=-trfi{i,1}(1,:);%which also equals gTti{i,1}\(grfi{i,1}-grti{i,1})
-
-    B=fTt{i};%B notation used in equations 18-20 in grood and suntay, note they use a matrix with translation rows 2-4 in column 1, here it is column 4 rows 1-3, and rotations are similarly mapped
-    q(i,1)=B(1,4);
-    if ~right
-        q(i,1)=-q(i,1);
-    end
-    q(i,2)=B(2,4)*cosd(angles(i,1))-B(3,4)*sind(angles(i,1));
-    q(i,3)=-(B(1,3)*B(1,4)+B(2,3)*B(2,4)+B(3,3)*B(3,4));
+    % [angles(i,:),trfi{i,1}(1,:)]=rotationsAndTranslations(fTt{i},right);
+    % 
+    % trfi{i,1}(1,:)=-trfi{i,1}(1,:);%which also equals gTti{i,1}\(grfi{i,1}-grti{i,1})
+    % 
+    % B=fTt{i};%B notation used in equations 18-20 in grood and suntay, note they use a matrix with translation rows 2-4 in column 1, here it is column 4 rows 1-3, and rotations are similarly mapped
+    % q(i,1)=B(1,4);
+    % if ~right
+    %     q(i,1)=-q(i,1);
+    % end
+    % q(i,2)=B(2,4)*cosd(angles(i,1))-B(3,4)*sind(angles(i,1));
+    % q(i,3)=-(B(1,3)*B(1,4)+B(2,3)*B(2,4)+B(3,3)*B(3,4));
 
     
     % fRtCheck{i,1}=[dot(I_,i_) dot(I_,j_) dot(I_,k_)
@@ -99,22 +97,24 @@ beta = acosd(cellfun(@(i, k) dot(i, k), I_,k_));
 
 
     
-    output(i).flexion = flexion;
-    output(i).varus = varus;
-    output(i).external = external;
-    output(i).lateral = lateral;
-    output(i).anterior = anterior;
-    output(i).superior = distal;
-    
+    output.flexion = flexion;
+    output.varus = varus;
+    output.external = external;
+    output.lateral = lateral;
+    output.anterior = anterior;
+    output.superior = distal;
+    output = table2struct(output);
+
     transforms_global.femur = gTfi;
     transforms_global.tibia = gTti;
+    
 
-    difference(i).flexion = angles(:,1) - output(i).flexion;
-    difference(i).varus = angles(:,2) - output(i).varus;
-    difference(i).external = angles(:,3) - output(i).external;
-    difference(i).lateral = q(:,1) - output(i).lateral;
-    difference(i).anterior = q(:,2) - output(i).anterior;
-    difference(i).superior = q(:,3) - output(i).superior;
+    % difference.flexion = angles(:,1) - output(i).flexion;
+    % difference.varus = angles(:,2) - output(i).varus;
+    % difference.external = angles(:,3) - output(i).external;
+    % difference.lateral = q(:,1) - output(i).lateral;
+    % difference.anterior = q(:,2) - output(i).anterior;
+    % difference.superior = q(:,3) - output(i).superior;
 
 end
 

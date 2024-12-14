@@ -52,7 +52,9 @@ for i = 1:numel(data_raw)
     data(i).femur = extract_from_label(data_sanitised(i).probes, label_f.femur);
     data(i).patella = extract_from_label(data_sanitised(i).probes, label_f.patella);
     output(i).name = data_sanitised(i).name;
+    tic
     [output(i).data, difference, g_transforms]= run_data(data(i), trackers, right);
+    toc
 
     % Shift flexion so max extension is 0:
     % flex = num2cell([output(i).data.flexion] - min([output(i).data.flexion]));
