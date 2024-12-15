@@ -58,7 +58,7 @@ for i = 1:numel(data_raw)
     % Shift flexion so max extension is 0:
     % flex = num2cell([output(i).data.flexion] - min([output(i).data.flexion]));
     % Shift max flexion to be 120 deg
-    [output(i).tibiofemoral.flexion] = output(i).tibiofemoral.flexion + 120 - max(output(i).tibiofemoral.flexion);
+    % [output(i).tibiofemoral.flexion] = output(i).tibiofemoral.flexion + 120 - max(output(i).tibiofemoral.flexion);
 end
 [g_transforms.name] = deal(output.name);
 
