@@ -1,5 +1,6 @@
-function [landmarks, use_quaternion, probe_labels, is_polaris] = load_data(filepath, labels)
+function [landmarks, use_quaternion, probe_labels, is_polaris, idx_interpolation] = load_data(filepath, labels)
 csv_files = dir(fullfile(filepath, "*.csv"));
+csv_files = csv_files(~contains({csv_files.name}, '3d.csv'));
 tsv_files = dir(fullfile(filepath, "*.tsv"));
 files = [csv_files; tsv_files];
 
@@ -10,15 +11,19 @@ for i = 1:numel(files)
     fp = fullfile(files(i).folder, files(i).name);
     remove_whitespaces(fp);
     data = readtable(fp, "VariableNamingRule","preserve");
+    
+    %% Interpolate data to fill out any gaps.
+    [data, idx_all_interpolation] = fillmissing(data, "movmedian", 50);
+    idx_interpolation{i} = any(idx_all_interpolation, 2);
+
+    data = smoothdata(data, "gaussian", 20);
     use_quaternion = any(contains(lower(data.Properties.VariableNames), "q0"));
     is_polaris = any(contains(data.Properties.VariableNames, "Port"));
-    
     if is_polaris
         landmarks(i).probes = load_data_polaris(data, use_quaternion);
     else
         landmarks(i).probes = load_data_certus(data);
     end
-    
     
 end
 
