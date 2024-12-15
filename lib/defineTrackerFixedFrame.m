@@ -3,6 +3,10 @@ function [ gTt0 ] = defineTrackerFixedFrame(eulerAngles,XYZ)
 % > euler angles => Rx, Ry, Rz as arguments
 % > XYZ => x, y, z as arguments
 
+if isempty(eulerAngles) || isempty(XYZ)
+    gTt0 = [];
+    return;
+end
 i=1;
 
 Rx=eulerAngles(i,1);

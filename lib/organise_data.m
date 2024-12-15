@@ -1,4 +1,5 @@
 function output = organise_data(landmarks, probe_labels, is_quaternion)
+warning = false;
 for i = 1:numel(landmarks)
     lmk_name = {landmarks.name};
     output(i).name = lmk_name{i};
@@ -20,10 +21,24 @@ for i = 1:numel(landmarks)
         ty = probe_data{:, contains(header, "Ty")}(:,1);
         tz = probe_data{:, contains(header, "Tz")}(:,1);
 
-        probes(j).probe = landmarks(i).probes(j).probe{:};
+        probe_name = landmarks(i).probes(j).probe;
+        if ischar(probe_name) || isstring(probe_name)
+            probes(j).probe = probe_name;
+        else
+            probes(j).probe = probe_name{:};
+        end
+        % probes(j).probe = landmarks(i).probes(j).probe{:};
         labels = {probe_labels.label};
 
-        probes(j).label = labels(strcmp([probe_labels.name], probes(j).probe));
+        label = labels(strcmp([probe_labels.name], probes(j).probe));
+    if isempty(label)
+        warning = true;
+        warning_probe = probe_name;
+        label = '';
+    elseif ~ischar(label) || ~isstring(label)
+            label = label{:};
+        end
+        probes(j).label = label;
         probes(j).Rx = rx;
         probes(j).Ry = ry;
         probes(j).Rz = rz;
@@ -38,6 +53,9 @@ for i = 1:numel(landmarks)
     end
     output(i).probes = probes;
 
+end
+if warning
+fprintf("Warning: Undefined label for %s\n", warning_probe);
 end
 
 end

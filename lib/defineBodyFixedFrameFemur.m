@@ -1,4 +1,4 @@
-function [ gTf0, origin] = defineBodyFixedFrameFemur(med,lat,prox,right)
+function gTf0 = defineBodyFixedFrameFemur(med,lat,prox,right)
 %defines a body fixed frame for the femur.  
 %my notation, _ implies it is a vector e.g. xa_ is the direction vector of
 %the x-axis

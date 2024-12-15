@@ -1,6 +1,9 @@
 function [ gTtiF ] = findTrackerFixedFrames(eulerAngles,XYZ)
 %
-
+if nargin == 0
+    gTtiF = [];
+    return;
+end
 for i=1:size(eulerAngles,1)
     
     Rx=eulerAngles(i,1);
