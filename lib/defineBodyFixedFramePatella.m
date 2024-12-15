@@ -1,7 +1,15 @@
-function gTp0 = defineBodyFixedFramePatella(med,lat,dist,right)
-if isempty(med) || isempty(lat) || isempty(dist)
+function gTp0 = defineBodyFixedFramePatella(patella,right)
+med = patella.medial.translations_mean;
+lat = patella.lateral.translations_mean;
+try
+dist = patella.distal.translations_mean;
+catch
+inf = patella.inferior.translations_mean;
+sup = patella.superior.translations_mean;
+end
+
+if isempty(med) || isempty(lat)
     gTp0 = [];
-    origin = [];
     return
 end
 %defines a body fixed frame for the tibia.  
@@ -31,7 +39,11 @@ else
     i_ = uvector(lat,med)'; %LEFT KNEE, x Axis
 end
 
-tempk_= uvector(dist,origin)'; %the distal point is approximate and thus this axis is not necessarily perpendicular to epicondylar axis
+if dist
+    tempk_= uvector(dist,origin)'; %the distal point is approximate and thus this axis is not necessarily perpendicular to epicondylar axis
+else
+    tempk_= uvector(inf,sup)'; %the inferior (distal) point is approximate and thus this axis is not necessarily perpendicular to epicondylar axis
+end
 j_ = ucross(tempk_,i_); % y-axis
 k_ = ucross(i_,j_); %recalculate k so perpendicular to give orthogonal coordinate system.
 

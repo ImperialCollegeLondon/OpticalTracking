@@ -1,11 +1,11 @@
 function trackers = bone_to_tracker_transform(tibia, femur, patella, right)
 %% Define coordinate systems for each bone using digitised points
 % For tibia
-gTt0 = defineBodyFixedFrameTibia(tibia.medial.translations_mean, tibia.lateral.translations_mean, tibia.distal.translations_mean, right);
+gTt0 = defineBodyFixedFrameTibia(tibia, right);
 grt0 = origins(gTt0);
-gTf0 = defineBodyFixedFrameFemur(femur.medial.translations_mean, femur.lateral.translations_mean, femur.proximal.translations_mean, right);
+gTf0 = defineBodyFixedFrameFemur(femur, right);
 grf0 = origins(gTf0);
-gTp0 = defineBodyFixedFramePatella(patella.medial.translations_mean, patella.lateral.translations_mean, patella.distal.translations_mean, right);
+gTp0 = defineBodyFixedFramePatella(patella, right);
 grp0 = origins(gTp0);
 
 %% Define frame of reference for each of the trackers in global coordinates

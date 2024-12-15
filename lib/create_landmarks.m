@@ -1,5 +1,13 @@
 function landmarks = create_landmarks(landmark_raw_data, label)
-
+%% Create landmarks
+% Expects the file names to include both the bone and the position, e.g.,
+% tibia-medial or femur_proximal. Doesn't care about order or what
+% separates the words.
+%
+% If neither can be found, it looks for the first letter of each word,
+% e.g., for tibia medial it looks for TM.
+% 
+% For Patella, it needs either distal or both inferior and superior.
 
 %% Tibia
 id = find_landmark(landmark_raw_data, {'tibia', 'medial'});
@@ -13,7 +21,6 @@ landmarks.tibia.distal = extract_from_label(landmark_raw_data(id).probes, label.
 
 landmarks.tibia.tracker = extract_from_label(landmark_raw_data(1).probes, label.tibia);
 
-
 %% Femur
 id = find_landmark(landmark_raw_data, {'femur', 'medial'});
 landmarks.femur.medial = extract_from_label(landmark_raw_data(id).probes, label.probe);
@@ -25,8 +32,6 @@ id = find_landmark(landmark_raw_data, {'femur', 'proximal'});
 landmarks.femur.proximal = extract_from_label(landmark_raw_data(id).probes, label.probe);
 
 landmarks.femur.tracker = extract_from_label(landmark_raw_data(1).probes, label.femur);
-
-
 %% Patella
 id = find_landmark(landmark_raw_data, {'patella', 'medial'});
 if ~any(id)
@@ -42,8 +47,16 @@ landmarks.patella.medial = extract_from_label(landmark_raw_data(id).probes, labe
 id = find_landmark(landmark_raw_data, {'patella', 'lateral'});
 landmarks.patella.lateral = extract_from_label(landmark_raw_data(id).probes, label.probe);
 
-id = find_landmark(landmark_raw_data, {'patella', 'distal'});
-landmarks.patella.distal = extract_from_label(landmark_raw_data(id).probes, label.probe);
+try
+    id = find_landmark(landmark_raw_data, {'patella', 'distal'});
+    landmarks.patella.distal = extract_from_label(landmark_raw_data(id).probes, label.probe);
+catch
+    id = find_landmark(landmark_raw_data, {'patella', 'inferior'});
+    landmarks.patella.inferior = extract_from_label(landmark_raw_data(id).probes, label.probe);
+
+    id = find_landmark(landmark_raw_data, {'patella', 'superior'});
+    landmarks.patella.superior = extract_from_label(landmark_raw_data(id).probes, label.probe);
+end
 
 landmarks.patella.tracker = extract_from_label(landmark_raw_data(1).probes, label.patella);
 

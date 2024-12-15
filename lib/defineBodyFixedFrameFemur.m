@@ -1,4 +1,7 @@
-function gTf0 = defineBodyFixedFrameFemur(med,lat,prox,right)
+function gTf0 = defineBodyFixedFrameFemur(femur,right)
+med = femur.medial.translations_mean;
+lat = femur.lateral.translations_mean;
+prox = femur.proximal.translations_mean;
 %defines a body fixed frame for the femur.  
 %my notation, _ implies it is a vector e.g. xa_ is the direction vector of
 %the x-axis

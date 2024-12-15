@@ -67,11 +67,11 @@ for i = 1:numel(input_raw)
     % flex = num2cell([output(i).tibiofemoral.flexion] - min([output(i).tibiofemoral.flexion]));
     data(i).tibiofemoral.flexion = [data(i).tibiofemoral.flexion] - min([data(i).tibiofemoral.flexion]);
     % Shift max flexion to be 120 deg
-    % [output(i).tibiofemoral.flexion] = output(i).tibiofemoral.flexion + 120 - max(output(i).tibiofemoral.flexion);
+    % [data(i).tibiofemoral.flexion] = data(i).tibiofemoral.flexion + 120 - max(data(i).tibiofemoral.flexion);
 end
 [g_transforms.name] = deal(data.name);
 
 %% Plot
-for i = 1:numel(input_organised)
+for i = 1:numel(data)
 plot_tf(data(i).name, data(i).tibiofemoral, idx_interpolation{i})
 end

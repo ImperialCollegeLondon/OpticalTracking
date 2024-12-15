@@ -1,4 +1,7 @@
-function gTt0 = defineBodyFixedFrameTibia(med,lat,dist,right)
+function gTt0 = defineBodyFixedFrameTibia(tibia,right)
+med = tibia.medial.translations_mean;
+lat = tibia.lateral.translations_mean;
+dist = tibia.distal.translations_mean;
 %defines a body fixed frame for the tibia.  
 %my notation, _ implies it is a vector e.g. xa_ is the direction vector of
 %the x-axis
