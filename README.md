@@ -10,12 +10,18 @@ Once calibration is complete, another popup window will show up. Pick the folder
 
 ## Overview
 To understand what this code does, take a look at this image. We're assuming the z-axis is 0 to make life easier.
-![rigid-bodies-demonstration](https://github.com/user-attachments/assets/224b66f0-a5d4-4d39-88bf-66405e6e7944)
+
+![rigid-bodies-demonstration](https://github.com/user-attachments/assets/995f4cdf-66b9-4d40-a1e5-de14d93a6faa)
+
 
 The blue and red are objects in space with orientations based on their x and y axes.
 The optical tracking camera gives us the black x,y axes (the _global_ frame of reference), but we are interested in the motion of the blue object relative to the red.
 
 The origin of the ![blue](https://placehold.co/15x15/0000ff/0000ff.png) blue object could be described as `(2,1,0)` in the ![black](https://placehold.co/15x15/000/000.png)global reference, or `(1,-1, 0)` relative to the ![red](https://placehold.co/15x15/ff0000/ff0000.png) red object.
+
+![rigid-bodies-demonstration-arrows](https://github.com/user-attachments/assets/a9bd3416-8e03-45f2-9baf-b62679a21f6f)
+
+
 In our notation, these would be:
 ```math
 _gr_b = \begin{bmatrix} 2 \\\ 1 \\\ 0 \end{bmatrix} \quad \quad _rr_b = \begin{bmatrix} 1 \\\ -1 \\\ 0 \end{bmatrix}
@@ -33,7 +39,7 @@ R_{zx} & R_{zy} & R_{zz} & t_z \\\
 0 & 0 & 0 & 1
 \end{bmatrix} 
 ```
-`t`, the translations, are x,y,z translations from the global frame of reference to the object. From the image we can see that is `x: 1`, `y: 2`, `z:0`
+`t`, the translations, are x,y,z translations from the global frame of reference to the object. From the image we can see that is `x: 1`, `y: 2`, `z: 0`
 ```math
 _gT_r = 
 \begin{bmatrix}
@@ -60,7 +66,11 @@ _gT_r =
 \end{bmatrix} 
 ```
 
-If we apply the same logic to the blue object and assume, say, 60 degrees, then the `i` unit vector (x axis) has rotated like so: 
+If we apply the same logic to the blue object and assume, say, 60 degrees, then the `i` unit vector (x axis) has rotated like so:
+
+![unit-vectors](https://github.com/user-attachments/assets/9ef4b804-decf-4440-99e8-ecb51a2953d5)
+
+
 ```math
  _g\hat{i}_b = \begin{bmatrix}
 \frac{1}{2} \\\ \frac{\sqrt{3}}{2} \\\ 0
