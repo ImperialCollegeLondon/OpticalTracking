@@ -7,7 +7,6 @@ for i = 1:numel(landmarks)
     for j = 1:numel(n_probes)
         probe_data = landmarks(i).probes(j).data;
         if is_quaternion
-            % Requires double checking.
             [rx, ry, rz] = quaternion2euler(probe_data.Q0, probe_data.Qx, probe_data.Qy, probe_data.Qz);
         else
             rx = probe_data.Rx;
@@ -46,9 +45,9 @@ for i = 1:numel(landmarks)
         probes(j).Ty = ty;
         probes(j).Tz = tz;
         probes(j).rotations = [rx ry rz];
-        probes(j).rotations_mean = mean(probes(j).rotations);
+        probes(j).rotations_mean = mean(probes(j).rotations, "omitmissing");
         probes(j).translations = [tx ty tz];
-        probes(j).translations_mean = mean(probes(j).translations);
+        probes(j).translations_mean = mean(probes(j).translations, "omitmissing");
 
     end
     output(i).probes = probes;
