@@ -46,21 +46,23 @@ trackers = bone_to_tracker_transform(landmarks.tibia, landmarks.femur, landmarks
 
 %% Sanitise data
 data_sanitised = sanitise_data(data_raw, probe_labels, use_quaternion);
+g_transforms = struct('tibia', [], 'femur', [], 'patella', []);
+g_transforms = repmat(g_transforms, 1, length(data_sanitised));
 for i = 1:numel(data_raw)
     data(i).name = data_sanitised(i).name;
     data(i).tibia = extract_from_label(data_sanitised(i).probes, label_f.tibia);
     data(i).femur = extract_from_label(data_sanitised(i).probes, label_f.femur);
     data(i).patella = extract_from_label(data_sanitised(i).probes, label_f.patella);
 
-    [output(i), difference(i), g_transforms(i)]= run_data(data(i), trackers, right);
+    [output(i), g_transforms(i)]= run_data(data(i), trackers, right);
     % Shift flexion so max extension is 0:
     % flex = num2cell([output(i).data.flexion] - min([output(i).data.flexion]));
     % Shift max flexion to be 120 deg
-    [output(i).data.flexion] = output(i).data.flexion + 120 - max(output(i).data.flexion);
+    [output(i).tibiofemoral.flexion] = output(i).tibiofemoral.flexion + 120 - max(output(i).tibiofemoral.flexion);
 end
 [g_transforms.name] = deal(output.name);
 
 %% Plot
 for i = 1:numel(data_sanitised)
-plot_all(output(i))
+plot_all(output(i).name, output(i).tibiofemoral)
 end
