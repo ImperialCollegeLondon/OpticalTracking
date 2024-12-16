@@ -73,5 +73,6 @@ end
 
 %% Plot
 for i = 1:numel(data)
-plot_tf(data(i).name, data(i).tibiofemoral, idx_interpolation{i})
+raw_plot_tf(data(i).name, data(i).tibiofemoral, idx_interpolation{i})
+% plot_tf(data(i).name, data(i).tibiofemoral, idx_interpolation{i})
 end
