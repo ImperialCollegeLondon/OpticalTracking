@@ -17,7 +17,7 @@ label.polaris.probe = "Probe";
 label.certus.tibia = "tibia";
 label.certus.femur = "femur";
 label.certus.patella = "patella";
-label.certus.probe = "Probe";
+label.certus.probe = "Probe"; % Don't change this even if the probe is called something else. Certus probe just needs to have a space in the name and it'll be found.
 
 %% Create calibration files
 disp("Choose the calibration folder");
