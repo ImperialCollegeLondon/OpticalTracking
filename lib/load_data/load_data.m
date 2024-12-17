@@ -12,16 +12,19 @@ for i = 1:numel(files)
     remove_whitespaces(fp);
     data = readtable(fp, "VariableNamingRule","preserve");
     
-    %% Interpolate data to fill out any gaps.
-    [data, idx_all_interpolation] = fillmissing(data, "movmedian", 50);
-    idx_interpolation{i} = any(idx_all_interpolation, 2);
-
-    data = smoothdata(data, "gaussian", 20);
     use_quaternion = any(contains(lower(data.Properties.VariableNames), "q0"));
     is_polaris = any(contains(data.Properties.VariableNames, "Port"));
     if is_polaris
         landmarks(i).probes = load_data_polaris(data, use_quaternion);
+        idx_interpolation{i}=[];
     else
+            %% Interpolate data to fill out any gaps.
+            %Should be moved back to both, but here for now. Solution might
+            %be to clean polaris data, or use the filtering after
+            %organisation.
+        [data, idx_all_interpolation] = fillmissing(data, "movmedian", 50);
+        idx_interpolation{i} = any(idx_all_interpolation, 2);
+        data = smoothdata(data, "gaussian", 20);
         landmarks(i).probes = load_data_certus(data);
     end
     
