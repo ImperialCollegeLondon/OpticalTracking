@@ -1,4 +1,13 @@
 function result = motion_tibiofemoral(relative_position, femur, tibia, right)
+if isempty(relative_position)
+result.flexion = [];
+result.varus = []; % Equivalent to varus
+result.external = []; % Equivalent to external
+result.lateral = []; % Equivalent to lateral
+result.anterior = [];
+result.superior = [];
+    return;
+end
 fTt = relative_position;
 e1_=femur.i;%Femoral X axis in global reference frame, Grood and Suntay definition
 e3_=tibia.k;%Tibial z axis in global reference frame, Grood and Suntay definition
