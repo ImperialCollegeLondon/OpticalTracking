@@ -13,7 +13,7 @@ idx_sweep(idx_sweep > numel(local_minima)) = idx(end);
 idx_sweep(idx_sweep < 1) = 1;
 changes_over_time = diff(input(idx_sweep), 2, 2) > 1;
 
-large_change = logical(zeros(size(local_minima)));
+large_change = false(size(local_minima));
 large_change(idx(find(changes_over_time))) = true;
 
 close_to_extension = input < mean(input, "omitmissing")/4;
@@ -55,17 +55,20 @@ else
         minima_clusters{end+1} = idx_minima(j);
     end
 
-    minima = use_midpoint(minima_clusters);
+    minima = get_min_from_clusters(minima_clusters, input);
 end
 
 minima = nearby_if_nan(minima, input);
 end
 
-function output = use_midpoint(cluster)
+function output = get_min_from_clusters(cluster, input)
 for i = 1:length(cluster)
+% Find the median value in the cluster of minima. Alternative is to find
+% the minimum on the cluster.
 med = median(cluster{i});
-men = mean(cluster{i});
 output(i) = round(med);
+% [min_val, min_idx] = min(input(cluster{i}));
+% output(i) = cluster{i}(min_idx);
 end
 end
 
