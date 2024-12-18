@@ -27,7 +27,7 @@ else
     varus=-(90-beta);
 end
 
-pH_ = [patella.point(1:3)-femur.point(1:3)]';%translation vector of from femoral origin to tibial origin (in global coordinate frame)
+pH_ = [patella.point(1:3,:) - femur.point(1:3,:)];%translation vector of from femoral origin to tibial origin (in global coordinate frame)
 if right
     lateral=dot(pH_,e1_);%projected onto the medial lateral axis e1
 else
@@ -36,10 +36,10 @@ end
 anterior=dot(pH_,pe2_);%projected onto the anterior posterior axis e2
 superior=-dot(pH_,pe3_);%projected onto the compression distraction axis e3, minus sign to make distraction +ve
 
-result.flexion = angles(1);
-result.medial_rotation = varus; % Equivalent to varus
-result.lateral_tilt = external; % Equivalent to external
-result.medial_shift = lateral; % Equivalent to lateral
-result.anterior = anterior;
-result.superior = superior;
+result.flexion = angles(:,1);
+result.medial_rotation = varus'; % Equivalent to varus
+result.lateral_tilt = external'; % Equivalent to external
+result.medial_shift = lateral'; % Equivalent to lateral
+result.anterior = anterior';
+result.superior = superior';
 end

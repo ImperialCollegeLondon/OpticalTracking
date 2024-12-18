@@ -4,5 +4,5 @@ if isempty(u_) || isempty(v_)
     res = [];
     return
 end
-res = cross(u_,v_)/norm(cross(u_,v_),2);
+res = cross(u_,v_)./vecnorm(cross(u_,v_));
 end

@@ -65,12 +65,13 @@ for i = 1:numel(input_raw)
     [data(i), g_transforms(i)]= run_data(input(i), trackers, is_right_knee);
     % Shift flexion so max extension is 0:
     % flex = num2cell([output(i).tibiofemoral.flexion] - min([output(i).tibiofemoral.flexion]));
+    
     data(i).tibiofemoral.flexion = [data(i).tibiofemoral.flexion] - min([data(i).tibiofemoral.flexion]);
+    
     % Shift max flexion to be 120 deg
     % [data(i).tibiofemoral.flexion] = data(i).tibiofemoral.flexion + 120 - max(data(i).tibiofemoral.flexion);
 end
 [g_transforms.name] = deal(data.name);
-
 %% Plot
 for i = 1:numel(data)
 raw_plot_tf(data(i).name, data(i).tibiofemoral, idx_interpolation{i})
