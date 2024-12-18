@@ -72,8 +72,24 @@ for i = 1:numel(input_raw)
     % [data(i).tibiofemoral.flexion] = data(i).tibiofemoral.flexion + 120 - max(data(i).tibiofemoral.flexion);
 end
 [g_transforms.name] = deal(data.name);
-%% Plot
+
+%% Plot data over time or over flexion
 for i = 1:numel(data)
 raw_plot_tf(data(i).name, data(i).tibiofemoral, idx_interpolation{i})
 % plot_tf(data(i).name, data(i).tibiofemoral, idx_interpolation{i})
 end
+%% Move the STL
+stl_plot("models/tibia_uka-m.stl", g_transforms(1).tibia, "models/femur_uka-m.stl", g_transforms(1).femur);
+
+%% Write to csv
+fp_results = fullfile(fp_data, "Results");
+mkdir(fp_results);
+for i = 1:numel(data)
+    writetable(data(i).tibiofemoral, fullfile(fp_results, data(i).name + ".csv"))
+end
+
+%% Visualisation of Landmarks
+plot_landmarks(landmarks, is_right_knee);
+
+%% Visualisation of kinematics
+visualise_kinematics(g_transforms(1));
