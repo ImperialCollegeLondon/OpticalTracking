@@ -77,3 +77,10 @@ for i = 1:numel(data)
 raw_plot_tf(data(i).name, data(i).tibiofemoral, idx_interpolation{i})
 % plot_tf(data(i).name, data(i).tibiofemoral, idx_interpolation{i})
 end
+
+%% Write to csv
+fp_results = fullfile(fp_data, "Results");
+mkdir(fp_results);
+for i = 1:numel(data)
+    writetable(data(i).tibiofemoral, fullfile(fp_results, data(i).name + ".csv"))
+end
