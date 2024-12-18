@@ -55,6 +55,7 @@ data_all_probes = organise_data(input_raw, probe_labels, use_quaternion);
 clear g_transforms
 g_transforms = struct('tibia', [], 'femur', [], 'patella', []);
 g_transforms = repmat(g_transforms, 1, length(data_all_probes));
+tic
 for i = 1:numel(input_raw)
     input(i).name = data_all_probes(i).name;
     % Assign the tracker to the right bone.
@@ -65,12 +66,14 @@ for i = 1:numel(input_raw)
     [data(i), g_transforms(i)]= run_data(input(i), trackers, is_right_knee);
     % Shift flexion so max extension is 0:
     % flex = num2cell([output(i).tibiofemoral.flexion] - min([output(i).tibiofemoral.flexion]));
+    
     data(i).tibiofemoral.flexion = [data(i).tibiofemoral.flexion] - min([data(i).tibiofemoral.flexion]);
+    
     % Shift max flexion to be 120 deg
     % [data(i).tibiofemoral.flexion] = data(i).tibiofemoral.flexion + 120 - max(data(i).tibiofemoral.flexion);
 end
+toc
 [g_transforms.name] = deal(data.name);
-
 %% Plot
 for i = 1:numel(data)
 raw_plot_tf(data(i).name, data(i).tibiofemoral, idx_interpolation{i})
