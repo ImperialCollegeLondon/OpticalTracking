@@ -26,12 +26,6 @@ fp_digitisation = uigetdir(".", "Choose the digitisation folder");
 %% Load digitisation
 [digitisation, use_quaternion, probe_labels, is_polaris, ~] = load_data(fp_digitisation, label);
 
-%% Load experiment data
-disp("Choose the data folder");
-fp_data = uigetdir(".", "Choose the data folder");
-%%
-[input_raw, ~, ~, ~, idx_interpolation] = load_data(fp_data, label);
-
 if is_polaris
     disp("Detected Polaris data.");
     label_f = label.polaris;
@@ -47,7 +41,16 @@ landmark_raw_data = organise_data(digitisation, probe_labels, use_quaternion);
 landmarks = create_landmarks(landmark_raw_data, label_f);
 % Calculate bone to tracker transforms
 trackers = bone_to_tracker_transform(landmarks.tibia, landmarks.femur, landmarks.patella, is_right_knee);
+%% Visualisation of Landmarks
+plot_landmarks(landmarks, is_right_knee);
 
+
+
+%% Load experiment data
+disp("Choose the data folder");
+fp_data = uigetdir(".", "Choose the data folder");
+
+[input_raw, ~, ~, ~, idx_interpolation] = load_data(fp_data, label);
 
 %% Organise the raw data into the expected struct. Probably should be implemented as a class instead.
 data_all_probes = organise_data(input_raw, probe_labels, use_quaternion);
@@ -79,7 +82,7 @@ raw_plot_tf(data(i).name, data(i).tibiofemoral, idx_interpolation{i})
 % plot_tf(data(i).name, data(i).tibiofemoral, idx_interpolation{i})
 end
 %% Move the STL
-stl_plot("models/tibia_uka-m.stl", g_transforms(1).tibia, "models/femur_uka-m.stl", g_transforms(1).femur);
+stl_plot("models/tibia2.stl", g_transforms(1).tibia, "models/femur2.stl", g_transforms(1).femur);
 
 %% Write to csv
 fp_results = fullfile(fp_data, "Results");
@@ -87,9 +90,6 @@ mkdir(fp_results);
 for i = 1:numel(data)
     writetable(data(i).tibiofemoral, fullfile(fp_results, data(i).name + ".csv"))
 end
-
-%% Visualisation of Landmarks
-plot_landmarks(landmarks, is_right_knee);
 
 %% Visualisation of kinematics
 visualise_kinematics(g_transforms(1));
