@@ -17,6 +17,7 @@ f_points = [femur.Points, ones(size(femur.Points, 1), 1)]'; % 4 x n
 f_transformed_points = pagemtimes(femur_transform, f_points); % 4 x m x n
 % Extract x,y,z and turn into 2D
 f_x = squeeze(f_transformed_points(1, :, :))';
+f_x = -f_x + 1.6*t_x(1);
 f_y = squeeze(f_transformed_points(2, :, :))';
 f_z = squeeze(f_transformed_points(3, :, :))';
 
