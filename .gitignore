@@ -1,4 +1,7 @@
+log.txt
+**/Results
 /target
+*.asv
 *.nco
 *.nrw
 *.n3d
