@@ -1,8 +1,5 @@
-clc;
-clear; close all;
-set(0,'defaulttextinterpreter','latex')
-
-profile on;
+clc;clear; close all;
+run(fullfile("lib", "configure", "defaults.m"));
 %%
 
 
@@ -84,83 +81,24 @@ catch ME
 end
 
 %% Run
-[datum, transforms] = run(data_raw, trackers, config);
-
-% all_data.(lower(root_ls(k).name)) = data;
-data = datum;
+data_all_probes = organise_data(data_raw, config);
+    for i = 1:numel(data_raw)
+        loading_condition = data_all_probes(i).name;
+        input.name = loading_condition;
+        % Assign the tracker to the right bone.
+        input.tibia = extract_from_label(data_all_probes(i).probes, config.label.tibia);
+        input.femur = extract_from_label(data_all_probes(i).probes, config.label.femur);
+        input.patella = extract_from_label(data_all_probes(i).probes, config.label.patella);
+    
+        [data(i), transforms(i)] = calculate_joint_kinematics(input, trackers, config.is_right_knee);
+    end
 %% STL
-stl_plot("models/tibia-left.stl", transforms(1).tibia, "models/femur-left.stl", transforms(1).femur);
+% stl_plot(config, transforms(1).in_global.tibia, transforms(1).in_global.femur, 1.2)
 
 %% Plot
 plot_intraspecies(data, specimen_name);
 
-% function plot_intraspecies(data)
-% %% PLOT_INTRASPECIES    plots all states 
-% states = fieldnames(data);
-% tiledlayout(3,2);
-% 
-% line_width = 2;
-% for i = 1:numel(states)
-%     state = states{i};
-%     current = data.(state);
-%     % datum = current.tibiofemoral;
-%     flex = current.tibiofemoral.flexion;
-%     ext = current.tibiofemoral.extension;
-% 
-%     % Varus
-%     nexttile(1); hold on; grid on;
-%     plot(flex.flexion, flex.varus, 'LineWidth', line_width)
-%     plot(ext.flexion, ext.varus, 'LineWidth', line_width)
-%     % plot(datum.flexion, datum.varus, 'LineWidth', line_width)
-% 
-%     title("Varus rotation")
-%     xlabel('Flexion ($\circ$)')
-%     ylabel('Varus ($\circ$) +ve')
-%     % External
-%     nexttile(2); hold on; grid on;
-%     plot(flex.flexion, flex.external, 'LineWidth', line_width)
-%     plot(ext.flexion, ext.external, 'LineWidth', line_width)
-%     % plot(datum.flexion, datum.external, 'LineWidth', line_width)
-%     title("External rotation")
-%     xlabel('Flexion ($\circ$)') 
-%     ylabel('External (mm) +ve')
-% 
-%     % Lateral
-%     nexttile(3); hold on; grid on;
-%     % plot(datum.flexion, datum.lateral, 'LineWidth', line_width)
-%     plot(flex.flexion, flex.lateral, 'LineWidth', line_width);
-%     plot(ext.flexion, ext.lateral, 'LineWidth', line_width);
-%     title("Lateral translation")
-%     xlabel('Flexion ($\circ$)') 
-%     ylabel('Lateral (mm) +ve')
-% 
-%     % Anterior
-%     nexttile(4); hold on; grid on;
-%     % plot(datum.flexion, datum.anterior, 'LineWidth', line_width)
-%     plot(flex.flexion, flex.anterior, 'LineWidth', line_width)
-%     plot(ext.flexion, ext.anterior, 'LineWidth', line_width)
-%     title("Anterior translation")
-%     xlabel('Flexion ($\circ$)') 
-%     ylabel('Anterior (mm) +ve')
-% 
-%     % Superior
-%     nexttile(5); hold on; grid on;
-%     % plot(datum.flexion, datum.superior, 'LineWidth', line_width)
-%     plot(flex.flexion, flex.superior, 'LineWidth', line_width)
-%     plot(ext.flexion, ext.superior, 'LineWidth', line_width)
-%     title("Superior translation")
-%     xlabel('Flexion ($\circ$)')
-%     ylabel('Superior (mm) +ve')
-% end
-% 
-% lg = legend(replace(states, '_', ' '), Interpreter="latex");
-% lg.FontSize = 14;
-% 
-% sgt = sgtitle(specimen_name);
-% sgt.Interpreter = "latex";
-% sgt.FontSize = 20;
-% end
-
+%%
 function plot_intraspecies(data, specimen_name)
 %% PLOT_INTRASPECIES    plots all states 
 test_run = {data.name};
@@ -168,7 +106,7 @@ test_run = {data.name};
 for j = 1:numel(test_run)
     figure(j);
     tiledlayout(3,2);
-        datum = data(j).tibiofemoral;
+        datum = config.intraspecimen_smoothing(data(j).tibiofemoral);
         % flex = data.(state)(j).tibiofemoral.flexion;
         % ext = data.(state)(j).tibiofemoral.extension;
         plotting(datum);

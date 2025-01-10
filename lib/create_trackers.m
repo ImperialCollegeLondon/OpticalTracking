@@ -3,7 +3,7 @@ function [trackers, landmarks, config] = create_trackers(fp_digitisation, config
     % knee_states = get_root_files(root, {'digit', 'calibr'}); % Second argument is a list of folders to exclude.
     % 'digit' covers variations of digitisation, digitize, digitise, etc.
     
-    knee_side; % Expects right_knees, left_knees to be created here
+    knee_side; % Expects right_knees, left_knees to be created here. Should not be done this way. 
     config.is_right_knee = get_knee_side(root, right_knees, left_knees);
     
     % specimen_name = get_specimen_name(root); % Assign specimen name based on folder name.

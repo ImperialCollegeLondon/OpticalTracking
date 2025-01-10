@@ -43,6 +43,7 @@ disp("Choose the root folder where all the specimens are")
 root = uigetdir(".", "Choose the root folder");
 
 %%
+specimen_with_duplicates = [];
 specimen_list = get_root_files(root, {'result'}); % Get all files in root and exclude any folders that include `result`
 specimen_folders = fullfile({specimen_list.folder}, {specimen_list.name});
 tic
@@ -58,14 +59,22 @@ for i = 1:numel(specimen_folders)
     if sum(digitisation_file_mask) > 1 % There's more than 1 digitisation file
         digitisation_file_mask(1:find(digitisation_file_mask, 1, "last")-1) = false; % Pick the last one
         warning("Found more than one digitisation folder. Using '%s'", fp_conditions(digitisation_file_mask).name);
+    elseif ~any(digitisation_file_mask)
+        warning("No digitisation files found. Skipping specimen")
+        continue
     end
     fp_digitisation = fullfile(fp_conditions(digitisation_file_mask).folder, fp_conditions(digitisation_file_mask).name);
 
+    try
     [trackers, landmarks, config] = create_trackers(fp_digitisation, config, label); % This mutates config. terrible idea, but fine for now.
+    [data, transforms, ~] = read_run_print_to_file(fp_digitisation, trackers, config);
+    catch ME
+        warning(ME.message);
+        continue;
+    end
     %     %% Visualisation of Landmarks
     % visualise_landmarks(landmarks, config.is_right_knee);
 
-    [data, transforms, ~] = read_run_print_to_file(fp_digitisation, trackers, config);
     states = fieldnames(data);
     state_data = struct2cell(data);
 
@@ -79,7 +88,9 @@ for i = 1:numel(specimen_folders)
 end
 disp("Done loading data")
 toc
-
+if isempty(specimen_with_duplicates)
+    return
+end
 %% Post process
 % Condense data
 specimens = remove_duplicate_specimens(specimen_with_duplicates);

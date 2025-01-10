@@ -42,7 +42,7 @@ label.certus.probe = 'Probe'; % Don't change this even if the probe is called so
 
 %% STL files
 config.stl.tibia_left = "models/tibia-left.stl";
-config.stl.tibia_right = "models/tibia-right-test.stl";
+config.stl.tibia_right = "models/tibia-right.stl";
 config.stl.femur_left = "models/femur-left.stl";
 config.stl.femur_right = "models/femur-right.stl";
 

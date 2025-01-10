@@ -6,5 +6,13 @@ function is_right_knee = get_knee_side(root, right_text, left_text)
         is_right_knee = true;
     elseif any(test_name_split == lower(left_text), "all")
         is_right_knee = false;
+    else
+        files = string({dir(root).name});
+        files = files(~ismember(lower(files), [".", "..", "results"]));
+        if isscalar(files)
+            is_right_knee = get_knee_side(files, right_text, left_text);
+        else
+            error("Could not determine knee side. Folder name should indicate the side.")
+        end
     end
 end
