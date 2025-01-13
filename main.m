@@ -49,6 +49,7 @@ specimen_folders = fullfile({specimen_list.folder}, {specimen_list.name});
 tic
 for i = 1:numel(specimen_folders)
     specimen_name = get_specimen_name(specimen_list(i).name);
+    config.specimen_name = specimen_name;
     fprintf("%d. Specimen: %s\n", i, specimen_name);
     fp_conditions = get_root_files(specimen_folders{i}, {});
     if isempty(fp_conditions)
@@ -69,11 +70,13 @@ for i = 1:numel(specimen_folders)
     [trackers, landmarks, config] = create_trackers(fp_digitisation, config, label); % This mutates config. terrible idea, but fine for now.
     [data, transforms, ~] = read_run_print_to_file(fp_digitisation, trackers, config);
     catch ME
-        warning(ME.message);
-        continue;
+        if config.debug
+            rethrow(ME)
+        else
+            warning(ME.message);
+            continue;
+        end
     end
-    %     %% Visualisation of Landmarks
-    % visualise_landmarks(landmarks, config.is_right_knee);
 
     states = fieldnames(data);
     state_data = struct2cell(data);
@@ -89,7 +92,7 @@ end
 disp("Done loading data")
 toc
 if isempty(specimen_with_duplicates)
-    return
+    error("No specimens were run. To see all errors, go to lib/configure/defaults.m, and set config.debug = true.")
 end
 %% Post process
 % Condense data

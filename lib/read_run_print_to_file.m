@@ -20,6 +20,9 @@ function [data, transforms, idx_interpolation] = read_run_print_to_file(fp_digit
     
         %% Run
 
+        if config.debug
+            fprintf("%s:\n", state_clean);
+        end
         [datum, transforms.(state_clean)] = generate_intraspecimen_jcs(data_raw, trackers, config);
 
         if config.print_single_runs

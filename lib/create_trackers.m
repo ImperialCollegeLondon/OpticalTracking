@@ -21,10 +21,16 @@ function [trackers, landmarks, config] = create_trackers(fp_digitisation, config
     landmark_raw = organise_data(digitisation, config);
     % Assign the rigid body landmarks using the probe, and create their respective trackers
     landmarks = create_landmarks(landmark_raw, config);
+
+    if config.debug
+        % %% Visualisation of Landmarks
+        visualise_landmarks(landmarks, config);
+        keyboard;
+    end
+
     % Calculate bone to tracker transforms in global coordinate system
     trackers = bone_to_tracker_transform(landmarks, config);
-    % %% Visualisation of Landmarks
-    % plot_landmarks(landmarks, config.is_right_knee);
+
 end
 
 function config = merge_config(config, new_config)

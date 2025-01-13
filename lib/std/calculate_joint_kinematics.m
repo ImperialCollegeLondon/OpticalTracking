@@ -1,4 +1,5 @@
-function [output, transforms] = calculate_joint_kinematics(data, trackers, right)
+function [output, transforms] = calculate_joint_kinematics(data, trackers, config)
+right = config.is_right_knee;
 % Use RvA nomenclature for all transforms and references (origins)
 ttTtc = trackers.tibia.transform;
 ttrtc = trackers.tibia.origin;
@@ -19,6 +20,7 @@ gTpti = findTrackerFixedFrames(data.patella.rotations, data.patella.translations
 gTfi = pagemtimes(gTfti, ftTfc);%multiply here instead of multiply by inverse as detailed in Pam's method
 gTti = pagemtimes(gTtti, ttTtc);%multiply here instead of divide in Pam's method
 fTt = pagemldivide(gTfi, gTti); % Transformation of Tibia relative to the femur
+
 % fRt=fTt(1:3,1:3); %Rotations of tibia relative to femur
 
 %calculate the position vectors of the origin in the global frame of
