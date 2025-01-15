@@ -55,34 +55,59 @@ for i = 1:numel(specimen_folders)
         continue
     end
 
-    digitisation_file_mask = contains({fp_conditions.name}, config.digitisation , "IgnoreCase",true);
-    if sum(digitisation_file_mask) > 1 % There's more than 1 digitisation file
-        digitisation_file_mask(1:find(digitisation_file_mask, 1, "last")-1) = false; % Pick the last one
-        warning("Found more than one digitisation folder. Using '%s'", fp_conditions(digitisation_file_mask).name);
-    elseif ~any(digitisation_file_mask)
+    fp_digitisation = get_digitisation(fp_conditions, config);
+    if isempty(fp_digitisation)
         warning("No digitisation files found. Skipping specimen")
         continue
     end
-    fp_digitisation = fullfile(fp_conditions(digitisation_file_mask).folder, fp_conditions(digitisation_file_mask).name);
 
+    %% Load digitisation
+    [root, ~, ~] = fileparts(fp_digitisation);
+    config.is_right_knee = get_knee_side(root, config.right, config.left);
+    [digitisation, config, ~] = load_data(fp_digitisation, label, config);
+    if config.is_polaris
+        config.label = label.polaris;
+    else
+        config.label = label.certus;
+    end
+    [trackers, landmarks] = create_trackers(digitisation, config);
+    if config.debug, visualise_landmarks(landmarks, config.is_right_knee), end
+    %% Load experiment data
+    knee_states = get_root_files(root, config.digitisation);
     try
-    [trackers, landmarks, config] = create_trackers(fp_digitisation, config, label); % This mutates config. terrible idea, but fine for now.
-    [data, transforms, ~] = read_run_print_to_file(fp_digitisation, trackers, config);
+        for k = 1:numel(knee_states)
+            state = knee_states(k);
+            state_clean = clean_specimen_condition(state.name);
+            fp_data = fullfile(state.folder, state.name);
+            try
+                [data_raw, ~, idx_interpolation] = load_data(fp_data, config.label);
+            catch ME
+                if config.debug, rethrow(ME), end
+                if any(contains({ME.stack.name}, "label", "IgnoreCase",true))
+                    warning("Insufficient tracker data recorded. Check that you are recording all trackers.");
+                    continue;
+                end
+            end
+        
+            %% Run
+            [datum, transforms.(state_clean)] = get_jcs(data_raw, trackers, config);
+    
+            if config.print_single_runs, print_to_file(datum, fp_data), end
+        
+            data.(state_clean) = datum; % Clean the names a little bit
+        end
     catch ME
         warning(ME.message);
         continue;
     end
-    %     %% Visualisation of Landmarks
-    % visualise_landmarks(landmarks, config.is_right_knee);
+    states = string(fieldnames(data));
+    for k = 1:numel(states)
+        data_post_processed = intraspecimen_postprocess(data.(states(k)), config);
 
-    states = fieldnames(data);
-    state_data = struct2cell(data);
-
-    % Unique runs are kept separate because the transforms in global are
-    % unique. Not useful for data. Useful for drawing if not using tibia/patella on femur
-    specimen_with_duplicates(i).name = specimen_name;
-    for f = 1:numel(states)
-        specimen_with_duplicates(i).(states{f}) = state_data{f};
+        % Unique runs are kept separate because the transforms in global are
+        % unique. Not useful for data. Useful for drawing if not using tibia/patella on femur
+        specimen_with_duplicates(i).name = specimen_name;
+        specimen_with_duplicates(i).(states(k)) = data_post_processed;
     end
 
 end

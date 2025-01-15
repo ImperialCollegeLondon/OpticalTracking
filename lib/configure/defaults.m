@@ -3,12 +3,16 @@
 
 config.shift_flex = @(x) x - min(x); % Offset so min flex (extension) is 0
 % config.shift_flex = @(x) x + 120 - max(x); % Offset so max flexion is 120.
-
-
+config.debug = false;
 config.print_single_runs = true; % Print individual runs to file. They are located in the Results folder for each specimen/knee state.
 config.step_size = 1; % quantisation step size for output data. i.e., flexion is grouped in intervals of 1 or 0.5 or n.
 config.average_runs = true; % Whether to take intraspecimen mean. Suggest to keep true.
 config.split_flex_ext = false; % Split flexion from extension arc
+
+% Substrings in the folder name to determine if it's left or right knee:
+config.right = {'rk', 'right', 'r'};
+config.left = {'lk', 'left', 'l'};
+
 
 config.digitisation = {'digit', 'calibr'}; % Case insensitive digitisation file names. If it contains any of these texts, treats it as a digitisation file
 
