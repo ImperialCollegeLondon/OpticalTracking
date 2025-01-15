@@ -6,10 +6,10 @@ function print_to_file(datum, path)
         mkdir(fp, tibiofemoral{i});
         for j = 1:numel(datum)
             loading_condition = datum(j).name;
-            tf = datum(j).(tibiofemoral{i});
-            if ~isempty(tf)
-                tf_filename = fullfile(fp, tibiofemoral{i}, [loading_condition '.csv']);
-                writetable(tf, tf_filename);
+            data = datum(j).(tibiofemoral{i});
+            if ~isempty(data)
+                filename = fullfile(fp, tibiofemoral{i}, [loading_condition '.csv']);
+                writetable(data, filename);
             end
         end
     end
