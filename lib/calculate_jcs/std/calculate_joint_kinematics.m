@@ -1,5 +1,4 @@
-function [output, transforms] = calculate_joint_kinematics(data, trackers, config)
-right = config.is_right_knee;
+function [output, transforms] = calculate_joint_kinematics(data, trackers, right)
 % Use RvA nomenclature for all transforms and references (origins)
 ttTtc = trackers.tibia.transform;
 ttrtc = trackers.tibia.origin;

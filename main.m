@@ -38,6 +38,9 @@
 clc; clear; close all;
 %% Load default configuration. Check ./lib/configure/defaults.m if you want to modify them.
 run(fullfile("lib", "configure", "defaults.m"));
+if config.digitisation_correction
+    warning("Rotation of landmarks based on digitisation angle is enabled")
+end
 
 disp("Choose the root folder where all the specimens are")
 root = uigetdir(".", "Choose the root folder");
@@ -72,7 +75,7 @@ for i = 1:numel(specimen_folders)
         config.label = label.certus;
     end
     [trackers, landmarks] = create_trackers(digitisation, config);
-    if config.debug, visualise_landmarks(landmarks, config.is_right_knee), end
+    if config.debug, visualise_landmarks(landmarks, config), end
     %% Load experiment data
     knee_states = get_root_files(root, config.digitisation);
     try
@@ -91,6 +94,7 @@ for i = 1:numel(specimen_folders)
             end
         
             %% Run
+            if config.debug, fprintf("%s:\n", state_clean), end
             [datum, transforms.(state_clean)] = get_jcs(data_raw, trackers, config);
     
             if config.print_single_runs, print_to_file(datum, fp_data), end

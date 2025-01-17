@@ -1,25 +1,28 @@
 function output = intraspecimen_postprocess(data, config)
-    for i = 1:numel(data)
+    for lc = 1:numel(data)
         if ~config.average_runs && config.split_flex_ext
             error("separation of flex/ext without averaging is not yet implemented.")
         end
         
         if ~config.average_runs
-            output(i) = data(i);
-            tibiofemoral = setdiff(fieldnames(data(i)), "name");
+            output(lc) = data(lc);
+            tibiofemoral = setdiff(fieldnames(data(lc)), "name");
             for j = 1:numel(tibiofemoral)
-                output(i).(tibiofemoral{j}) = post_process(data(i).(tibiofemoral{j}));
+                output(lc).(tibiofemoral{j}) = post_process(data(lc).(tibiofemoral{j}));
             end
         end
         
         if config.average_runs
-            output(i).name = replace(data(i).name, '_', ' ');
-            tibiofemoral = setdiff(fieldnames(data(i)), "name");
-        
+            output(lc).name = replace(data(lc).name, '_', ' ');
+            tibiofemoral = setdiff(fieldnames(data(lc)), "name");
             for j=1:numel(tibiofemoral)
-                headers = data(i).(tibiofemoral{j}).Properties.VariableNames;
-                datum = intraspecimen_mean(data(i).(tibiofemoral{j}), config.step_size, config.split_flex_ext);
-                output(i).(tibiofemoral{j}) =  post_process(datum, config, headers);
+                headers = data(lc).(tibiofemoral{j}).Properties.VariableNames;
+                if config.debug
+                    loading_condition = data(lc).name;
+                    fprintf("  %s: %s\n", loading_condition, tibiofemoral{j})
+                end
+                datum = intraspecimen_mean(data(lc).(tibiofemoral{j}), config.step_size, config.split_flex_ext);
+                output(lc).(tibiofemoral{j}) =  post_process(datum, config, headers);
             end
         end
     end
