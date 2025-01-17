@@ -1,14 +1,13 @@
-function minima = find_minima(input)
+function minima = find_minima(input, config)
 % distance_threshold = 100;  % Minimum distance between minima
 distance_threshold = round(10+7*log(height(input)));  % Minimum distance between minima
-slope_threshold = 0.02;    % Minimum slope between minima
 
 local_minima = islocalmin(input);
 
 % We get several minima on a long tail where the user forgot to turn off
 % the camera. We require a minimum slope to make sure it's actual data.
 idx_minima = find(local_minima);
-idx_sweep = idx_minima * [1 1 1] + [-distance_threshold 0 distance_threshold];
+idx_sweep = idx_minima * [1 1 1] + [-round(.8*distance_threshold) 0 round(.8*distance_threshold)];
 idx_sweep(idx_sweep > numel(local_minima)) = idx_minima(end);
 idx_sweep(idx_sweep < 1) = 1;
 changes_over_time = diff(input(idx_sweep), 2, 2) > 1;
@@ -23,8 +22,6 @@ idx_reasonable_minima = find(reasonable_minima);
 % Find the minima that aren't too close to each other:
 
 distances = diff(idx_reasonable_minima);
-% INSPECTION: Visualise all minima and the viable minima clusters by uncommenting the lines below
-% plot(input); hold on; scatter(find(local_minima), input(local_minima)); scatter(idx_minima, input(reasonable_minima), "k*"); hold off;legend("data", "all minima", "viable minima");
 
 % With noisy data you end up with a few local minima. We do 2 passes to
 % find true minima: first one to find points that are far away from each
@@ -72,6 +69,16 @@ else
 end
 
 minima = nearby_if_nan(minima, input);
+% INSPECTION: Visualise all minima and the viable minima clusters by uncommenting the lines below
+if config.debug
+    plot(input); hold on; grid;
+    title("Flexion arc, find\_minima");
+    scatter(find(local_minima), input(local_minima));
+    scatter(minima, input(minima), "k*");
+    legend("data", "Identified minima", "Chosen minima");
+    hold off;
+    keyboard;
+end
 end
 
 function output = get_min_from_clusters(cluster, input)

@@ -1,4 +1,4 @@
-function specimen_mean = intraspecimen_mean(input, step_size, separate)
+function specimen_mean = intraspecimen_mean(input, config)
 % INTRASPECIMEN_MEAN   Splits dataset into runs and calculates their mean.
 %
 % Splits the dataset into individual runs by identifying
@@ -11,15 +11,10 @@ function specimen_mean = intraspecimen_mean(input, step_size, separate)
 %                table | matrix
 %                Tables are expected to have a column named "flexion".
 %                If "flexion" is not found, assumes the first column is flexion.
-%   step_size  - Step size for quantisation.
-%                Default is 1 (i.e., rounding to whole numbers).
-%   separate   - Separate flexion from extension. Default is false.
+%   config      - must include fields `step_size` and `split_flex_ext`
 
-    arguments
-        input 
-        step_size (1,1) {mustBePositive}  = 1
-        separate (1,1) {mustBeNumericOrLogical} = false
-    end
+    step_size = config.step_size;
+    separate = config.split_flex_ext;
     
     if isempty(input)
         specimen_mean = input;
@@ -40,9 +35,10 @@ function specimen_mean = intraspecimen_mean(input, step_size, separate)
         data_arr = input;
     end
     
+
     
     %% Split runs
-    [split_runs, no_tails] = split_run(flex_ext);
+    [split_runs, no_tails] = split_run(flex_ext, config);
     split_runs_idx = nonzero_to_one(split_runs); % Don't use logical() because it gives an error on NaN. Don't use ~isnan() because we need to maintain all the time points.
     
     

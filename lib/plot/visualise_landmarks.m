@@ -1,15 +1,9 @@
-function plot_landmarks(landmarks, is_right_knee)
-figure;
-hold on;
-grid;
-if is_right_knee
-    title("Right knee")
-else
-    title("Left knee")
-end
+function visualise_landmarks(landmarks, config)
 %% Tibia
+grid;
     t = landmarks.tibia;
     plot_t = scatter3(t.medial.Tx(1), t.medial.Ty(1), t.medial.Tz(1), 'b');
+    hold on;
     text(t.medial.Tx(1), t.medial.Ty(1), t.medial.Tz(1), "  Medial");
     scatter3(t.lateral.Tx(1), t.lateral.Ty(1), t.lateral.Tz(1), 'b');
     text(t.lateral.Tx(1), t.lateral.Ty(1), t.lateral.Tz(1), "  Lateral");
@@ -19,7 +13,7 @@ end
     % Medial-lateral axis
     o = (t.medial.translations_mean + t.lateral.translations_mean)/2;
     scatter3(o(1), o(2), o(3), 8, 'b', 'filled')
-    if is_right_knee
+    if config.is_right_knee
         med_lat = t.lateral.translations_mean - t.medial.translations_mean;
         quiver3(t.medial.Tx(1), t.medial.Ty(1), t.medial.Tz(1), med_lat(1), med_lat(2), med_lat(3), 0, 'b')
     else
@@ -43,7 +37,7 @@ end
     % Medial-lateral axis
     o = (f.medial.translations_mean + f.lateral.translations_mean)/2;
     scatter3(o(1), o(2), o(3), 8, 'r', 'filled')
-    if is_right_knee
+    if config.is_right_knee
         med_lat = f.lateral.translations_mean - f.medial.translations_mean;
         quiver3(f.medial.Tx(1), f.medial.Ty(1), f.medial.Tz(1), med_lat(1), med_lat(2), med_lat(3), 0, 'r')
     else
@@ -53,7 +47,13 @@ end
     % Proximal-distal axis
     prox_dist = f.proximal.translations_mean - o;
     quiver3(o(1), o(2), o(3), prox_dist(1), prox_dist(2), prox_dist(3), 0, 'r');
-
+% grid;
+if config.is_right_knee
+    title_str = [config.specimen_name '. Right knee'];
+else
+    title_str = [config.specimen_name '. Left knee'];
+end
+title(title_str);
 legend([plot_t, plot_f], {"Tibia", "Femur"})
 hold off;
 end

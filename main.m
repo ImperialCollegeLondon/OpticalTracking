@@ -49,6 +49,7 @@ specimen_folders = fullfile({specimen_list.folder}, {specimen_list.name});
 tic
 for i = 1:numel(specimen_folders)
     specimen_name = get_specimen_name(specimen_list(i).name);
+    config.specimen_name = specimen_name;
     fprintf("%d. Specimen: %s\n", i, specimen_name);
     fp_conditions = get_root_files(specimen_folders{i}, {});
     if isempty(fp_conditions)
@@ -97,8 +98,12 @@ for i = 1:numel(specimen_folders)
             data.(state_clean) = datum; % Clean the names a little bit
         end
     catch ME
-        warning(ME.message);
-        continue;
+        if config.debug
+            rethrow(ME)
+        else
+            warning(ME.message);
+            continue;
+        end
     end
     states = string(fieldnames(data));
     for k = 1:numel(states)
@@ -114,7 +119,7 @@ end
 disp("Done loading data")
 toc
 if isempty(specimen_with_duplicates)
-    return
+    error("No specimens were run. To see all errors, go to lib/configure/defaults.m, and set config.debug = true.")
 end
 %% Post process
 % Condense data

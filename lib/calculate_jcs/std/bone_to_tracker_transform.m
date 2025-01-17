@@ -13,6 +13,35 @@ grf0 = origins(gTf0);
 gTp0 = defineBodyFixedFramePatella(patella, right);
 grp0 = origins(gTp0);
 
+%% Correct transforms based on digitisation angle
+if config.digitisation_correction
+    fTt0 = gTf0\gTt0;
+    [ang, ~] = rotationsAndTranslations(fTt0, config.is_right_knee);
+    correction_angle = (90 - ang(1) - config.digitisation_angle)/2;
+
+    fQfx = quaternion_from_axis_angle(gTf0(1:3, 3), deg2rad(-correction_angle)); % Femoral rotation about the femoral flexion axis (Quaternion)
+    tQtx = quaternion_from_axis_angle(gTt0(1:3, 3), deg2rad(correction_angle)); % Tibial rotation about the tibial flexion axis (Quaternion)
+    if config.debug
+        [f_rot, ~] = rotationsAndTranslations(gTf0, right);
+        [t_rot, ~] = rotationsAndTranslations(gTt0, right);
+        f_str = [mat2str(f_rot) ' => '];
+        t_str = [mat2str(t_rot) ' => '];
+    end
+
+    gTf0 = gTf0 * quaternion2matrix(fQfx);
+    gTt0 = gTt0 * quaternion2matrix(tQtx);
+
+    if config.debug
+        [f_rot, ~] = rotationsAndTranslations(gTf0, right);
+        [t_rot, ~] = rotationsAndTranslations(gTt0, right);
+        fprintf("Femur:%s%s\n", f_str, mat2str(f_rot));
+        fprintf("Tibia:%s%s\n", t_str, mat2str(t_rot));
+    end
+end
+
+
+
+
 %% Define frame of reference for each of the trackers in global coordinates
 [gTft0] = defineTrackerFixedFrame(femur.tracker.rotations_mean, femur.tracker.translations_mean);
 [gTtt0] = defineTrackerFixedFrame(tibia.tracker.rotations_mean, tibia.tracker.translations_mean);
