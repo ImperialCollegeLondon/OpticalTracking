@@ -8,6 +8,7 @@ config.print_single_runs = true; % Print individual runs to file. They are locat
 config.step_size = 1; % quantisation step size for output data. i.e., flexion is grouped in intervals of 1 or 0.5 or n.
 config.average_runs = true; % Whether to take intraspecimen mean. Suggest to keep true.
 config.split_flex_ext = false; % Split flexion from extension arc
+config.enable_raw_plot = true;
 
 % Substrings in the folder name to determine if it's left or right knee:
 config.right = {'rk', 'right', 'r'};
