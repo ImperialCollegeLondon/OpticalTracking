@@ -1,4 +1,4 @@
-function stl_plot(config, tibia_transform, femur_transform)
+function visualise_stl(config, tibia_transform, femur_transform)
 % Tibia and femur transform are 4 x 4 x m matrices.
 
 if config.is_right_knee

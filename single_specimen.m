@@ -39,7 +39,7 @@ end
 plot_intraspecies(data, specimen_name);
 
 %% STL
-stl_plot(config, transforms(1).in_global.tibia, transforms(1).in_global.femur)
+visualise_stl(config, transforms(1).in_global.tibia, transforms(1).in_global.femur)
 
 %%
 

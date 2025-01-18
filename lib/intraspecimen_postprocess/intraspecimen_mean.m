@@ -11,10 +11,8 @@ function specimen_mean = intraspecimen_mean(input, config)
 %                table | matrix
 %                Tables are expected to have a column named "flexion".
 %                If "flexion" is not found, assumes the first column is flexion.
-%   config      - must include fields `step_size` and `split_flex_ext`
+%   config      - must include fields `step_size: float` and `split_flex_ext: bool`
 
-    step_size = config.step_size;
-    separate = config.split_flex_ext;
     
     if isempty(input)
         specimen_mean = input;
@@ -52,7 +50,7 @@ function specimen_mean = intraspecimen_mean(input, config)
     arc = flex_ext(has_datum); % Flexion-extension arc excluding tails
     
     %% Separate flexion from extension
-    if separate
+    if config.split_flex_ext
         % Find the flexion/extension arcs and remove any tails
         flexion_extension_arc = split_runs_idx(:, no_tails);
         flexion_extension_arc = flexion_extension_arc(has_datum, :);
@@ -67,8 +65,8 @@ function specimen_mean = intraspecimen_mean(input, config)
         extension_arc(not_extension) = 0;
         flexion_arc = flexion_extension_arc - extension_arc; % Could use xor(), but logical operations when you have NaN tend to cause trouble.
     
-        quantised_extension = flip(quantise(data.*extension_arc, arc, step_size));
-        quantised_flexion = quantise(data.*flexion_arc, arc, step_size);
+        quantised_extension = flip(quantise(data.*extension_arc, arc, config.step_size));
+        quantised_flexion = quantise(data.*flexion_arc, arc, config.step_size);
         if ndims(quantised_extension) == 3 || ndims(quantised_flexion) == 3
         quantised_extension_means = clean(mean_nonzero(quantised_extension, 2)); 
         quantised_flexion_means = clean(mean_nonzero(quantised_flexion, 2));
@@ -78,7 +76,7 @@ function specimen_mean = intraspecimen_mean(input, config)
         end
 
     else
-        quantised_flex_ext = quantise(data, arc, step_size);
+        quantised_flex_ext = quantise(data, arc, config.step_size);
         if ndims(quantised_flex_ext) == 3
             quantised_means = clean(mean_nonzero(quantised_flex_ext, 2)); % 98 x 1 x 6 => 98 x 6 and remove empty quanta
         else
@@ -86,7 +84,7 @@ function specimen_mean = intraspecimen_mean(input, config)
         end
     end
     
-    if separate
+    if config.split_flex_ext
         specimen_mean.extension = quantised_extension_means;
         specimen_mean.flexion = quantised_flexion_means;
     else

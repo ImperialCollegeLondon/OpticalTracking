@@ -37,7 +37,7 @@
 % `transforms` to their specific runs, use `specimen_with_duplicates`
 clc; clear; close all;
 %% Load default configuration. Check ./lib/configure/defaults.m if you want to modify them.
-run(fullfile("lib", "configure", "defaults.m"));
+defaults
 if config.digitisation_correction
     warning("Rotation of landmarks based on digitisation angle is enabled")
 end
@@ -65,6 +65,9 @@ for i = 1:numel(specimen_folders)
         continue
     end
 
+    if isempty(get_root_files(fp_digitisation, {}))
+        continue
+    end
     %% Load digitisation
     [root, ~, ~] = fileparts(fp_digitisation);
     config.is_right_knee = get_knee_side(root, config.right, config.left);
@@ -81,7 +84,7 @@ for i = 1:numel(specimen_folders)
     try
         for k = 1:numel(knee_states)
             state = knee_states(k);
-            state_clean = clean_specimen_condition(state.name);
+            
             fp_data = fullfile(state.folder, state.name);
             try
                 [data_raw, ~, idx_interpolation] = load_data(fp_data, config.label);
@@ -94,12 +97,17 @@ for i = 1:numel(specimen_folders)
             end
         
             %% Run
-            if config.debug, fprintf("%s:\n", state_clean), end
+            state_clean = clean_specimen_condition(state.name);
+            config.state = state_clean;
             [datum, transforms.(state_clean)] = get_jcs(data_raw, trackers, config);
+
+            if config.enable_raw_plot
+                plot_raw(datum, config)
+            end
     
             if config.print_single_runs, print_to_file(datum, fp_data), end
         
-            data.(state_clean) = datum; % Clean the names a little bit
+            data.(state_clean) = datum;
         end
     catch ME
         if config.debug
@@ -111,6 +119,9 @@ for i = 1:numel(specimen_folders)
     end
     states = string(fieldnames(data));
     for k = 1:numel(states)
+        if config.debug
+            fprintf("%s:\n", clean_specimen_condition(states(k)))
+        end
         data_post_processed = intraspecimen_postprocess(data.(states(k)), config);
 
         % Unique runs are kept separate because the transforms in global are

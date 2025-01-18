@@ -71,13 +71,14 @@ end
 minima = nearby_if_nan(minima, input);
 % INSPECTION: Visualise all minima and the viable minima clusters by uncommenting the lines below
 if config.debug
-    plot(input); hold on; grid;
-    title("Flexion arc, find\_minima");
+    hold on;
+    plot(input);
+    % title([config.specimen_name, ' ', replace(config.state, '_', ' '), ' ', config.loading_condition]);
     scatter(find(local_minima), input(local_minima));
     scatter(minima, input(minima), "k*");
-    legend("data", "Identified minima", "Chosen minima");
+    legend("data", "Reasonable minima", "Chosen minima");
     hold off;
-    keyboard;
+    % keyboard;
 end
 end
 

@@ -3,7 +3,6 @@ function [landmarks, config, idx_interpolation] = load_data(folder_path, labels,
     csv_files = csv_files(~contains({csv_files.name}, '3d.csv'));
     tsv_files = dir(fullfile(folder_path, "*.tsv"));
     files = [csv_files; tsv_files];
-    
     landmarks = struct();
     
     for i = 1:numel(files)

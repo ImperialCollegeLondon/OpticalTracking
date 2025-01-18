@@ -56,4 +56,20 @@ end
 title(title_str);
 legend([plot_t, plot_f], {"Tibia", "Femur"})
 hold off;
+
+
+if config.debug
+    femur = eye(4);
+    femur(1) = f.medial.Rx(1);
+    femur(2) = f.medial.Ry(1);
+    femur(3) = f.medial.Rz(1);
+    tibia = eye(4);
+    tibia(1) = t.medial.Rx(1);
+    tibia(2) = t.medial.Ry(1);
+    tibia(3) = t.medial.Rz(1);
+    [f_ang, ~] = rotationsAndTranslations(femur, config.is_right_knee);
+    [t_ang, ~] = rotationsAndTranslations(tibia, config.is_right_knee);
+    t_ang - f_ang
+end
+
 end
