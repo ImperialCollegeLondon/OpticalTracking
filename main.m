@@ -65,7 +65,7 @@ for i = 1:numel(specimen_folders)
         continue
     end
 
-    if isempty(get_root_files(fp_digitisation, {}))
+    if isempty(get_root_files(fp_digitisation, {'result'}))
         continue
     end
     %% Load digitisation

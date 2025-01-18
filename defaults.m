@@ -10,9 +10,9 @@ config.digitisation_angle = 0; % Angle of the knee when it was digitised
 config.intact_name = "Intact"; % Usually "Intact" or "Native". Must be consistent with file naming.
 %% Run flags
 config.enable_raw_plot = true; % Creates plots of translations/rotations over time. Suggest enable config.debug as well, otherwise this produces hundreds of popups.
-config.digitisation_correction = false;
 config.debug = true; % Generates landmark visualisation, run splitting plots, allows errors to stop execution, etc.
 % If something is not working, set config.debug = true. Prepare for spam.
+config.digitisation_correction = false;
 %% Post-processing definitions
 % Smoothing functions are very computationally expensive. Suggest no intraspecimen smoothing intraspecimen.
 % Intraspecimen

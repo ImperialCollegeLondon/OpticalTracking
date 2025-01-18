@@ -92,6 +92,7 @@ function output = error_to_nan(input)
     diffs = diff(input);
     mean_diff = mean(abs(diffs));
     outlier_mask = [false; abs(diffs) > 20 * mean_diff];
+    outlier_mask = outlier_mask | abs(input) > 1e15;
     idx_outlier = find(outlier_mask);
 
     % There are no NaN.
