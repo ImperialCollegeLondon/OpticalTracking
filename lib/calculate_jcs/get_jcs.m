@@ -12,12 +12,13 @@ function [data, transforms] = get_jcs(data_raw, trackers, config)
     for i = 1:numel(data_raw)
         loading_condition = data_all_probes(i).name;
         input.name = loading_condition;
+        config.loading_condition = loading_condition;
         % Assign the tracker to the right bone.
         input.tibia = extract_from_label(data_all_probes(i).probes, config.label.tibia);
         input.femur = extract_from_label(data_all_probes(i).probes, config.label.femur);
         input.patella = extract_from_label(data_all_probes(i).probes, config.label.patella);
     
-        [data(i), transforms(i)] = calculate_joint_kinematics(input, trackers, config.is_right_knee);
+        [data(i), transforms(i)] = calculate_joint_kinematics(input, trackers, config);
         
     end
     [transforms.name] = deal(data.name);

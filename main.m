@@ -78,7 +78,7 @@ for i = 1:numel(specimen_folders)
         config.label = label.certus;
     end
     [trackers, landmarks] = create_trackers(digitisation, config);
-    if config.debug, visualise_landmarks(landmarks, config), end
+    if config.debug, visualise_landmarks(landmarks, config), keyboard, end
     %% Load experiment data
     knee_states = get_root_files(root, config.digitisation);
     try
@@ -89,9 +89,8 @@ for i = 1:numel(specimen_folders)
             try
                 [data_raw, ~, idx_interpolation] = load_data(fp_data, config.label);
             catch ME
-                if config.debug, rethrow(ME), end
                 if any(contains({ME.stack.name}, "label", "IgnoreCase",true))
-                    warning("Insufficient tracker data recorded. Check that you are recording all trackers.");
+                    warning("Some data may be valid, but entire state will be skipped.");
                     continue;
                 end
             end
@@ -122,7 +121,12 @@ for i = 1:numel(specimen_folders)
         if config.debug
             fprintf("%s:\n", clean_specimen_condition(states(k)))
         end
+        try
         data_post_processed = intraspecimen_postprocess(data.(states(k)), config);
+        catch ME
+            warning("x")
+            continue
+        end
 
         % Unique runs are kept separate because the transforms in global are
         % unique. Not useful for data. Useful for drawing if not using tibia/patella on femur

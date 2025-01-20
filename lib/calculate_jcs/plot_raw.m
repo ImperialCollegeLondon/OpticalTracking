@@ -39,7 +39,7 @@ function plot_raw(data, config)
             plot(datum.superior);
             ylabel('Distal (mm) +ve');
 
-            sgtitle([[config.specimen_name ' ' config.state ' ' config.loading_condition] "Tibia motion relative to Femur"]);
+            sgtitle([[config.specimen_name ' ' replace(config.state, '_', ' ') ' ' config.loading_condition] "Tibia motion relative to Femur"]);
             sgt.Interpreter = "latex";
 
             if config.debug, keyboard, end
