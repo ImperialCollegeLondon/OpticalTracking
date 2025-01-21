@@ -92,11 +92,13 @@ for i = 1:numel(specimen_folders)
             
             fp_data = fullfile(state.folder, state.name);
             try
-                [data_raw, ~, idx_interpolation] = load_data(fp_data, config.label);
+                [data_raw, ~, idx_interpolation] = load_data(fp_data, config.label, config);
             catch ME
                 if any(contains({ME.stack.name}, "label", "IgnoreCase",true))
                     warning("Some data may be valid, but entire state will be skipped.");
                     continue;
+                else
+                    rethrow(ME)
                 end
             end
         

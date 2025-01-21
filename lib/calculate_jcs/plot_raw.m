@@ -8,38 +8,49 @@ function fig = plot_raw(data, config)
                 continue
             end
             datum = data(lc).(tibiofemoral(tf));
-            % if ~config.debug, figure, end
+            headers = datum.Properties.VariableNames;
             fig = tiledlayout(3, 2);
+            title(tibiofemoral(tf))
+            disp(loading_conditions{lc})
+            for h = 1:numel(headers)
+                nexttile(h);
+                plot(datum.(headers{h}))
+                ylabel(headers{h});
 
-            nexttile; title('Rotations');
-            ylabel('Flexion ($\circ$)');
-            if config.debug
-                find_minima(datum.flexion, config);
-            else
-                plot(datum.flexion);
+                % if config.debug
+                %     find_minima(datum.flexion, config);
+                % else
+                %     plot(datum.flexion);
+                % end
             end
+            % if ~config.debug, figure, end
 
-            nexttile; title('Translations');
-            plot(datum.lateral);
-            ylabel('Lateral (mm) +ve');
+            
+            % title('Rotations');
+            % ylabel('Flexion ($\circ$)');
 
-            nexttile
-            plot(datum.varus);
-            ylabel('Tibial Varus ($\circ$) +ve');
+            % 
+            % nexttile; title('Translations');
+            % plot(datum.lateral);
+            % ylabel('Lateral (mm) +ve');
+            % 
+            % nexttile
+            % plot(datum.varus);
+            % ylabel('Tibial Varus ($\circ$) +ve');
+            % 
+            % nexttile
+            % plot(datum.anterior);
+            % ylabel('Anterior (mm) +ve');
+            % 
+            % nexttile
+            % plot(datum.external);
+            % ylabel('Tibial External ($\circ$) +ve');
+            % 
+            % nexttile
+            % plot(datum.superior);
+            % ylabel('Distal (mm) +ve');
 
-            nexttile
-            plot(datum.anterior);
-            ylabel('Anterior (mm) +ve');
-
-            nexttile
-            plot(datum.external);
-            ylabel('Tibial External ($\circ$) +ve');
-
-            nexttile
-            plot(datum.superior);
-            ylabel('Distal (mm) +ve');
-
-            sgtitle([[config.specimen_name ' ' replace(config.state, '_', ' ') ' ' config.loading_condition] "Tibia motion relative to Femur"]);
+            sgtitle([[config.specimen_name ' ' replace(config.state, '_', ' ') ' ' config.loading_condition] tibiofemoral(tf)]);
             sgt.Interpreter = "latex";
 
             if config.debug, keyboard, end

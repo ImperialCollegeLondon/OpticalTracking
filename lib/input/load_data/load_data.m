@@ -12,8 +12,10 @@ function [landmarks, config, idx_interpolation] = load_data(folder_path, labels,
         remove_whitespaces(fp);
         data = readtable(fp, "VariableNamingRule","preserve");
         
-        config.is_quaternion = use_quaternion(data.Properties.VariableNames);
-        config.is_polaris = use_polaris(data.Properties.VariableNames);
+        if ~any(contains(fieldnames(config), "quaternion"))
+            config.is_quaternion = use_quaternion(data.Properties.VariableNames);
+            config.is_polaris = use_polaris(data.Properties.VariableNames);
+        end
         if config.is_polaris
             landmarks(i).probes = load_data_polaris(data, config);
             idx_interpolation{i}=[];
@@ -22,8 +24,12 @@ function [landmarks, config, idx_interpolation] = load_data(folder_path, labels,
                 %Should be moved back to both, but here for now. Solution might
                 %be to clean polaris data, or use the filtering after
                 %organisation.
-            [data, idx_all_interpolation] = fillmissing(data, "movmedian", 50);
+            [data, idx_all_interpolation] = config.fill_missing_quantisation(data);
             idx_interpolation{i} = any(idx_all_interpolation, 2);
+            % data_arr = table2array(data);
+            % data_arr(isnan(data_arr)) = NaN;
+            % data = array2table(data_arr, "VariableNames", data.Properties.VariableNames);
+            % idx_interpolation = [];
             % data = smoothdata(data, "gaussian", 20);
             landmarks(i).probes = load_data_certus(data);
         end

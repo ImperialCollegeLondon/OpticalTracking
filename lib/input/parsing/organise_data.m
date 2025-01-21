@@ -58,12 +58,14 @@ function output = organise_data(landmarks, config)
                 end
         
                 %% Polaris registers NaN as some really big value. here we assign it to NaN properly
-                rx= error_to_nan(rx);
-                ry = error_to_nan(ry);
-                rz = error_to_nan(rz);
-                tx = error_to_nan(tx);
-                ty = error_to_nan(ty);
-                tz = error_to_nan(tz);
+                if config.is_polaris
+                    rx = error_to_nan(rx);
+                    ry = error_to_nan(ry);
+                    rz = error_to_nan(rz);
+                    tx = error_to_nan(tx);
+                    ty = error_to_nan(ty);
+                    tz = error_to_nan(tz);
+                end
         
                 %% Create probes
                 probes(j).label = label;
