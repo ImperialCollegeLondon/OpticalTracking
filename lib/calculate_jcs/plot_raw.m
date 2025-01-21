@@ -1,4 +1,4 @@
-function plot_raw(data, config)
+function fig = plot_raw(data, config)
     loading_conditions = {data.name};
     for lc = 1:numel(loading_conditions)
         tibiofemoral = setdiff(fieldnames(data), "name");
@@ -8,8 +8,8 @@ function plot_raw(data, config)
                 continue
             end
             datum = data(lc).(tibiofemoral(tf));
-            if ~config.debug, figure, end
-            tiledlayout(3, 2);
+            % if ~config.debug, figure, end
+            fig = tiledlayout(3, 2);
 
             nexttile; title('Rotations');
             ylabel('Flexion ($\circ$)');

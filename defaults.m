@@ -13,6 +13,7 @@ config.enable_raw_plot = false; % Creates plots of translations/rotations over t
 config.debug = false; % Generates landmark visualisation, run splitting plots, allows errors to stop execution, etc.
 % If something is not working, set config.debug = true. Prepare for spam.
 config.digitisation_correction = false;
+config.plot_missing_data = false;
 %% Post-processing definitions
 % Smoothing functions are very computationally expensive. Suggest no intraspecimen smoothing intraspecimen.
 % Intraspecimen

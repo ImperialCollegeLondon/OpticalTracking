@@ -47,9 +47,14 @@ root = uigetdir(".", "Choose the root folder");
 
 %%
 specimen_with_duplicates = [];
-specimen_list = get_root_files(root, {'result'}); % Get all files in root and exclude any folders that include `result`
+specimen_list = get_root_files(root, {'result', 'problem'}); % Get all files in root and exclude any folders that include `result`
 specimen_folders = fullfile({specimen_list.folder}, {specimen_list.name});
 tic
+
+if config.plot_missing_data
+    config.path_missing_data = fullfile(root, "problematic_data");
+    mkdir(config.path_missing_data);
+end
 for i = 1:numel(specimen_folders)
     specimen_name = get_specimen_name(specimen_list(i).name);
     config.specimen_name = specimen_name;

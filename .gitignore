@@ -1,5 +1,6 @@
 log.txt
 **/Results
+**/problematic_data
 /target
 *.asv
 *.nco
