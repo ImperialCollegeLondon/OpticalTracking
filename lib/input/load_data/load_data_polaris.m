@@ -16,7 +16,8 @@ for k = 1:n_probes
         continue
     end
     probes(k).probe = table2cell(data(1, id));
-    probes(k).data = data(:, 1+id:id+n-1);
+    % Get the data and convert the errors into NaN
+    probes(k).data = standardizeMissing(data(:, 1+id:id+n-1), -3.697314E+028);
     headers = probes(k).data.Properties.VariableNames;
     
     if config.is_quaternion
@@ -24,7 +25,6 @@ for k = 1:n_probes
         headers = regexprep(headers, '.*Qx.*', 'Qx');
         headers = regexprep(headers, '.*Qy.*', 'Qy');
         headers = regexprep(headers, '.*Qz.*', 'Qz');
-        headers = regexprep(headers, '.*State*', "State");
     else
         headers = regexprep(headers, '.*Rx.*', 'Rx');
         headers = regexprep(headers, '.*Ry.*', 'Ry');

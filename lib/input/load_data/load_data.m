@@ -1,4 +1,4 @@
-function [landmarks, config, idx_interpolation] = load_data(folder_path, labels, config)
+function [landmarks, config] = load_data(folder_path, labels, config)
     csv_files = dir(fullfile(folder_path, "*.csv"));
     csv_files = csv_files(~contains({csv_files.name}, '3d.csv'));
     tsv_files = dir(fullfile(folder_path, "*.tsv"));
@@ -10,7 +10,11 @@ function [landmarks, config, idx_interpolation] = load_data(folder_path, labels,
         landmarks(i).name = clean_specimen_condition(parent_path);
         fp = fullfile(files(i).folder, files(i).name);
         remove_whitespaces(fp);
-        data = readtable(fp, "VariableNamingRule","preserve");
+        try
+            data = readtable(fp, "VariableNamingRule","preserve");
+        catch
+            data = readtable(fp, "VariableNamingRule","preserve", "FileType","text", "Delimiter", '\t');
+        end
         
         if ~any(contains(fieldnames(config), "quaternion"))
             config.is_quaternion = use_quaternion(data.Properties.VariableNames);
@@ -18,26 +22,13 @@ function [landmarks, config, idx_interpolation] = load_data(folder_path, labels,
         end
         if config.is_polaris
             landmarks(i).probes = load_data_polaris(data, config);
-            idx_interpolation{i}=[];
         else
-                %% Interpolate data to fill out any gaps.
-                %Should be moved back to both, but here for now. Solution might
-                %be to clean polaris data, or use the filtering after
-                %organisation.
-            [data, idx_all_interpolation] = config.fill_missing_quantisation(data);
-            idx_interpolation{i} = any(idx_all_interpolation, 2);
-            % data_arr = table2array(data);
-            % data_arr(isnan(data_arr)) = NaN;
-            % data = array2table(data_arr, "VariableNames", data.Properties.VariableNames);
-            % idx_interpolation = [];
-            % data = smoothdata(data, "gaussian", 20);
             landmarks(i).probes = load_data_certus(data);
         end
     
         if isempty(landmarks(i).probes(1).data)
-            [path_warn, filename, ~] = fileparts(folder_path);
-            [~, parent_path, ~] = fileparts(path_warn);
-            warning("Missing data from %s/%s/%s", parent_path, filename, landmarks(i).name)
+            [~, filename, ~] = fileparts(folder_path);
+            warning("Missing data from %s %s", filename, landmarks(i).name)
         end
         
     end
