@@ -1,4 +1,5 @@
-function fig = plot_raw(data, config)
+function fig = plot_raw(data, config, idx_interpol)
+    figure(1); hold off;
     loading_conditions = {data.name};
     for lc = 1:numel(loading_conditions)
         tibiofemoral = setdiff(fieldnames(data), "name");
@@ -10,50 +11,45 @@ function fig = plot_raw(data, config)
             datum = data(lc).(tibiofemoral(tf));
             headers = datum.Properties.VariableNames;
             fig = tiledlayout(3, 2);
-            title(tibiofemoral(tf))
-            disp(loading_conditions{lc})
             for h = 1:numel(headers)
+                % Plot data
                 nexttile(h);
-                plot(datum.(headers{h}))
+                header = headers{h};
+                p = datum.(header);
+                if strcmpi(header, "flexion") & config.show_minima
+                    find_minima(p, config);
+                else
+                    plot(p);
+                end
                 ylabel(headers{h});
+                % Plot the interpolation
+                if isempty(idx_interpol)
+                    % Called from calculate_kinematics(). Means there's
+                    % insufficient data
+                    continue;
+                end
+                interpolated_points = idx_interpol{lc, tf}(:,h);
 
-                % if config.debug
-                %     find_minima(datum.flexion, config);
-                % else
-                %     plot(datum.flexion);
-                % end
+                if any(interpolated_points)
+                    hold on;
+                    scatter(find(interpolated_points), p(interpolated_points), 10, "filled", "red")
+                    hold off;
+                end
+               
             end
-            % if ~config.debug, figure, end
-
-            
-            % title('Rotations');
-            % ylabel('Flexion ($\circ$)');
-
-            % 
-            % nexttile; title('Translations');
-            % plot(datum.lateral);
-            % ylabel('Lateral (mm) +ve');
-            % 
-            % nexttile
-            % plot(datum.varus);
-            % ylabel('Tibial Varus ($\circ$) +ve');
-            % 
-            % nexttile
-            % plot(datum.anterior);
-            % ylabel('Anterior (mm) +ve');
-            % 
-            % nexttile
-            % plot(datum.external);
-            % ylabel('Tibial External ($\circ$) +ve');
-            % 
-            % nexttile
-            % plot(datum.superior);
-            % ylabel('Distal (mm) +ve');
 
             sgtitle([[config.specimen_name ' ' replace(config.state, '_', ' ') ' ' config.loading_condition] tibiofemoral(tf)]);
             sgt.Interpreter = "latex";
 
-            if config.debug, keyboard, end
+            if isempty(idx_interpol) % Print problematic data
+                filename = strjoin(fig.Title.String, '_');
+                saveas(fig, fullfile(config.path_missing_data, [filename '.png']))
+            end
+
+
+            if config.enable_raw_plot || config.debug
+                keyboard
+            end
         end
     end
 

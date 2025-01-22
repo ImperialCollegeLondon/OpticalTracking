@@ -82,15 +82,13 @@ num_nan = sum(isnan(table2array(result_tf)), "all");
 if num_nan > 0.2 * numel(result_tf)
     nan_indices = find(isnan(result_tf.flexion));
     continuous_stretch = diff([0; nan_indices]) - 1;
-    if any(continuous_stretch > 50)
+    if any(continuous_stretch > 60)
         warning("%s %s: %d%% of data missing. But maybe there's enough data", config.state, config.loading_condition, round(num_nan/numel(result_tf)*100) )
     else
-    warning("%s %s: %d%% of data missing", config.state, config.loading_condition, round(num_nan/numel(result_tf)*100) )
+        warning("%s %s: %d%% of data missing", config.state, config.loading_condition, round(num_nan/numel(result_tf)*100) )
     end
     if config.plot_missing_data
-        fig = plot_raw(output, config);
-        filename = fig.Title.String{1};
-        saveas(fig, fullfile(config.path_missing_data, [filename '.png']))
+        plot_raw(output, config, {});
     end
 end
 

@@ -1,11 +1,10 @@
 function result = motion_tibiofemoral(relative_position, femur, tibia, right)
-
-result = table();
 if isempty(relative_position)
-    var_type = {'int8', 'int8', 'int8', 'int8', 'int8', 'int8'};
-    result = table('Size', [0 6], 'VariableTypes', var_type, 'VariableNames', {'flexion', 'varus', 'external', 'lateral', 'anterior', 'superior'});
+    result = array2table([], 'VariableNames', {'flexion', 'varus', 'external', 'lateral', 'anterior', 'superior'});
     return;
 end
+
+result = table();
 
 fTt = relative_position;
 e1_=femur.i;%Femoral X axis in global reference frame, Grood and Suntay definition
@@ -23,7 +22,7 @@ else
 end
 
 %     H_=tibiaOrigin-femurOrigin;
-H_ = [tibia.point(1:3, :)-femur.point(1:3, :)];%translation vector of from femoral origin to tibial origin (in global coordinate frame)
+H_ = tibia.point(1:3, :) - femur.point(1:3, :);%translation vector of from femoral origin to tibial origin (in global coordinate frame)
 if right
     lateral = dot(H_,e1_);%projected onto the medial lateral axis e1
 else

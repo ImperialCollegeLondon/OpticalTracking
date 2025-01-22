@@ -76,14 +76,14 @@ for i = 1:numel(specimen_folders)
     %% Load digitisation
     [root, ~, ~] = fileparts(fp_digitisation);
     config.is_right_knee = get_knee_side(root, config.right, config.left);
-    [digitisation, config, ~] = load_data(fp_digitisation, label, config);
+    [digitisation, config] = load_data(fp_digitisation, label, config);
     if config.is_polaris
         config.label = label.polaris;
     else
         config.label = label.certus;
     end
     [trackers, landmarks] = create_trackers(digitisation, config);
-    if config.debug, visualise_landmarks(landmarks, config), keyboard, end
+    if config.enable_raw_plot, clf; visualise_landmarks(landmarks, config), keyboard, end
     %% Load experiment data
     knee_states = get_root_files(root, config.digitisation);
     try
@@ -92,10 +92,10 @@ for i = 1:numel(specimen_folders)
             
             fp_data = fullfile(state.folder, state.name);
             try
-                [data_raw, ~, idx_interpolation] = load_data(fp_data, config.label, config);
+                [data_raw, ~] = load_data(fp_data, config.label, config);
             catch ME
                 if any(contains({ME.stack.name}, "label", "IgnoreCase",true))
-                    warning("Some data may be valid, but entire state will be skipped.");
+                    warning("%s: There's something wrong with the tracker data. Skipping the whole state. Check the file manually.", state_clean);
                     continue;
                 else
                     rethrow(ME)
@@ -107,8 +107,15 @@ for i = 1:numel(specimen_folders)
             config.state = state_clean;
             [datum, transforms.(state_clean)] = get_jcs(data_raw, trackers, config);
 
+            tibiofemoral = setdiff(fieldnames(datum), "name");
+            idx_interpol = cell(numel(datum), numel(tibiofemoral));
+            for lc = 1:numel(datum)
+                for tf = 1:numel(tibiofemoral)
+                    [datum(lc).(tibiofemoral(tf)), idx_interpol{lc, tf}] = config.fill_missing_quantisation(datum(lc).(tibiofemoral(tf)));
+                end
+            end
             if config.enable_raw_plot
-                plot_raw(datum, config)
+                plot_raw(datum, config, idx_interpol);
             end
     
             if config.print_single_runs, print_to_file(datum, fp_data), end
@@ -128,12 +135,7 @@ for i = 1:numel(specimen_folders)
         if config.debug
             fprintf("%s:\n", clean_specimen_condition(states(k)))
         end
-        try
         data_post_processed = intraspecimen_postprocess(data.(states(k)), config);
-        catch ME
-            warning("x")
-            continue
-        end
 
         % Unique runs are kept separate because the transforms in global are
         % unique. Not useful for data. Useful for drawing if not using tibia/patella on femur
@@ -145,7 +147,7 @@ end
 disp("Done loading data")
 toc
 if isempty(specimen_with_duplicates)
-    error("No specimens were run. To see all errors, go to lib/configure/defaults.m, and set config.debug = true.")
+    error("No specimens were run. go to lib/configure/defaults.m, and set config.debug = true.")
 end
 %% Post process
 % Condense data

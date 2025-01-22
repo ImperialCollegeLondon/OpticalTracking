@@ -74,7 +74,7 @@ function minima = find_minima(input, config)
     
     minima = nearby_if_nan(minima, input);
     % INSPECTION: Visualise all minima and the viable minima clusters by uncommenting the lines below
-    if config.debug
+    if config.show_minima && config.enable_raw_plot
         hold on;
         plot(input);
         % title([config.specimen_name, ' ', replace(config.state, '_', ' '), ' ', config.loading_condition]);

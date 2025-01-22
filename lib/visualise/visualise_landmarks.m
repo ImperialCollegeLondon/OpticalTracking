@@ -1,4 +1,5 @@
 function visualise_landmarks(landmarks, config)
+figure(1)
 %% Tibia
 grid;
     t = landmarks.tibia;
