@@ -80,19 +80,13 @@ transforms.in_femur.femur = repmat(eye(4), 1, 1, size(fTt, 3));
 
 num_nan = sum(isnan(table2array(result_tf)), "all");
 if num_nan > 0.2 * numel(result_tf)
-    nan_indices = find(isnan(result_tf.flexion));
-    continuous_stretch = diff([0; nan_indices]) - 1;
-    if any(continuous_stretch > 60)
-        warning("%s %s: %d%% of data missing. But maybe there's enough data", config.state, config.loading_condition, round(num_nan/numel(result_tf)*100) )
-    else
-        warning("%s %s: %d%% of data missing", config.state, config.loading_condition, round(num_nan/numel(result_tf)*100) )
-    end
+    warning("%s %s: %d%% of data missing", config.state, config.loading_condition, round(num_nan/numel(result_tf)*100) )
     if config.plot_missing_data
         plot_raw(output, config, {});
     end
 end
 
-if max(result_tf.flexion) - min(result_tf.flexion) < 50
+if config.enable_warn_arc_of_flexion && max(result_tf.flexion) - min(result_tf.flexion) < config.warn_arc_of_flexion
     warning("%s %s: Arc of flexion less than 50 deg", config.state, config.loading_condition)
 end
 end

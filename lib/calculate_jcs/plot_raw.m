@@ -47,7 +47,7 @@ function fig = plot_raw(data, config, idx_interpol)
             end
 
 
-            if config.enable_raw_plot || config.debug
+            if config.enable_raw_plot
                 keyboard
             end
         end

@@ -26,7 +26,8 @@ function [landmarks, config] = load_data(folder_path, labels, config)
             landmarks(i).probes = load_data_certus(data);
         end
     
-        if isempty(landmarks(i).probes(1).data)
+        if numel(landmarks(i).probes) < 2
+        % if isempty(landmarks(i).probes(1).data)
             [~, filename, ~] = fileparts(folder_path);
             warning("Missing data from %s %s", filename, landmarks(i).name)
         end
