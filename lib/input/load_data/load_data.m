@@ -1,10 +1,15 @@
 function [landmarks, config] = load_data(folder_path, labels, config)
     csv_files = dir(fullfile(folder_path, "*.csv"));
-    csv_files = csv_files(~contains({csv_files.name}, '3d.csv'));
+    csv_files = csv_files(~contains({csv_files.name}, '3d.csv')); % Certus data files that shouldn't be used
     tsv_files = dir(fullfile(folder_path, "*.tsv"));
     files = [csv_files; tsv_files];
+
     landmarks = struct();
     
+    % Open the files as tables, use the headers to determine which optical
+    % trackin system is being used, then apply any parsing necessary to
+    % make data usable.
+    % e.g. convert -3.697314E+028 => NaN on the polaris.
     for i = 1:numel(files)
         [~, parent_path, ~] = fileparts(files(i).name);
         landmarks(i).name = clean_specimen_condition(parent_path);
@@ -20,6 +25,7 @@ function [landmarks, config] = load_data(folder_path, labels, config)
             config.is_quaternion = use_quaternion(data.Properties.VariableNames);
             config.is_polaris = use_polaris(data.Properties.VariableNames);
         end
+
         if config.is_polaris
             landmarks(i).probes = load_data_polaris(data, config);
         else
@@ -27,13 +33,13 @@ function [landmarks, config] = load_data(folder_path, labels, config)
         end
     
         if numel(landmarks(i).probes) < 2
-        % if isempty(landmarks(i).probes(1).data)
             [~, filename, ~] = fileparts(folder_path);
             warning("Missing data from %s %s", filename, landmarks(i).name)
         end
         
     end
     
+    % Necessary to use the same load_data() for landmarks and data. Handles switching from generic labels to optical tracker specific. 
     if config.is_polaris
         if isfield(labels, 'polaris')
             lb = labels.polaris;
@@ -47,7 +53,6 @@ function [landmarks, config] = load_data(folder_path, labels, config)
         else
             lb = labels;
         end
-        % l = struct2array(labels.certus);
         for i = 1:numel(lb)
             config.probe_labels(i).label = struct2cell(lb(i));
             config.probe_labels(i).name = struct2cell(lb(i));
@@ -58,6 +63,7 @@ end
 
 function remove_whitespaces(filepath)
 %% Remove whitespaces, a common cause for matlab to not properly interpret the headers of a csv file.
+% This is chatgpt stuff. Worth making sure it can't be done less painfully.
 fid = fopen(filepath, 'r');
 file_content = textscan(fid, '%s', 'Delimiter', '\n', 'Whitespace', '');
 fclose(fid);

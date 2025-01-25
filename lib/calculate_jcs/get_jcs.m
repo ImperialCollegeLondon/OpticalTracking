@@ -5,7 +5,7 @@ function [data, transforms] = get_jcs(data_raw, trackers, config)
         return
     end
     
-    all_probes = organise_data(data_raw, config);
+    all_probes = new_probe(data_raw, config);
     
     %% Apply the tracker transforms to the data
     for i = 1:numel(data_raw)

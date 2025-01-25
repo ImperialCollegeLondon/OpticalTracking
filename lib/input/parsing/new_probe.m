@@ -1,4 +1,4 @@
-function output = organise_data(landmarks, config)
+function output = new_probe(landmarks, config)
     probe_labels = config.probe_labels;
     
     probe_names = [probe_labels.name];
