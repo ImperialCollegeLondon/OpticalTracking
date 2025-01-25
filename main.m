@@ -169,6 +169,9 @@ for s = 1:numel(states)
     stats.(state) = interspecimen_stats([specimens.(state)], config);
 end
 
+%% Visualise stl
+neutral = strcmpi({transforms.Intact.name}, "neutral");
+visualise_stl(config, transforms.Intact(neutral).in_femur.tibia, transforms.Intact(neutral).in_femur.femur);
 %% print to file
 print_mean_std_to_file(stats, states, root);
 %% Plot
