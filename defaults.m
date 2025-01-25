@@ -9,12 +9,15 @@ config.split_flex_ext = false; % Split flexion from extension arc
 config.digitisation_angle = 0; % Angle of the knee when it was digitised
 config.intact_name = "Intact"; % Usually "Intact" or "Native". Must be consistent with file naming.
 %% Run flags
-config.enable_raw_plot = true; % Creates plots of translations/rotations over time. Suggest enable config.debug as well, otherwise this produces hundreds of popups.
+config.enable_raw_plot = false; % Creates plots of translations/rotations over time. Suggest enable config.debug as well, otherwise this produces hundreds of popups.
 config.show_minima = true;
 config.debug = false; % Generates landmark visualisation, run splitting plots, allows errors to stop execution, etc.
 % If something is not working, set config.debug = true. Prepare for spam.
 config.digitisation_correction = false;
-config.plot_missing_data = true;
+config.plot_missing_data = false;
+
+config.enable_warn_arc_of_flexion = true; % Warn if arc arc of flexion is less than `config.warn_arc_of_flexion`
+config.warn_arc_of_flexion = 50; % Warn if arc arc of flexion is less than
 %% Post-processing definitions
 % Smoothing functions are very computationally expensive. Suggest no intraspecimen smoothing intraspecimen.
 % Intraspecimen
