@@ -1,4 +1,4 @@
-function [landmarks, config] = load_data(folder_path, labels, config)
+function [landmarks, config] = load_data(folder_path, config)
     csv_files = dir(fullfile(folder_path, "*.csv"));
     csv_files = csv_files(~contains({csv_files.name}, '3d.csv')); % Certus data files that shouldn't be used
     tsv_files = dir(fullfile(folder_path, "*.tsv"));
@@ -27,7 +27,7 @@ function [landmarks, config] = load_data(folder_path, labels, config)
         end
 
         if config.is_polaris
-            landmarks(i).probes = load_data_polaris(data, config);
+            landmarks(i).probes = load_data_polaris(data, config.is_quaternion);
         else
             landmarks(i).probes = load_data_certus(data);
         end
@@ -41,20 +41,11 @@ function [landmarks, config] = load_data(folder_path, labels, config)
     
     % Necessary to use the same load_data() for landmarks and data. Handles switching from generic labels to optical tracker specific. 
     if config.is_polaris
-        if isfield(labels, 'polaris')
-            lb = labels.polaris;
-        else
-            lb = labels;
-        end
-        config.probe_labels = get_probe_labels(lb, landmarks, folder_path);
+        config.probe_labels = get_probe_labels(config.polaris, landmarks, folder_path);
     else
-        if isfield(labels, 'certus')
-            lb = labels.certus;
-        else
-            lb = labels;
-        end
+        lb = config.certus;
         for i = 1:numel(lb)
-            config.probe_labels(i).label = struct2cell(lb(i));
+            config.probe_labels(i).label = Option(struct2cell(lb(i)));
             config.probe_labels(i).name = struct2cell(lb(i));
         end
     end

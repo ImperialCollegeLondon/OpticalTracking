@@ -9,9 +9,9 @@ ptTtc = trackers.patella.transform;
 ptrpc = trackers.patella.origin;
 
 %% Load how tracker moves with time
-gTtti = findTrackerFixedFrames(data.tibia.rotations, data.tibia.translations);
-gTfti = findTrackerFixedFrames(data.femur.rotations, data.femur.translations);
-gTpti = findTrackerFixedFrames(data.patella.rotations, data.patella.translations);
+gTtti = findTrackerFixedFrames(data.tibia);
+gTfti = findTrackerFixedFrames(data.femur);
+gTpti = findTrackerFixedFrames(data.patella);
 % Create matrices of tracker marker position and rotations in time
 
 

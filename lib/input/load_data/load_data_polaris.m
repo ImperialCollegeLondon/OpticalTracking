@@ -1,4 +1,4 @@
-function probes = load_data_polaris(data, config)
+function probes = load_data_polaris(data, is_quaternion)
 probes = struct();
 probe_idx = find(contains(data.Properties.VariableNames, "Port"));
 
@@ -20,7 +20,7 @@ for k = 1:n_probes
     probes(k).data = standardizeMissing(data(:, 1+id:id+n-1), -3.697314E+028);
     headers = probes(k).data.Properties.VariableNames;
     
-    if config.is_quaternion
+    if is_quaternion
         headers = regexprep(headers, '.*Q0.*', 'Q0');
         headers = regexprep(headers, '.*Qx.*', 'Qx');
         headers = regexprep(headers, '.*Qy.*', 'Qy');

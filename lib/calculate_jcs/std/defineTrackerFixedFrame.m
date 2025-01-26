@@ -1,10 +1,12 @@
 function [ gTt0 ] = defineTrackerFixedFrame(eulerAngles,XYZ)
-
-if isempty(eulerAngles) || isempty(XYZ)
+if eulerAngles.is_none || XYZ.is_none
     gTt0 = [];
     return;
 end
 i=1;
+
+eulerAngles = eulerAngles.unwrap();
+XYZ = XYZ.unwrap();
 
 Rx=eulerAngles(i,1);
 Ry=eulerAngles(i,2);

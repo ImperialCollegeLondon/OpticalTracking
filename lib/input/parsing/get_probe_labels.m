@@ -9,25 +9,23 @@ for i = 1:numel(names)
     name = names{i}{1};
     label = read_config(config, name);
     % If it finds no label, attempt to determine it from probe name
-    if isempty(label)
-        labels_cell = struct2cell(labels);
-        found_label_cells = cellfun(@(x) any(strcmp(x, strsplit(name, ' '))), labels_cell, 'UniformOutput',false);
-        label_idx = cell2mat(found_label_cells);
-        if ~any(label_idx)
-
-        end
-        if any(label_idx)
-            label = labels_cell{label_idx};
-        else
-            non_empty = labels_cell(~cellfun(@isempty,labels_cell));
-            idx = cellfun(@(x) any(contains(name, x)) , non_empty, 'UniformOutput',false);
-            if ~any(idx)
-                error("Could not determine tracker labels. Make sure they have a label in the tbr file or the name contains a single word that matches the assigned label in main.")
-            end
-            label = non_empty(idx);
-        end
+    if ~isempty(label)
+        probe(i).label = label;
+        continue
     end
-    % fprintf("Probe %s given label %s\n", name, label);
+
+    labels_cell = struct2cell(labels);
+    found_label_cells = cellfun(@(x) any(strcmp(x, strsplit(name, ' '))), labels_cell, 'UniformOutput',false);
+    label_idx = cell2mat(found_label_cells);
+    label = Option(labels_cell{label_idx});
+
+    if label.is_none()
+        non_empty = labels_cell(~cellfun(@isempty,labels_cell));
+        idx = cellfun(@(x) any(contains(name, x)) , non_empty, 'UniformOutput',false);
+        idx = [idx{:}];
+        label = Option(non_empty(idx));
+    end
+
     probe(i).label = label;
 end
 end

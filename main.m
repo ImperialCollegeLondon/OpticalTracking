@@ -47,7 +47,7 @@ root = uigetdir(".", "Choose the root folder");
 
 %%
 specimen_with_duplicates = [];
-specimen_list = get_root_files(root, {'result', 'problem'}); % Get all files in root and exclude any folders that include `result`
+specimen_list = get_root_files(root, {'result', 'problem'}).unwrap(); % Get all files in root and exclude any folders that include `result`
 specimen_folders = fullfile({specimen_list.folder}, {specimen_list.name});
 tic
 
@@ -57,42 +57,45 @@ if config.plot_missing_data
 end
 for i = 1:numel(specimen_folders)
     specimen_name = get_specimen_name(specimen_list(i).name);
-    config.specimen_name = specimen_name;
+    config.specimen.name = specimen_name;
     fprintf("%d. Specimen: %s\n", i, specimen_name);
-    fp_conditions = get_root_files(specimen_folders{i}, {});
+    fp_conditions = get_root_files(specimen_folders{i}, {}).unwrap();
     if isempty(fp_conditions)
         continue
     end
 
-    fp_digitisation = get_digitisation(fp_conditions, config);
-    if isempty(fp_digitisation)
+    fp_digitisation = get_digitisation(fp_conditions, config.digitisation);
+    if fp_digitisation.is_none()
         warning("No digitisation files found. Skipping specimen")
         continue
     end
+    fp_digitisation = fp_digitisation.unwrap();
 
-    if isempty(get_root_files(fp_digitisation, {'result'}))
+    if get_root_files(fp_digitisation, {'result'}).is_none()
         continue
     end
     %% Load digitisation
     [root, ~, ~] = fileparts(fp_digitisation);
-    config.is_right_knee = get_knee_side(root, config.right, config.left);
-    [digitisation, config] = load_data(fp_digitisation, label, config);
-    if config.is_polaris
-        config.label = label.polaris;
-    else
-        config.label = label.certus;
-    end
+    config.is_right_knee = get_knee_side(root, config.right, config.left) ...
+        .expect("Could not determine knee side. Folder name should indicate the side.");
+
+    [digitisation, config] = load_data(fp_digitisation, config);
+    % if config.is_polaris
+    %     config.label = label.polaris;
+    % else
+    %     config.label = label.certus;
+    % end
     [trackers, landmarks] = create_trackers(digitisation, config);
     if config.enable_raw_plot, clf; visualise_landmarks(landmarks, config), keyboard, end
     %% Load experiment data
-    knee_states = get_root_files(root, config.digitisation);
+    knee_states = get_root_files(root, config.digitisation).unwrap();
     try
         for k = 1:numel(knee_states)
             state = knee_states(k);
             
             fp_data = fullfile(state.folder, state.name);
             try
-                [data_raw, ~] = load_data(fp_data, config.label, config);
+                [data_raw, ~] = load_data(fp_data, config);
             catch ME
                 if any(contains({ME.stack.name}, "label", "IgnoreCase",true))
                     warning("%s: There's something wrong with the tracker data. Skipping the whole state. Check the file manually.", state_clean);
