@@ -93,7 +93,7 @@ for i = 1:numel(specimen_folders)
     if config.enable_raw_plot, clf; visualise_landmarks(landmarks, config), keyboard, end
     %% Load experiment data
     knee_states = get_root_files(root, config.digitisation).unwrap();
-    try
+    % try
         for k = 1:numel(knee_states)
             state = knee_states(k);
             
@@ -115,7 +115,7 @@ for i = 1:numel(specimen_folders)
             idx_interpol = cell(numel(datum), numel(tibiofemoral));
             for lc = 1:numel(datum)
                 for tf = 1:numel(tibiofemoral)
-                    [datum(lc).(tibiofemoral(tf)), idx_interpol{lc, tf}] = config.fill_missing_quantisation(datum(lc).(tibiofemoral(tf)));
+                    [datum(lc).(tibiofemoral(tf)), idx_interpol{lc, tf}] = config.fill_missing_raw_data(datum(lc).(tibiofemoral(tf)));
                 end
             end
             if config.enable_raw_plot
@@ -126,14 +126,14 @@ for i = 1:numel(specimen_folders)
         
             data.(state_clean) = datum;
         end
-    catch ME
-        if config.debug
-            rethrow(ME)
-        else
-            warning(ME.message);
-            continue;
-        end
-    end
+    % catch ME
+    %     if config.debug
+    %         rethrow(ME)
+    %     else
+    %         warning(ME.message);
+    %         continue;
+    %     end
+    % end
     states = string(fieldnames(data));
     for k = 1:numel(states)
         if config.debug

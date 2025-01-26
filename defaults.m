@@ -21,8 +21,9 @@ config.warn_arc_of_flexion = 50; % Warn if arc arc of flexion is less than
 %% Post-processing definitions
 % Smoothing functions are very computationally expensive. Suggest no intraspecimen smoothing intraspecimen.
 % Intraspecimen
-config.fill_missing_quantisation = @(x) fillmissing(x, "linear"); % Missing quanta are filled with this function. E.g., have flexion angles 40 and 42; it fills the 41 linearly.
-config.intraspecimen_smoothing = @(x) smoothdata(x, "gaussian", 10); % @(x) x => no smoothing
+config.fill_missing_raw_data = @(x) deal(x, false(size(x))); % No interpolation
+
+config.fill_missing_quantisation = @(x) fillmissing(x, "pchip"); % Missing quanta are filled with this function. E.g., have flexion angles 40 and 42; it fills the 41 linearly.config.intraspecimen_smoothing = @(x) smoothdata(x, "gaussian", 10); % @(x) x => no smoothing
 
  % Interspecimen
 config.interpolation_algorithm = @(x, v, xq) interp1(x, v, xq, "pchip");
