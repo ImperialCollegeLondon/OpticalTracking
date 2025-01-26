@@ -4,6 +4,11 @@ function [landmarks, config] = load_data(folder_path, config)
     tsv_files = dir(fullfile(folder_path, "*.tsv"));
     files = [csv_files; tsv_files];
 
+    if isempty(files)
+        landmarks = Option.None;
+        return
+    end
+
     landmarks = struct();
     
     % Open the files as tables, use the headers to determine which optical
@@ -56,6 +61,7 @@ function [landmarks, config] = load_data(folder_path, config)
         end
     end
 
+    landmarks = Option.Some(landmarks);
 end
 
 function remove_whitespaces(filepath)

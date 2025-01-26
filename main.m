@@ -80,6 +80,10 @@ for i = 1:numel(specimen_folders)
         .expect("Could not determine knee side. Folder name should indicate the side.");
 
     [digitisation, config] = load_data(fp_digitisation, config);
+    if digitisation.is_none()
+        continue
+    end
+    digitisation = digitisation.unwrap();
     % if config.is_polaris
     %     config.label = label.polaris;
     % else
@@ -96,7 +100,12 @@ for i = 1:numel(specimen_folders)
             fp_data = fullfile(state.folder, state.name);
             
             [data_raw, ~] = load_data(fp_data, config);
-        
+            
+            if data_raw.is_none()
+                warning('No csv files in %s', fp_data)
+                continue;
+            end
+            data_raw = data_raw.unwrap();
             %% Run
             state_clean = clean_specimen_condition(state.name);
             config.specimen.state = state_clean;
