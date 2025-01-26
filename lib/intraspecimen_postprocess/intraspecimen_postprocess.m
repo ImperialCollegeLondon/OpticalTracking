@@ -19,7 +19,7 @@ function output = intraspecimen_postprocess(data, config)
                 headers = data(lc).(tibiofemoral{j}).Properties.VariableNames;
                 if config.debug
                     loading_condition = data(lc).name;
-                    config.loading_condition = loading_condition;
+                    config.specimen.loading_condition = loading_condition;
                     fprintf("  Interspecimen post-process: %s: %s\n", loading_condition, tibiofemoral{j})
                 end
                 datum = intraspecimen_mean(data(lc).(tibiofemoral{j}), config);

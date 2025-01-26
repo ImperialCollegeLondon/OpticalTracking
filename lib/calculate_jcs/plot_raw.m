@@ -3,7 +3,7 @@ function fig = plot_raw(data, config, idx_interpol)
     loading_conditions = {data.name};
     for lc = 1:numel(loading_conditions)
         tibiofemoral = setdiff(fieldnames(data), "name");
-        config.loading_condition = loading_conditions{lc};
+        config.specimen.loading_condition = loading_conditions{lc};
         for tf = 1:numel(tibiofemoral)
             if isempty(data(lc).(tibiofemoral(tf)))
                 continue
@@ -21,7 +21,7 @@ function fig = plot_raw(data, config, idx_interpol)
                 else
                     plot(p);
                 end
-                ylabel(headers{h});
+                ylabel(replace(headers{h}, '_', ' '));
                 % Plot the interpolation
                 if isempty(idx_interpol)
                     % Called from calculate_kinematics(). Means there's
@@ -38,7 +38,7 @@ function fig = plot_raw(data, config, idx_interpol)
                
             end
 
-            sgtitle([[config.specimen_name ' ' replace(config.state, '_', ' ') ' ' config.loading_condition] tibiofemoral(tf)]);
+            sgtitle([[config.specimen.name ' ' replace(config.specimen.state, '_', ' ') ' ' config.specimen.loading_condition] tibiofemoral(tf)]);
             sgt.Interpreter = "latex";
 
             if isempty(idx_interpol) % Print problematic data

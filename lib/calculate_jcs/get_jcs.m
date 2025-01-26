@@ -11,7 +11,7 @@ function [data, transforms] = get_jcs(data_raw, trackers, config)
     for i = 1:numel(data_raw)
         loading_condition = landmarks(i).name;
         input.name = loading_condition;
-        config.loading_condition = loading_condition;
+        config.specimen.loading_condition = loading_condition;
         % Assign the tracker to the right bone based on their labels
         % defined in `defaults`
         if config.is_polaris

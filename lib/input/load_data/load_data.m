@@ -41,7 +41,13 @@ function [landmarks, config] = load_data(folder_path, config)
     
     % Necessary to use the same load_data() for landmarks and data. Handles switching from generic labels to optical tracker specific. 
     if config.is_polaris
-        config.probe_labels = get_probe_labels(config.polaris, landmarks, folder_path);
+        probe = probe_labels_from_name(config.polaris, landmarks);
+        probe_label = [probe.label];
+        if any(probe_label.is_none())
+            probe = probe_labels_from_config(landmarks, folder_path);
+        end
+        config.probe_labels = probe;
+        % config.probe_labels = get_probe_labels(config.polaris, landmarks, folder_path);
     else
         lb = config.certus;
         for i = 1:numel(lb)

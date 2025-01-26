@@ -3,6 +3,10 @@ figure(1)
 %% Tibia
 grid;
     t = landmarks.tibia;
+    fields = fieldnames(t);
+    for i = 1:numel(fields)
+        t.(fields{i}) = t.(fields{i}).unwrap();
+    end
     plot_t = scatter3(t.medial.Tx(1), t.medial.Ty(1), t.medial.Tz(1), 'b');
     hold on;
     text(t.medial.Tx(1), t.medial.Ty(1), t.medial.Tz(1), "  Medial");
@@ -27,6 +31,10 @@ grid;
 
 %% Femur
     f = landmarks.femur;
+    fields = fieldnames(f);
+    for i = 1:numel(fields)
+        f.(fields{i}) = f.(fields{i}).unwrap();
+    end
 
     plot_f = scatter3(f.medial.Tx(1), f.medial.Ty(1), f.medial.Tz(1), 'r');
     text(f.medial.Tx(1), f.medial.Ty(1), f.medial.Tz(1), '  Medial')
@@ -50,9 +58,9 @@ grid;
     quiver3(o(1), o(2), o(3), prox_dist(1), prox_dist(2), prox_dist(3), 0, 'r');
 % grid;
 if config.is_right_knee
-    title_str = [config.specimen_name '. Right knee'];
+    title_str = [config.specimen.name '. Right knee'];
 else
-    title_str = [config.specimen_name '. Left knee'];
+    title_str = [config.specimen.name '. Left knee'];
 end
 title(title_str);
 legend([plot_t, plot_f], {"Tibia", "Femur"})

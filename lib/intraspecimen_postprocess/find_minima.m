@@ -77,7 +77,7 @@ function minima = find_minima(input, config)
     if config.show_minima && config.enable_raw_plot
         hold on;
         plot(input);
-        % title([config.specimen_name, ' ', replace(config.state, '_', ' '), ' ', config.loading_condition]);
+        % title([config.specimen.name, ' ', replace(config.specimen.state, '_', ' '), ' ', config.specimen.loading_condition]);
         scatter(find(local_minima), input(local_minima));
         scatter(minima, input(minima), "k*");
         legend("data", "Reasonable minima", "Chosen minima");

@@ -94,20 +94,12 @@ for i = 1:numel(specimen_folders)
             state = knee_states(k);
             
             fp_data = fullfile(state.folder, state.name);
-            try
-                [data_raw, ~] = load_data(fp_data, config);
-            catch ME
-                if any(contains({ME.stack.name}, "label", "IgnoreCase",true))
-                    warning("%s: There's something wrong with the tracker data. Skipping the whole state. Check the file manually.", state_clean);
-                    continue;
-                else
-                    rethrow(ME)
-                end
-            end
+            
+            [data_raw, ~] = load_data(fp_data, config);
         
             %% Run
             state_clean = clean_specimen_condition(state.name);
-            config.state = state_clean;
+            config.specimen.state = state_clean;
             [datum, transforms.(state_clean)] = get_jcs(data_raw, trackers, config);
 
             tibiofemoral = setdiff(fieldnames(datum), "name");

@@ -40,13 +40,22 @@ classdef Option
         function r = unwrap(obj)
             r = obj.expect("Called unwrap() on None");
         end
-        function r = unwrap_or(obj, default)
-            if obj.is_none
-                r = default;
-                return
-            end
-            r = obj.value;
-        end
+        % function r = unwrap_or(obj, default)
+        %     % None
+        %     none = obj.is_none;
+        %     r = obj;
+        %     if any(none)
+        %         disp("x");
+        %     end
+        %     r(none) = default;
+        %     r = r.unwrap();
+        %     % if obj.is_none
+        %     %     r = default;
+        %     %     return
+        %     % end
+        %     % % Some
+        %     % r = obj.value;
+        % end
         function r = is_none(obj)
             some = [obj.is_some];
             val = {obj.value};
