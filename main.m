@@ -48,6 +48,7 @@ root = uigetdir(".", "Choose the root folder");
 %%
 specimen_with_duplicates = [];
 specimen_list = get_root_files(root, {'result', 'problem'}).unwrap(); % Get all files in root and exclude any folders that include `result`
+specimen_list(~[specimen_list.isdir]) = [];
 specimen_folders = fullfile({specimen_list.folder}, {specimen_list.name});
 tic
 

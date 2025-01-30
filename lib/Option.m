@@ -13,17 +13,14 @@ classdef Option
     end
     methods
         function r = and_then(obj, func)
-            obj = obj(~obj.is_none);
             if obj.is_none
                 r = Option.None;
                 return
             end
-            val = {obj.value};
-            r = cellfun(func, val, "UniformOutput", false);
-            r = r(cellfun(@(x) x.is_some, r));
-            if isscalar(r)
-                r = r{:};
-            end
+            obj = obj(~obj.is_none);
+            val = [obj.value];
+            r = func(val);
+            r = r(~r.is_none());
             if isempty(r)
                 r = Option.None();
             end
@@ -64,11 +61,12 @@ classdef Option
             % r = ~obj.is_some && isempty(obj.value);
         end
         function r = map(obj, func)
-            obj = obj(~obj.is_none);
             if isempty(obj)
                 r = Option.None();
                 return;
             end
+            obj = obj(~obj.is_none);
+
             val = {obj.value};
             r = Option(cellfun(func, val, "UniformOutput", false));
             if isscalar(r.value)

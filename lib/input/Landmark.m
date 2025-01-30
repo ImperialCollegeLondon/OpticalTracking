@@ -22,7 +22,7 @@ classdef Landmark
             end
 
             one_letter = cellfun(@(x) x(1), bone_position);
-            match_one_letter = strcmpi(filenames, one_letter);
+            match_one_letter = contains(filenames, one_letter);
             if any(match_one_letter)
                 result = Option(obj(match_one_letter));
                 return
