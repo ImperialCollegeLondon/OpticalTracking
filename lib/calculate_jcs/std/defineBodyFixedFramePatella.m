@@ -1,18 +1,23 @@
 function gTp0 = defineBodyFixedFramePatella(patella,right)
-med = patella.medial.translations_mean;
-lat = patella.lateral.translations_mean;
-try
-dist = patella.distal.translations_mean;
-catch
-inf = patella.inferior.translations_mean;
-sup = patella.superior.translations_mean;
-end
-
-if isempty(med) || isempty(lat)
+med = patella.medial.map(@(x) x.translations_mean);
+lat = patella.lateral.map(@(x) x.translations_mean);
+dist = patella.distal.map(@(x) x.translations_mean);
+inf = patella.inferior.map(@(x) x.translations_mean);
+sup = patella.superior.map(@(x) x.translations_mean);
+if med.is_none || lat.is_none
     gTp0 = [];
     return
 end
-%defines a body fixed frame for the tibia.  
+med = med.unwrap();
+lat = lat.unwrap();
+try
+    dist = dist.unwrap();
+catch
+    inf = inf.unwrap();
+    sup = sup.unwrap();
+end
+
+%defines a body fixed frame for the patella.  
 %my notation, _ implies it is a vector e.g. xa_ is the direction vector of
 %the x-axis
 

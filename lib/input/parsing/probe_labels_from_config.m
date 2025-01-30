@@ -1,36 +1,19 @@
-function probe = get_probe_labels(labels, calibration, root)
-files = dir(fullfile(root, "*.tbr"));
-if numel(files) == 0
-    disp("x")
-end
-config = fullfile(files(1).folder, files(1).name);
-
-probes = {calibration.probes};
-names = {probes{1}.probe};
-for i = 1:numel(names)
-    probe(i).name = names{i};
-    name = names{i}{1};
-    label = read_config(config, name);
-    % If it finds no label, attempt to determine it from probe name
-    if ~isempty(label)
-        probe(i).label = label;
-        continue
+function probe = probe_labels_from_config(calibration, root)
+    files = dir(fullfile(root, "*.tbr"));
+    if numel(files) == 0
+        disp("x")
     end
-
-    labels_cell = struct2cell(labels);
-    found_label_cells = cellfun(@(x) any(strcmp(x, strsplit(name, ' '))), labels_cell, 'UniformOutput',false);
-    label_idx = cell2mat(found_label_cells);
-    label = Option(labels_cell{label_idx});
-
-    if label.is_none()
-        non_empty = labels_cell(~cellfun(@isempty,labels_cell));
-        idx = cellfun(@(x) any(contains(name, x)) , non_empty, 'UniformOutput',false);
-        idx = [idx{:}];
-        label = Option(non_empty(idx));
+    config = fullfile(files(1).folder, files(1).name);
+    
+    probes = {calibration.probes};
+    names = {probes{1}.probe};
+    for i = 1:numel(names)
+        probe(i).name = names{i};
+        name = names{i}{1};
+        label = read_config(config, name);
+        % If it finds no label, attempt to determine it from probe name
+        probe(i).label = Option(label);
     end
-
-    probe(i).label = label;
-end
 end
 
 function label = read_config(file_path, target_string)

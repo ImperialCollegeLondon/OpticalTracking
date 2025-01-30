@@ -1,7 +1,15 @@
 function gTt0 = defineBodyFixedFrameTibia(tibia,right)
-med = tibia.medial.translations_mean;
-lat = tibia.lateral.translations_mean;
-dist = tibia.distal.translations_mean;
+med = tibia.medial.map(@(x) x.translations_mean);
+lat = tibia.lateral.map(@(x) x.translations_mean);
+dist = tibia.distal.map(@(x) x.translations_mean);
+if med.is_none || lat.is_none || dist.is_none
+    gTt0 = [];
+    return
+end
+med = med.unwrap();
+lat = lat.unwrap();
+dist = dist.unwrap();
+
 %defines a body fixed frame for the tibia.  
 %my notation, _ implies it is a vector e.g. xa_ is the direction vector of
 %the x-axis

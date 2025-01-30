@@ -9,9 +9,9 @@ ptTtc = trackers.patella.transform;
 ptrpc = trackers.patella.origin;
 
 %% Load how tracker moves with time
-gTtti = findTrackerFixedFrames(data.tibia.rotations, data.tibia.translations);
-gTfti = findTrackerFixedFrames(data.femur.rotations, data.femur.translations);
-gTpti = findTrackerFixedFrames(data.patella.rotations, data.patella.translations);
+gTtti = findTrackerFixedFrames(data.tibia);
+gTfti = findTrackerFixedFrames(data.femur);
+gTpti = findTrackerFixedFrames(data.patella);
 % Create matrices of tracker marker position and rotations in time
 
 
@@ -80,14 +80,14 @@ transforms.in_femur.femur = repmat(eye(4), 1, 1, size(fTt, 3));
 
 num_nan = sum(isnan(table2array(result_tf)), "all");
 if num_nan > 0.2 * numel(result_tf)
-    warning("%s %s: %d%% of data missing", config.state, config.loading_condition, round(num_nan/numel(result_tf)*100) )
+    warning("%s %s: %d%% of data missing", config.specimen.state, config.specimen.loading_condition, round(num_nan/numel(result_tf)*100) )
     if config.plot_missing_data
         plot_raw(output, config, {});
     end
 end
 
 if config.enable_warn_arc_of_flexion && max(result_tf.flexion) - min(result_tf.flexion) < config.warn_arc_of_flexion
-    warning("%s %s: Arc of flexion less than 50 deg", config.state, config.loading_condition)
+    warning("%s %s: Arc of flexion less than 50 deg", config.specimen.state, config.specimen.loading_condition)
 end
 end
 

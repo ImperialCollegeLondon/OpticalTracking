@@ -21,10 +21,12 @@ config.warn_arc_of_flexion = 50; % Warn if arc arc of flexion is less than
 %% Post-processing definitions
 % Smoothing functions are very computationally expensive. Suggest no intraspecimen smoothing intraspecimen.
 % Intraspecimen
-config.fill_missing_quantisation = @(x) fillmissing(x, "linear"); % Missing quanta are filled with this function. E.g., have flexion angles 40 and 42; it fills the 41 linearly.
+config.fill_missing_raw_data = @(x) deal(x, false(size(x))); % No interpolation
+
+config.fill_missing_quantisation = @(x) fillmissing(x, "pchip"); % Missing quanta are filled with this function. E.g., have flexion angles 40 and 42; it fills the 41 linearly.
 config.intraspecimen_smoothing = @(x) smoothdata(x, "gaussian", 10); % @(x) x => no smoothing
 
-% Interspecimen
+ % Interspecimen
 config.interpolation_algorithm = @(x, v, xq) interp1(x, v, xq, "pchip");
 config.interspecimen_smoothing = @(x) smoothdata(x, "gaussian", 10); 
 
@@ -44,24 +46,27 @@ config.digitisation = {'digit', 'calibr'}; % Case insensitive digitisation file 
 
 % Polaris labels: determined by either looking at its name
 % (e.g., Brainlab Y Junction) or the label defined in the .tbr file.
-label.polaris.tibia = 'T';
-label.polaris.femur = 'Y';
-label.polaris.patella = '';
-label.polaris.probe = 'Probe';
+config.polaris.tibia = 'T';
+config.polaris.femur = 'Y';
+config.polaris.patella = '';
+config.polaris.probe = 'Probe';
 
 % Certus labels: Names used for each tracker in the data files.
 % The way we find the Certus probe is defined in lib/configure/is_certus_probe.
-label.certus.tibia = 'tibia';
-label.certus.femur = 'femur';
-label.certus.patella = 'patella';
-label.certus.probe = 'Probe'; % Don't change this even if the probe is called something else.
-
+config.certus.tibia = 'tibia';
+config.certus.femur = 'femur';
+config.certus.patella = 'patella';
+config.certus.probe = 'Probe'; % Don't change this even if the probe is called something else.
 
 %% STL files
 config.stl.tibia_left = "models/tibia-left.stl";
 config.stl.tibia_right = "models/tibia-right.stl";
 config.stl.femur_left = "models/femur-left.stl";
 config.stl.femur_right = "models/femur-right.stl";
+
+%% Create the config
+
+% config = Config(config);
 
 %% Misc
 % Change the rendering in images from tex to latex.

@@ -1,7 +1,14 @@
 function gTf0 = defineBodyFixedFrameFemur(femur,right)
-med = femur.medial.translations_mean;
-lat = femur.lateral.translations_mean;
-prox = femur.proximal.translations_mean;
+med = femur.medial.map(@(x) x.translations_mean);
+lat = femur.lateral.map(@(x) x.translations_mean);
+prox = femur.proximal.map(@(x) x.translations_mean);
+if med.is_none || lat.is_none || prox.is_none
+    gTf0 = [];
+    return
+end
+med = med.unwrap();
+lat = lat.unwrap();
+prox = prox.unwrap();
 %defines a body fixed frame for the femur.  
 %my notation, _ implies it is a vector e.g. xa_ is the direction vector of
 %the x-axis

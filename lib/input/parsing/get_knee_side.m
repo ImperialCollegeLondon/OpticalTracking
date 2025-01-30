@@ -3,16 +3,17 @@ function is_right_knee = get_knee_side(root, right_text, left_text)
     test_name = parent_folder_full_fp{end};
     test_name_split = lower(string(split(test_name, {'_', ' ', '-'})));
     if any(test_name_split == lower(right_text), "all")
-        is_right_knee = true;
+        is_right_knee = Option(true);
     elseif any(test_name_split == lower(left_text), "all")
-        is_right_knee = false;
+        is_right_knee = Option(false);
     else
         files = string({dir(root).name});
         files = files(~ismember(lower(files), [".", "..", "results"]));
-        if isscalar(files)
+        % if isscalar(files)
             is_right_knee = get_knee_side(files, right_text, left_text);
-        else
-            error("Could not determine knee side. Folder name should indicate the side.")
-        end
+            is_right_knee = Option(is_right_knee);
+        % else
+            % error("Could not determine knee side. Folder name should indicate the side.")
+        % end
     end
 end

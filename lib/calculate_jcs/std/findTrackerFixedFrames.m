@@ -1,10 +1,14 @@
-function [ gTtiF ] = findTrackerFixedFrames(eulerAngles,XYZ)
+function [ gTtiF ] = findTrackerFixedFrames(rigid_body)
+if rigid_body.is_none
+    gTtiF = [];
+    return
+end
+rigid_body = rigid_body.unwrap();
+eulerAngles = rigid_body.rotations;
+XYZ = rigid_body.translations;
+
 % Creates 4 x 4 x m matrices, where each page is gTtiF (tracker in global
 % frame of reference)
-if nargin == 0
-    gTtiF = [];
-    return;
-end
 Rx = reshape(eulerAngles(:,1), [1, 1, length(eulerAngles(:,1))]);
 Ry = reshape(eulerAngles(:,2), [1, 1, length(eulerAngles(:,2))]);
 Rz = reshape(eulerAngles(:,3), [1, 1, length(eulerAngles(:,3))]);
