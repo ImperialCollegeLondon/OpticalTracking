@@ -9,9 +9,9 @@ config.split_flex_ext = false; % Split flexion from extension arc
 config.digitisation_angle = 0; % Angle of the knee when it was digitised
 config.intact_name = "Intact"; % Usually "Intact" or "Native". Must be consistent with file naming.
 %% Run flags
-config.enable_raw_plot = true; % Creates plots of translations/rotations over time. Suggest enable config.debug as well, otherwise this produces hundreds of popups.
+config.enable_raw_plot = false; % Creates plots of translations/rotations over time. Suggest enable config.debug as well, otherwise this produces hundreds of popups.
 config.show_minima = true;
-config.debug = true; % Generates landmark visualisation, run splitting plots, allows errors to stop execution, etc.
+config.debug = false; % Generates landmark visualisation, run splitting plots, allows errors to stop execution, etc.
 % If something is not working, set config.debug = true. Prepare for spam.
 config.digitisation_correction = false;
 config.plot_missing_data = false;
@@ -23,7 +23,8 @@ config.warn_arc_of_flexion = 50; % Warn if arc arc of flexion is less than
 % Intraspecimen
 config.fill_missing_raw_data = @(x) deal(x, false(size(x))); % No interpolation
 
-config.fill_missing_quantisation = @(x) fillmissing(x, "pchip"); % Missing quanta are filled with this function. E.g., have flexion angles 40 and 42; it fills the 41 linearly.config.intraspecimen_smoothing = @(x) smoothdata(x, "gaussian", 10); % @(x) x => no smoothing
+config.fill_missing_quantisation = @(x) fillmissing(x, "pchip"); % Missing quanta are filled with this function. E.g., have flexion angles 40 and 42; it fills the 41 linearly.
+config.intraspecimen_smoothing = @(x) smoothdata(x, "gaussian", 10); % @(x) x => no smoothing
 
  % Interspecimen
 config.interpolation_algorithm = @(x, v, xq) interp1(x, v, xq, "pchip");

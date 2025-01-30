@@ -59,10 +59,11 @@ for i = 1:numel(specimen_folders)
     specimen_name = get_specimen_name(specimen_list(i).name);
     config.specimen.name = specimen_name;
     fprintf("%d. Specimen: %s\n", i, specimen_name);
-    fp_conditions = get_root_files(specimen_folders{i}, {}).unwrap();
-    if isempty(fp_conditions)
+    fp_conditions = get_root_files(specimen_folders{i}, {});
+    if fp_conditions.is_none
         continue
     end
+    fp_conditions = fp_conditions.unwrap();
 
     fp_digitisation = get_digitisation(fp_conditions, config.digitisation);
     if fp_digitisation.is_none()
@@ -84,11 +85,7 @@ for i = 1:numel(specimen_folders)
         continue
     end
     digitisation = digitisation.unwrap();
-    % if config.is_polaris
-    %     config.label = label.polaris;
-    % else
-    %     config.label = label.certus;
-    % end
+
     [trackers, landmarks] = create_trackers(digitisation, config);
     if config.enable_raw_plot, clf; visualise_landmarks(landmarks, config), keyboard, end
     %% Load experiment data
@@ -126,14 +123,7 @@ for i = 1:numel(specimen_folders)
         
             data.(state_clean) = datum;
         end
-    % catch ME
-    %     if config.debug
-    %         rethrow(ME)
-    %     else
-    %         warning(ME.message);
-    %         continue;
-    %     end
-    % end
+
     states = string(fieldnames(data));
     for k = 1:numel(states)
         if config.debug
