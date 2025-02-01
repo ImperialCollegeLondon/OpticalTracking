@@ -26,9 +26,9 @@ fTt = pagemldivide(gTfi, gTti); % Transformation of Tibia relative to the femur
 %calculate the position vectors of the origin in the global frame of
 %reference
 grfi = squeeze(pagemtimes(gTfti, ftrfc)); %femur origin in global reference frame
-femur.point=grfi;
+femur.origin=grfi;
 grti = squeeze(pagemtimes(gTtti, ttrtc)); %tibia origin in global reference frame
-tibia.point=grti;
+tibia.origin=grti;
 % frti = squeeze(fTt(:, 4, :));%tibial origin point in the femoral reference frame, note this also equals gTfi{i,1}(1:3,1:3)'*(grti{i,1}(1:3)-grfi{i,1}(1:3); as in Woltring et al. It also equals fTt{i,1}(:,4) and equals gTfi{i,1}\grti{i,1} as gTfi, grfi{1,1} = [0,0,0,1]' which makes sense as the femoral origin in the femoral reference frame is 0,0,0);
 % Creates the structures the code expects, but all with empty data. Necessary to handle a missing patella without crashing.
 if isempty(gTpti) || isempty(ptTtc)
@@ -52,7 +52,7 @@ else
     patella.j  = squeeze( gTpi(1:3, 2, :));
     patella.k  = squeeze( gTpi(1:3, 3, :));
 end
-patella.point  = grpi;
+patella.origin = grpi;
 
 % Femoral x, y, z unit vector, Grood and Suntay definition
 femur.i = squeeze(gTfi(1:3, 1, :));

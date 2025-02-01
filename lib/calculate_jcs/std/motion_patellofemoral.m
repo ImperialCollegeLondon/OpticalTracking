@@ -24,7 +24,7 @@ else
     varus=-(90-beta);
 end
 
-pH_ = [patella.point(1:3,:) - femur.point(1:3,:)];%translation vector of from femoral origin to tibial origin (in global coordinate frame)
+pH_ = [patella.origin(1:3,:) - femur.origin(1:3,:)];%translation vector of from femoral origin to tibial origin (in global coordinate frame)
 if right
     lateral=dot(pH_,e1_);%projected onto the medial lateral axis e1
 else
