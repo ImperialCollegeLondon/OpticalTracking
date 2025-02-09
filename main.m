@@ -122,6 +122,9 @@ for i = 1:numel(specimen_folders)
             if config.print_single_runs, print_to_file(datum, fp_data), end
         
             data.(state_clean) = datum;
+
+            %% Tension data
+            load_tension(fp_data, config);
         end
 
     states = string(fieldnames(data));
