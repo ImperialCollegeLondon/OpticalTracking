@@ -36,7 +36,7 @@ classdef Marker
                 r = mean(obj.rotations(), "omitmissing");
         end
         function r = translations(obj)
-            r = [obj.Tx obj.Ty obj.Tz];
+            r = [vertcat(obj.Tx) vertcat(obj.Ty) vertcat(obj.Tz)];
         end
         function r = translations_mean(obj)
             if isempty(obj.translations)

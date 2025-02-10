@@ -7,26 +7,37 @@ grid;
     for i = 1:numel(fields)
         t.(fields{i}) = t.(fields{i}).unwrap();
     end
-    plot_t = scatter3(t.medial.Tx(1), t.medial.Ty(1), t.medial.Tz(1), 'b');
+    t_med = t.medial.translations_mean();
+    plot_t = scatter3(t_med(1), t_med(2), t_med(3), 'b');
     hold on;
-    text(t.medial.Tx(1), t.medial.Ty(1), t.medial.Tz(1), "  Medial");
-    scatter3(t.lateral.Tx(1), t.lateral.Ty(1), t.lateral.Tz(1), 'b');
-    text(t.lateral.Tx(1), t.lateral.Ty(1), t.lateral.Tz(1), "  Lateral");
-    scatter3(t.distal.Tx(1), t.distal.Ty(1), t.distal.Tz(1), 'b');
-    text(t.distal.Tx(1), t.distal.Ty(1), t.distal.Tz(1), "  Distal");
+    text(t_med(1), t_med(2), t_med(3), "  Medial");
+
+    t_lat = t.lateral.translations_mean();
+    scatter3(t_lat(1), t_lat(2), t_lat(3), 'b');
+    text(t_lat(1), t_lat(2), t_lat(3), "  Lateral");
+
+    t_dist = t.distal.translations_mean();
+    scatter3(t_dist(1), t_dist(2), t_dist(3), 'b');
+    text(t_dist(1), t_dist(2), t_dist(3), "  Distal");
+
+    if ~isscalar(t.distal)
+        for n = 1:numel(t.distal)
+            scatter3(t.distal(n).Tx(1), t.distal(n).Ty(1), t.distal(n).Tz(1), 'k');
+        end
+    end
 
     % Medial-lateral axis
     o = (t.medial.translations_mean + t.lateral.translations_mean)/2;
     scatter3(o(1), o(2), o(3), 8, 'b', 'filled')
     if config.is_right_knee
-        med_lat = t.lateral.translations_mean - t.medial.translations_mean;
-        quiver3(t.medial.Tx(1), t.medial.Ty(1), t.medial.Tz(1), med_lat(1), med_lat(2), med_lat(3), 0, 'b')
+        med_lat = t_lat - t_med;
+        quiver3(t_med(1), t_med(2), t_med(3), med_lat(1), med_lat(2), med_lat(3), 0, 'b')
     else
-        med_lat = t.medial.translations_mean - t.lateral.translations_mean;
-        quiver3(t.lateral.Tx(1), t.lateral.Ty(1), t.lateral.Tz(1), med_lat(1), med_lat(2), med_lat(3), 0, 'b')
+        med_lat = t_med - t_lat;
+        quiver3(t_lat(1), t_lat(2), t_lat(3), med_lat(1), med_lat(2), med_lat(3), 0, 'b')
     end
     % Proximal-distal axis
-    prox_dist = t.distal.translations_mean - o;
+    prox_dist = t_dist - o;
     quiver3(o(1), o(2), o(3), prox_dist(1), prox_dist(2), prox_dist(3), 0, 'b');
 
 %% Femur
@@ -36,25 +47,36 @@ grid;
         f.(fields{i}) = f.(fields{i}).unwrap();
     end
 
-    plot_f = scatter3(f.medial.Tx(1), f.medial.Ty(1), f.medial.Tz(1), 'r');
-    text(f.medial.Tx(1), f.medial.Ty(1), f.medial.Tz(1), '  Medial')
-    scatter3(f.lateral.Tx(1), f.lateral.Ty(1), f.lateral.Tz(1), 'r');
-    text(f.lateral.Tx(1), f.lateral.Ty(1), f.lateral.Tz(1), '  Lateral')
-    scatter3(f.proximal.Tx(1), f.proximal.Ty(1), f.proximal.Tz(1), 'r');
-    text(f.proximal.Tx(1), f.proximal.Ty(1), f.proximal.Tz(1), "  Proximal")
+    f_med = f.medial.translations_mean();
+    plot_f = scatter3(f_med(1), f_med(2), f_med(3), 'r');
+    text(f_med(1), f_med(2), f_med(3), '  Medial')
+
+    f_lat = f.lateral.translations_mean();
+    scatter3(f_lat(1), f_lat(2), f_lat(3), 'r');
+    text(f_lat(1), f_lat(2), f_lat(3), '  Lateral');
+
+    f_prox = f.proximal.translations_mean();
+    scatter3(f_prox(1), f_prox(2), f_prox(3), 'r');
+    text(f_prox(1), f_prox(2), f_prox(3), "  Proximal")
+
+    if ~isscalar(f.proximal)
+        for n = 1:numel(f.proximal)
+            scatter3(f.proximal(n).Tx(1), f.proximal(n).Ty(1), f.proximal(n).Tz(1), 'k');
+        end
+    end
 
     % Medial-lateral axis
-    o = (f.medial.translations_mean + f.lateral.translations_mean)/2;
+    o = (f_med + f_lat)/2;
     scatter3(o(1), o(2), o(3), 8, 'r', 'filled')
     if config.is_right_knee
-        med_lat = f.lateral.translations_mean - f.medial.translations_mean;
-        quiver3(f.medial.Tx(1), f.medial.Ty(1), f.medial.Tz(1), med_lat(1), med_lat(2), med_lat(3), 0, 'r')
+        med_lat = f_lat - f_med;
+        quiver3(f_med(1), f_med(2), f_med(3), med_lat(1), med_lat(2), med_lat(3), 0, 'r')
     else
-        med_lat = f.medial.translations_mean - f.lateral.translations_mean;
-        quiver3(f.lateral.Tx(1), f.lateral.Ty(1), f.lateral.Tz(1), med_lat(1), med_lat(2), med_lat(3), 0, 'r')
+        med_lat = f_med - f_lat;
+        quiver3(f_lat(1), f_lat(2), f_lat(3), med_lat(1), med_lat(2), med_lat(3), 0, 'r')
     end
     % Proximal-distal axis
-    prox_dist = f.proximal.translations_mean - o;
+    prox_dist = f_prox - o;
     quiver3(o(1), o(2), o(3), prox_dist(1), prox_dist(2), prox_dist(3), 0, 'r');
 % grid;
 if config.is_right_knee

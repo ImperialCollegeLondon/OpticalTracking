@@ -1,0 +1,6 @@
+105 -- range 100 to 110
+
+Digitisation in flexion
+Starting motion in flexion 90deg
+Extension -> flexion 3x.
+External -> internal 3x 
