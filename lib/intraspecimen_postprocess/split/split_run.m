@@ -1,6 +1,11 @@
-function [split_runs, includes_a_peak] = split_run(input, config)
+function [split_runs, includes_a_peak] = split_run(input, config, threshold)
+arguments
+    input
+    config
+    threshold = round(10+7*log(height(input)));
+end
     % valid_runs = split_runs(:, includes_a_peak);
-    minima = find_minima(input, config);
+    minima = find_minima(input, config, threshold);
     minima = minima(:).'; % force it to be a row vector
     flexions = input * ones(1, length(minima) + 1);
     runs = false(size(flexions));

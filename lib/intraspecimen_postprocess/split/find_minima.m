@@ -1,6 +1,9 @@
-function minima = find_minima(input, config)
-    distance_threshold = round(10+7*log(height(input)));  % Minimum distance between minima
-    
+function minima = find_minima(input, config, distance_threshold)
+    arguments
+        input
+        config
+        distance_threshold = round(10+7*log(height(input)));
+    end
     local_minima = islocalmin(input);
     if ~any(local_minima)
         minima = [];
@@ -19,7 +22,7 @@ function minima = find_minima(input, config)
     large_change = false(size(local_minima));
     large_change(idx_minima(changes_over_time)) = true;
     
-    close_to_extension = input < mean(input, "omitmissing")/4;
+    close_to_extension = input < mean(input, "omitmissing");
     reasonable_minima = local_minima & large_change & close_to_extension;
     
     idx_reasonable_minima = find(reasonable_minima);
@@ -73,7 +76,6 @@ function minima = find_minima(input, config)
     end
     
     minima = nearby_if_nan(minima, input);
-    % INSPECTION: Visualise all minima and the viable minima clusters by uncommenting the lines below
     if config.show_minima && config.enable_raw_plot
         hold on;
         plot(input);
