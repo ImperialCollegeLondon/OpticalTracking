@@ -2,12 +2,17 @@
 % Please read them anyway, especially Settings and Run flags.
 
 %% Settings
+
 config.print_single_runs = true; % Print individual runs to file. They are located in the Results folder for each specimen/knee state.
 config.step_size = 1; % quantisation step size for output data. i.e., flexion is grouped in intervals of 1, 0.5, 0.2, etc. Suggest 1.
 config.average_runs = true; % Whether to take intraspecimen mean. Suggest true.
 config.split_flex_ext = false; % Split flexion from extension arc
 config.digitisation_angle = 0; % Angle of the knee when it was digitised
 config.intact_name = "Intact"; % Usually "Intact" or "Native". Must be consistent with file naming.
+
+% Tension
+config.tension = true;
+config.enable_tension_plot = true;
 %% Run flags
 config.enable_raw_plot = false; % Creates plots of translations/rotations over time. Suggest enable config.debug as well, otherwise this produces hundreds of popups.
 config.show_minima = true;

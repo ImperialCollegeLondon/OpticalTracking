@@ -14,9 +14,12 @@ function O = clean_specimen_condition(input)
     O = replace(O, "ext", "Ext");
     O = replace(O, "neut", "Neut");
     O = replace(O, "Cut", "cut");
-    O = replace(O, 'repair', 'recon');
+    % O = replace(O, 'repair', 'recon');
     O = replace(O, 'every', 'Every');
     O = replace(O, 'varus', 'Varus');
+
+    O = replace(O, 'KF_repair', 'LET');
+    O = replace(O, 'KF_recon', 'LET');
 
     %% Corrections of the stupid mistakes
     O = replace(O, 'All_states', 'Everything_recon');

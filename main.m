@@ -124,7 +124,13 @@ for i = 1:numel(specimen_folders)
             data.(state_clean) = datum;
 
             %% Tension data
-            load_tension(fp_data, config);
+            if config.tension    
+                tension = load_tension(fp_data, config);
+                if ~tension.is_none
+                    tension_mean(i).name = specimen_name;
+                    tension_mean(i).(state_clean) = tension.unwrap();
+                end
+            end
         end
 
     states = string(fieldnames(data));
