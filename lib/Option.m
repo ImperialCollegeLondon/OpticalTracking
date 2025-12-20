@@ -1,7 +1,9 @@
 classdef Option
     properties
-        is_some
         value
+    end
+    properties (Access = private)
+        contains_val
     end
     methods(Static)
         function none = None()
@@ -12,6 +14,9 @@ classdef Option
         end
     end
     methods
+        function r = is_some(self)
+            r = self.contains_val;
+        end
         function r = and_then(obj, func)
             obj = obj(~obj.is_none);
             if obj.is_none
@@ -57,7 +62,7 @@ classdef Option
         %     % r = obj.value;
         % end
         function r = is_none(obj)
-            some = [obj.is_some];
+            some = [obj.contains_val];
             val = {obj.value};
             r = ~some & cellfun(@isempty, val);
 
@@ -91,10 +96,10 @@ classdef Option
         end
         function obj = Option(val)
             if nargin == 0 || isempty(val)
-                obj.is_some = false;
+                obj.contains_val = false;
                 obj.value = [];
             else
-                obj.is_some = true;
+                obj.contains_val = true;
                 obj.value = val;
             end
         end

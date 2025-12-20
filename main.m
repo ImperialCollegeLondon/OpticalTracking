@@ -37,6 +37,7 @@
 % `transforms` to their specific runs, use `specimen_with_duplicates`
 clc; clear; close all;
 %% Load default configuration. Check ./lib/configure/defaults.m if you want to modify them.
+addpath(genpath('lib'))
 defaults
 if config.digitisation_correction
     warning("Rotation of landmarks based on digitisation angle is enabled")
@@ -80,13 +81,13 @@ for i = 1:numel(specimen_folders)
     config.is_right_knee = get_knee_side(root, config.right, config.left) ...
         .expect("Could not determine knee side. Folder name should indicate the side.");
 
-    [digitisation, config] = load_data(fp_digitisation, config);
+    digitisation = load_data(fp_digitisation, config);
     if digitisation.is_none()
         continue
     end
     digitisation = digitisation.unwrap();
 
-    [trackers, landmarks] = create_trackers(digitisation, config);
+    [trackers, landmarks] = assign_tracker_to_bone(digitisation, config);
     if config.enable_raw_plot, clf; visualise_landmarks(landmarks, config), keyboard, end
     %% Load experiment data
     knee_states = get_root_files(root, config.digitisation).unwrap();

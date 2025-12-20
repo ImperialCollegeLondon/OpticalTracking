@@ -1,9 +1,8 @@
 function probe = probe_labels_from_name(labels, calibration)
-    probes = {calibration.probes};
-    names = {probes{1}.probe};
+    names = unique({calibration.Name});
     for i = 1:numel(names)
-        probe(i).name = names{i};
-        name = names{i}{1};
+        name = names{i};
+        probe(i).name = name;
     
         labels_cell = struct2cell(labels);
         found_label_cells = cellfun(@(x) any(strcmp(x, strsplit(name, ' '))), labels_cell, 'UniformOutput',false);

@@ -46,17 +46,17 @@ config.digitisation = {'digit', 'calibr'}; % Case insensitive digitisation file 
 
 % Polaris labels: determined by either looking at its name
 % (e.g., Brainlab Y Junction) or the label defined in the .tbr file.
-config.polaris.tibia = 'T';
-config.polaris.femur = 'Y';
-config.polaris.patella = '';
-config.polaris.probe = 'Probe';
+config.camera_labels.polaris.tibia = 'T';
+config.camera_labels.polaris.femur = 'Y';
+config.camera_labels.polaris.patella = '';
+config.camera_labels.polaris.probe = 'Probe';
 
 % Certus labels: Names used for each tracker in the data files.
 % The way we find the Certus probe is defined in lib/configure/is_certus_probe.
-config.certus.tibia = 'tibia';
-config.certus.femur = 'femur';
-config.certus.patella = 'patella';
-config.certus.probe = 'Probe'; % Don't change this even if the probe is called something else.
+config.camera_labels.certus.tibia = 'tibia';
+config.camera_labels.certus.femur = 'femur';
+config.camera_labels.certus.patella = 'patella';
+config.camera_labels.certus.probe = 'Probe'; % Don't change this even if the probe is called something else.
 
 %% STL files
 config.stl.femur_right = "models/femur2.stl";
