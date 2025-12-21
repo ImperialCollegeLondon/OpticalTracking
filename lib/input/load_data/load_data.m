@@ -27,9 +27,9 @@ function trackers = load_data(folder_path, config)
             end
         end
 
-        trackers(i, :) = Camera.load_data(data);
+        trackers(:, i) = Camera.load_data(data);
         landmark = clean_specimen_condition(parent_path);
-        trackers(i, :).add_landmark(landmark);
+        trackers(:, i).add_landmark(landmark);
     end
     
     trackers.add_labels(config.camera_labels);

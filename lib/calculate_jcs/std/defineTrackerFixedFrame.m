@@ -1,41 +1,32 @@
 function [ gTt0 ] = defineTrackerFixedFrame(eulerAngles,XYZ)
-if eulerAngles.is_none || XYZ.is_none
-    gTt0 = [];
-    return;
-end
-i=1;
+    if isempty(eulerAngles) || isempty(XYZ)
+        gTt0 = [];
+        return;
+    end 
+    identity_mat = @(n) repmat(eye(4), 1, 1, n);
+    n = height(eulerAngles);
 
-eulerAngles = eulerAngles.unwrap();
-XYZ = XYZ.unwrap();
+    Qx = identity_mat(n);
+    Qy = identity_mat(n);
+    Qz = identity_mat(n);
+    trans = identity_mat(n);
 
-Rx=eulerAngles(i,1);
-Ry=eulerAngles(i,2);
-Rz=eulerAngles(i,3);
+    Rx = eulerAngles(:, 1);
+    Ry = eulerAngles(:, 2);
+    Rz = eulerAngles(:, 3);
 
-Qx=[1   0         0
-    0   cosd(Rx)  -sind(Rx)
-    0   sind(Rx)  cosd(Rx)];
+    Qx(2:3, 2:3, :) = [cosd(Rx), -sind(Rx); sind(Rx), cosd(Rx)];
 
-Qy=[cosd(Ry)    0   sind(Ry)
-    0           1   0
-    -sind(Ry)   0   cosd(Ry)];
+    Qy(1, 1, :) = cosd(Ry);
+    Qy(1, 3, :) = sind(Ry);
+    Qy(3, 1, :) = -sind(Ry);
+    Qy(3, 3, :) = cosd(Ry);
 
-Qz=[cosd(Rz)    -sind(Rz)   0
-    sind(Rz)    cosd(Rz)    0
-    0           0           1];
+    Qz(1:2, 1:2, :) = [cosd(Rz), -sind(Rz); sind(Rz), cosd(Rz)];
 
-rot=Qz*Qy*Qx;
+    rot = pagemtimes(pagemtimes(Qz, Qy), Qx);
 
-rot=[rot,[0 0 0]';0 0 0 1];
+    trans(4, 1:3, :) = XYZ';
 
-trans=[1 0 0 XYZ(i,1);
-       0 1 0 XYZ(i,2);
-       0 0 1 XYZ(i,3)
-       0 0 0 1];
-
-
-gTt0=trans*rot;
-
-
-
+    gTt0 = pagemtimes(trans, rot);
 end

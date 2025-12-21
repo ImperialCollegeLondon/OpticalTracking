@@ -16,9 +16,11 @@ grp0 = origins(gTp0);
 
 %% Define frame of reference for each of the trackers in global coordinates
 gTft0 = femur.tracker.map(@(x) defineTrackerFixedFrame(x.rotations_mean, x.translations_mean));
-[gTft0] = defineTrackerFixedFrame(femur.tracker.map(@(x) x.rotations_mean), femur.tracker.map(@(x) x.translations_mean));
-[gTtt0] = defineTrackerFixedFrame(tibia.tracker.map(@(x) x.rotations_mean), tibia.tracker.map(@(x) x.translations_mean));
-[gTpt0] = defineTrackerFixedFrame(patella.tracker.map(@(x) x.rotations_mean), patella.tracker.map(@(x) x.translations_mean));
+gTtt0 = tibia.tracker.map(@(x) defineTrackerFixedFrame(x.rotations_mean, x.translations_mean));
+gTpt0 = patella.tracker.map(@(x) defineTrackerFixedFrame(x.rotations_mean, x.translations_mean));
+% [gTft0] = defineTrackerFixedFrame(femur.tracker.map(@(x) x.rotations_mean), femur.tracker.map(@(x) x.translations_mean));
+% [gTtt0] = defineTrackerFixedFrame(tibia.tracker.map(@(x) x.rotations_mean), tibia.tracker.map(@(x) x.translations_mean));
+% [gTpt0] = defineTrackerFixedFrame(patella.tracker.map(@(x) x.rotations_mean), patella.tracker.map(@(x) x.translations_mean));
 
 %% Relate body fixed frames and origin to the tracker rigid body
 % A constant transform of the body fixed frame in the tracker frame of reference (assumes rigid body)

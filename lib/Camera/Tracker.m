@@ -3,13 +3,9 @@ classdef Tracker < handle
         Landmark
         Name
         Label
-        Q
-        Rx
-        Ry
-        Rz
-        Tx
-        Ty
-        Tz
+        Q0, Qx, Qy, Qz
+        Rx, Ry, Rz,
+        Tx, Ty, Tz,
         Error
     end
     properties (Access = private)
@@ -29,10 +25,10 @@ classdef Tracker < handle
             self.Ty    = ty;
             self.Tz    = tz;
 
-            self.Q.q0  = q0;
-            self.Q.qx  = qx;
-            self.Q.qy  = qy;
-            self.Q.qz  = qz;
+            self.Q0  = q0;
+            self.Qx  = qx;
+            self.Qy  = qy;
+            self.Qz  = qz;
 
             [rx, ry, rz] = quaternion2euler(q0, qx, qy, qz);
 
