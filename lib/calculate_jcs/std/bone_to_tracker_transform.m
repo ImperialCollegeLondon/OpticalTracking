@@ -18,10 +18,10 @@ grp0 = origins(gTp0);
 gTft0 = femur.tracker.map(@(x) defineTrackerFixedFrame(x.rotations_mean, x.translations_mean));
 gTtt0 = tibia.tracker.map(@(x) defineTrackerFixedFrame(x.rotations_mean, x.translations_mean));
 gTpt0 = patella.tracker.map(@(x) defineTrackerFixedFrame(x.rotations_mean, x.translations_mean));
-% [gTft0] = defineTrackerFixedFrame(femur.tracker.map(@(x) x.rotations_mean), femur.tracker.map(@(x) x.translations_mean));
-% [gTtt0] = defineTrackerFixedFrame(tibia.tracker.map(@(x) x.rotations_mean), tibia.tracker.map(@(x) x.translations_mean));
-% [gTpt0] = defineTrackerFixedFrame(patella.tracker.map(@(x) x.rotations_mean), patella.tracker.map(@(x) x.translations_mean));
 
+gTft0 = gTft0.unwrap_or([]);
+gTtt0 = gTtt0.unwrap_or([]);
+gTpt0 = gTpt0.unwrap_or([]);
 %% Relate body fixed frames and origin to the tracker rigid body
 % A constant transform of the body fixed frame in the tracker frame of reference (assumes rigid body)
 % As in, tibia in the tibial tracker's frame of reference.
@@ -33,12 +33,22 @@ trackers.femur.origin = gTft0\grf0; %ftrfc
 
 trackers.patella.transform = gTpt0\gTp0; %ttTpc
 trackers.patella.origin = gTpt0\grp0; %ptrpc
+
+% trackers.tibia.transform = gTtt0.map(@(x) x\gTt0); %ttTtc
+% trackers.tibia.origin = gTtt0.map(@(x) x\grt0); %ttrtc
+%
+% trackers.femur.transform = gTft0.map(@(x) x\gTf0); %ftTfc
+% trackers.femur.origin = gTft0.map(@(x) x\grf0); %ftrfc
+%
+% trackers.patella.transform = gTpt0.map(@(x) x\gTp0); %ttTpc
+% trackers.patella.origin = gTpt0.map(@(x) x\grp0); %ptrpc
+
 end
 
 function o = origins(tracker)
-if isempty(tracker)
-    o = [];
-else
-    o = tracker(:,4);
-end
+    if isempty(tracker)
+        o = [];
+    else
+        o = tracker(:,4);
+    end
 end
