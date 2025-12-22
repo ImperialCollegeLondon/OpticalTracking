@@ -5,9 +5,10 @@ classdef Digitisation < handle
         filepath
         bone
         transforms
+        module
     end
     methods (Static)
-        function digitisation = new(filepath, config) % => Option<Digitisation>
+        function digitisation = new(filepath, config, module) % => Option<Digitisation>
             digitisation = Option.None;
             folder = get_folder(filepath, config.digitisation);
             root = folder.map(@fileparts);
@@ -24,17 +25,26 @@ classdef Digitisation < handle
             if trackers.is_none()
                 return;
             end
-            digitisation = Option(Digitisation(trackers.unwrap(), root, config));
+            digitisation = Digitisation(trackers.unwrap(), root, config, module);
+            switch module
+                case Module.Knee
+                    Knee.assign_bone(digitisation);
+                case Module.Hip
+                    error("Not implemented")
+            end
+
+            digitisation = Option(digitisation);
         end
 
 
     end
 
     methods (Access = private)
-        function self = Digitisation(trackers, filepath, config)
+        function self = Digitisation(trackers, filepath, config, module)
             self.trackers = trackers;
             self.config = config;
             self.filepath = filepath;
+            self.module = module;
         end
     end
 end

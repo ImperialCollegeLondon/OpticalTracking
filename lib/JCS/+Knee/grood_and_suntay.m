@@ -65,8 +65,8 @@ function trajectory = grood_and_suntay(data, trackers, config)
     tibia.j = squeeze(gTti(1:3, 2, :));
     tibia.k = squeeze(gTti(1:3, 3, :));
 
-    trajectory.add_data('tibiofemoral', GroodAndSuntay.tibiofemoral(fTt, femur, tibia, right));
-    trajectory.add_data('patellofemoral', GroodAndSuntay.patellofemoral(fTp, femur, patella, right));
+    trajectory.add_data('tibiofemoral', Knee.GroodAndSuntay.tibiofemoral(fTt, femur, tibia, right));
+    trajectory.add_data('patellofemoral', Knee.GroodAndSuntay.patellofemoral(fTp, femur, patella, right));
 
     trajectory.add_transforms('gTfi', gTfi);
     trajectory.add_transforms('gTti', gTti);

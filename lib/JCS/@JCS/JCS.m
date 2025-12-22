@@ -9,6 +9,7 @@ classdef JCS
         function jcs = new(digitisation)
             config = digitisation.config;
             digitisation_transforms = digitisation.transforms;
+            module = digitisation.module;
             states = get_root_files(digitisation.filepath, config.digitisation).unwrap();
             i = 1;
             for st = 1:numel(states)
@@ -26,7 +27,12 @@ classdef JCS
                 loading_conditions = unique({trackers.Landmark});
                 for lc = 1:numel(loading_conditions)
                     loading_condition = loading_conditions{lc};
-                    trajectory = calculate_jcs(trackers(:, lc), loading_condition, digitisation_transforms, config);
+                    switch module
+                        case Module.Knee
+                            trajectory = Knee.calculate_jcs(trackers(:, lc), loading_condition, digitisation_transforms, config);
+                        case Module.Hip
+                            error("Not yet implemented");
+                    end
                     trajectories(i) = trajectory;
                     i = i + 1;
                 end
@@ -60,18 +66,3 @@ end
 % if config.print_single_runs, print_to_file(datum, fp_data), end
 %
 % data.(state_clean) = datum;
-function trajectory = calculate_jcs(trackers, loading_condition, digitisation_transforms, config)
-    %% Apply the tracker transforms to the data
-    input.name = loading_condition;
-    config.specimen.loading_condition = loading_condition;
-
-    label = trackers.camera().get_possible_labels(config.camera_labels);
-
-    input.tibia = trackers.with_label(label.tibia);
-    input.femur = trackers.with_label(label.femur);
-    input.patella = trackers.with_label(label.patella);
-    if (input.femur.is_none() && input.tibia.is_none()) || (input.femur.is_none() && input.patella.is_none())
-        return
-    end
-    trajectory = grood_and_suntay(input, digitisation_transforms, config);
-end

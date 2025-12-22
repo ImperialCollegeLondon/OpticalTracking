@@ -76,13 +76,14 @@ for i = 1:numel(specimen_folders)
     end
     fp_conditions = fp_conditions.unwrap();
 
-    digitisation = Digitisation.new(fp_conditions, config);
-    digitisation.map(@assign_bone);
+    module = Module.Knee;
+
+    digitisation = Digitisation.new(fp_conditions, config, module);
     if digitisation.is_none()
+        warning("Failed to complete digitisation");
         continue
     end
     digitisation = digitisation.unwrap();
-    % digitisation.assign_bone();
 
     if config.enable_raw_plot, clf; digitisation.visualise(), keyboard, end
 
