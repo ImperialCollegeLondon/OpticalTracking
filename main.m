@@ -77,14 +77,18 @@ for i = 1:numel(specimen_folders)
     fp_conditions = fp_conditions.unwrap();
 
     digitisation = Digitisation.new(fp_conditions, config);
+    digitisation.map(@assign_bone);
     if digitisation.is_none()
         continue
     end
     digitisation = digitisation.unwrap();
-    digitisation.assign_bone();
+    % digitisation.assign_bone();
 
     if config.enable_raw_plot, clf; digitisation.visualise(), keyboard, end
-    JCS.new(digitisation);
+
+    jcs = JCS.new(digitisation);
+    [trajectories, interp_idx] = jcs.trajectories.interpolate(config.fill_missing_raw_data);
+    jcs.plot()
     %% Load experiment data
     % knee_states = get_root_files(root, config.digitisation).unwrap();
     % % try
