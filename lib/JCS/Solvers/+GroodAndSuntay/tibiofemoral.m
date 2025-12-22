@@ -1,4 +1,4 @@
-function result = motion_tibiofemoral(relative_position, femur, tibia, right)
+function result = tibiofemoral(relative_position, femur, tibia, right)
 if isempty(relative_position)
     result = array2table([], 'VariableNames', {'flexion', 'varus', 'external', 'lateral', 'anterior', 'superior'});
     return;

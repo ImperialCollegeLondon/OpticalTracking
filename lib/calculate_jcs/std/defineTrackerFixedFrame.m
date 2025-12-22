@@ -26,7 +26,7 @@ function [ gTt0 ] = defineTrackerFixedFrame(eulerAngles,XYZ)
 
     rot = pagemtimes(pagemtimes(Qz, Qy), Qx);
 
-    trans(4, 1:3, :) = XYZ';
+    trans(1:3, 4, :) = XYZ';
 
     gTt0 = pagemtimes(trans, rot);
 end

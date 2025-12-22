@@ -1,33 +1,26 @@
-function [data, transforms] = get_jcs(data_raw, trackers, config)
-    if isempty(data_raw)
+function [data, transforms] = get_jcs(trackers, tracker_transforms, config)
+    if isempty(trackers)
         data = [];
         transforms = [];
         return
     end
     
-    landmarks = new_landmark(data_raw, config);
-    
     %% Apply the tracker transforms to the data
-    for i = 1:numel(data_raw)
-        loading_condition = landmarks(i).name;
+    loading_conditions = unique({trackers.Name});
+    for i = 1:numel(loading_conditions)
+        loading_condition = loading_condition{i};
         input.name = loading_condition;
         config.specimen.loading_condition = loading_condition;
-        % Assign the tracker to the right bone based on their labels
-        % defined in `defaults`
-        if config.is_polaris
-            label = config.polaris;
-        else
-            label = config.certus;
-        end
 
+        label = trackers.camera().get_possible_labels(config.camera_labels);
 
-        input.tibia = landmarks(i).probes.and_then(@(x) x.with_label(label.tibia));
-        input.femur = landmarks(i).probes.and_then(@(x) x.with_label(label.femur));
-        input.patella = landmarks(i).probes.and_then(@(x) x.with_label(label.patella));
+        input.tibia = trackers(i).with_label(label.tibia);
+        input.femur = trackers(i).with_label(label.femur);
+        input.patella = trackers(i).with_label(label.patella);
         if (input.femur.is_none() && input.tibia.is_none()) || (input.femur.is_none() && input.patella.is_none())
             continue
         end
-        [data(i), transforms(i)] = calculate_joint_kinematics(input, trackers, config);
+        [data(i), transforms(i)] = calculate_joint_kinematics(input, tracker_transforms, config);
         
     end
     mask = cellfun(@isempty, {data.name});

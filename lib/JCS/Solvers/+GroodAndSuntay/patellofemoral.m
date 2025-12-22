@@ -1,4 +1,4 @@
-function result = motion_patellofemoral(relative_position, femur, patella, right)
+function result = patellofemoral(relative_position, femur, patella, right)
 result = table();
 if isempty(relative_position)
     var_type = {'int8', 'int8', 'int8', 'int8', 'int8', 'int8'};

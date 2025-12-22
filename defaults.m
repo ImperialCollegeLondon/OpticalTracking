@@ -36,6 +36,7 @@ config.shift_flex = @(x) x; % No flexion shift
 
 %% Definitions that automate runs.
 % Substrings in the folder name to determine if it's left or right knee:
+% Folder name for each specimen must include these. e.g. AA123_LK or BB123-left to indicate a left knee. The list it checks is defined by these variables.
 config.right = {'rk', 'right', 'r'};
 config.left = {'lk', 'left', 'l'};
 

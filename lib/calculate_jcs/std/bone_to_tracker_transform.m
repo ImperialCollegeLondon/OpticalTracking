@@ -1,8 +1,8 @@
-function trackers = bone_to_tracker_transform(landmarks, config)
+function transforms = bone_to_tracker_transform(trackers, config)
 
-tibia = landmarks.tibia;
-femur = landmarks.femur;
-patella = landmarks.patella;
+tibia = trackers.tibia;
+femur = trackers.femur;
+patella = trackers.patella;
 right = config.is_right_knee;
 
 %% Define coordinate systems for each bone using digitised points
@@ -25,14 +25,14 @@ gTpt0 = gTpt0.unwrap_or([]);
 %% Relate body fixed frames and origin to the tracker rigid body
 % A constant transform of the body fixed frame in the tracker frame of reference (assumes rigid body)
 % As in, tibia in the tibial tracker's frame of reference.
-trackers.tibia.transform = gTtt0\gTt0; %ttTtc
-trackers.tibia.origin = gTtt0\grt0; %ttrtc
+transforms.tibia.transform = gTtt0\gTt0; %ttTtc
+transforms.tibia.origin = gTtt0\grt0; %ttrtc
 
-trackers.femur.transform = gTft0\gTf0; %ftTfc
-trackers.femur.origin = gTft0\grf0; %ftrfc
+transforms.femur.transform = gTft0\gTf0; %ftTfc
+transforms.femur.origin = gTft0\grf0; %ftrfc
 
-trackers.patella.transform = gTpt0\gTp0; %ttTpc
-trackers.patella.origin = gTpt0\grp0; %ptrpc
+transforms.patella.transform = gTpt0\gTp0; %ttTpc
+transforms.patella.origin = gTpt0\grp0; %ptrpc
 
 % trackers.tibia.transform = gTtt0.map(@(x) x\gTt0); %ttTtc
 % trackers.tibia.origin = gTtt0.map(@(x) x\grt0); %ttrtc

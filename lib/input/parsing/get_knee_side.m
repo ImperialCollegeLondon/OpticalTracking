@@ -10,8 +10,12 @@ function is_right_knee = get_knee_side(root, right_text, left_text)
         files = string({dir(root).name});
         files = files(~ismember(lower(files), [".", "..", "results"]));
         % if isscalar(files)
+        try
             is_right_knee = get_knee_side(files, right_text, left_text);
             is_right_knee = Option(is_right_knee);
+        catch
+            is_right_knee = Option.None;
+        end
         % else
             % error("Could not determine knee side. Folder name should indicate the side.")
         % end

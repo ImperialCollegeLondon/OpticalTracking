@@ -38,6 +38,16 @@
 clc; clear; close all;
 %% Load default configuration. Check ./lib/configure/defaults.m if you want to modify them.
 addpath(genpath('lib'))
+addpath(genpath('external'))
+
+path_postprocess = fullfile(pwd, 'external', 'postprocess');
+if ~isfolder(path_postprocess)
+    error(['Post-processing framework not found in "%s".\n' ...
+           'Please download it from https://github.com/ImperialCollegeLondon/opticaltracking-postprocess'] ...
+           , path_postprocess);
+end
+
+
 defaults
 if config.digitisation_correction
     warning("Rotation of landmarks based on digitisation angle is enabled")
@@ -66,64 +76,50 @@ for i = 1:numel(specimen_folders)
     end
     fp_conditions = fp_conditions.unwrap();
 
-    fp_digitisation = get_digitisation(fp_conditions, config.digitisation);
-    if fp_digitisation.is_none()
-        warning("No digitisation files found. Skipping specimen")
-        continue
-    end
-    fp_digitisation = fp_digitisation.unwrap();
-
-    if get_root_files(fp_digitisation, {'result'}).is_none()
-        continue
-    end
-    %% Load digitisation
-    [root, ~, ~] = fileparts(fp_digitisation);
-    config.is_right_knee = get_knee_side(root, config.right, config.left) ...
-        .expect("Could not determine knee side. Folder name should indicate the side.");
-
-    digitisation = load_data(fp_digitisation, config);
+    digitisation = Digitisation.new(fp_conditions, config);
     if digitisation.is_none()
         continue
     end
     digitisation = digitisation.unwrap();
+    digitisation.assign_bone();
 
-    [trackers, landmarks] = assign_tracker_to_bone(digitisation, config);
-    if config.enable_raw_plot, clf; visualise_landmarks(landmarks, config), keyboard, end
+    if config.enable_raw_plot, clf; digitisation.visualise(), keyboard, end
+    JCS.new(digitisation);
     %% Load experiment data
-    knee_states = get_root_files(root, config.digitisation).unwrap();
-    % try
-        for k = 1:numel(knee_states)
-            state = knee_states(k);
-            
-            fp_data = fullfile(state.folder, state.name);
-            
-            [data_raw, ~] = load_data(fp_data, config);
-            
-            if data_raw.is_none()
-                warning('No csv files in %s', fp_data)
-                continue;
-            end
-            data_raw = data_raw.unwrap();
-            %% Run
-            state_clean = clean_specimen_condition(state.name);
-            config.specimen.state = state_clean;
-            [datum, transforms.(state_clean)] = get_jcs(data_raw, trackers, config);
-
-            tibiofemoral = setdiff(fieldnames(datum), "name");
-            idx_interpol = cell(numel(datum), numel(tibiofemoral));
-            for lc = 1:numel(datum)
-                for tf = 1:numel(tibiofemoral)
-                    [datum(lc).(tibiofemoral(tf)), idx_interpol{lc, tf}] = config.fill_missing_raw_data(datum(lc).(tibiofemoral(tf)));
-                end
-            end
-            if config.enable_raw_plot
-                plot_raw(datum, config, idx_interpol);
-            end
-    
-            if config.print_single_runs, print_to_file(datum, fp_data), end
-        
-            data.(state_clean) = datum;
-        end
+    % knee_states = get_root_files(root, config.digitisation).unwrap();
+    % % try
+    %     for k = 1:numel(knee_states)
+    %         state = knee_states(k);
+    %         
+    %         fp_data = fullfile(state.folder, state.name);
+    %         
+    %         data_raw = load_data(fp_data, config);
+    %         
+    %         if data_raw.is_none()
+    %             warning('No csv files in %s', fp_data)
+    %             continue;
+    %         end
+    %         data_raw = data_raw.unwrap();
+    %         %% Run
+    %         state_clean = clean_specimen_condition(state.name);
+    %         config.specimen.state = state_clean;
+    %         [datum, transforms.(state_clean)] = get_jcs(data_raw, trackers, config);
+    %
+    %         tibiofemoral = setdiff(fieldnames(datum), "name");
+    %         idx_interpol = cell(numel(datum), numel(tibiofemoral));
+    %         for lc = 1:numel(datum)
+    %             for tf = 1:numel(tibiofemoral)
+    %                 [datum(lc).(tibiofemoral(tf)), idx_interpol{lc, tf}] = config.fill_missing_raw_data(datum(lc).(tibiofemoral(tf)));
+    %             end
+    %         end
+    %         if config.enable_raw_plot
+    %             plot_raw(datum, config, idx_interpol);
+    %         end
+    % 
+    %         if config.print_single_runs, print_to_file(datum, fp_data), end
+    %     
+    %         data.(state_clean) = datum;
+    %     end
 
     states = string(fieldnames(data));
     for k = 1:numel(states)
