@@ -2,49 +2,54 @@ classdef JCS
     properties
         trajectories
     end
-    properties
+    properties(Access = private)
+        digitisation
         config
     end
     methods (Static)
-        function jcs = new(digitisation)
-            config = digitisation.config;
-            digitisation_transforms = digitisation.transforms;
-            module = digitisation.module;
-            states = get_root_files(digitisation.filepath, config.digitisation).unwrap();
+        function jcs = new(digitisations)
             i = 1;
-            for st = 1:numel(states)
-                state = states(st);
-                fp_data = fullfile(state.folder, state.name);
-                trackers = load_data(fp_data, config);
-                if trackers.is_none()
-                    warning('No csv files in %s', fp_data)
-                    continue;
-                end
-                trackers = trackers.unwrap();
-
-                config.specimen.state = clean_specimen_condition(state.name);
-
-                loading_conditions = unique({trackers.Landmark});
-                for lc = 1:numel(loading_conditions)
-                    loading_condition = loading_conditions{lc};
-                    switch module
-                        case Module.Knee
-                            trajectory = Knee.calculate_jcs(trackers(:, lc), loading_condition, digitisation_transforms, config);
-                        case Module.Hip
-                            error("Not yet implemented");
+            for d = 1:numel(digitisations)
+                digitisation = digitisations(d);
+                config = digitisation.config;
+                digitisation_transforms = digitisation.transforms;
+                module = digitisation.module;
+                states = get_root_files(digitisation.filepath, config.digitisation).unwrap();
+                for st = 1:numel(states)
+                    state = states(st);
+                    fp_data = fullfile(state.folder, state.name);
+                    trackers = load_data(fp_data, config);
+                    if trackers.is_none()
+                        warning('No csv files in %s', fp_data)
+                        continue;
                     end
-                    trajectories(i) = trajectory;
-                    i = i + 1;
+                    trackers = trackers.unwrap();
+
+                    config.specimen.state = clean_specimen_condition(state.name);
+
+                    loading_conditions = unique({trackers.Landmark});
+                    for lc = 1:numel(loading_conditions)
+                        loading_condition = loading_conditions{lc};
+                        switch module
+                            case Module.Knee
+                                trajectory = Knee.calculate_jcs(trackers(:, lc), loading_condition, digitisation_transforms, config);
+                            case Module.Hip
+                                error("Not yet implemented");
+                        end
+                        trajectories(i) = trajectory;
+                        i = i + 1;
+                    end
                 end
             end
 
-            jcs = JCS(trajectories, config);
+            jcs = JCS(trajectories, digitisation, config);
         end
     end
     methods
-        function self = JCS(trajectories, config)
+        function self = JCS(trajectories, digitisation, config)
             self.trajectories = trajectories;
             self.config = config;
+            self.digitisation = digitisation;
         end
     end
 end

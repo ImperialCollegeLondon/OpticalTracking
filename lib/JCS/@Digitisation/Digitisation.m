@@ -38,6 +38,11 @@ classdef Digitisation < handle
 
 
     end
+    methods
+        function path = root(self)
+            path = fileparts(self(1).filepath);
+        end
+    end
 
     methods (Access = private)
         function self = Digitisation(trackers, filepath, config, module)
