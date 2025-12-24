@@ -73,17 +73,5 @@ function trajectory = grood_and_suntay(data, trackers, config)
     trajectory.add_transforms('gTpi', gTpi);
     trajectory.add_transforms('fTt', fTt);
     trajectory.add_transforms('fTp', fTp);
-    trajectory.add_transforms('fTf', repmat(eye(4), 1, 1, size(fTt, 3)));
-
-% num_nan = sum(isnan(table2array(result_tf)), "all");
-% if num_nan > 0.2 * numel(result_tf)
-%     warning("%s %s: %d%% of data missing", config.specimen.state, config.specimen.loading_condition, round(num_nan/numel(result_tf)*100) )
-%     if config.plot_missing_data
-%         plot_raw(output, config, {});
-%     end
-% end
-%
-% if config.enable_warn_arc_of_flexion && max(result_tf.flexion) - min(result_tf.flexion) < config.warn_arc_of_flexion
-%     warning("%s %s: Arc of flexion less than 50 deg", config.specimen.state, config.specimen.loading_condition)
-% end
 end
+
