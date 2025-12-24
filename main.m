@@ -86,6 +86,12 @@ end
     % jcs.print_to_file();
     % jcs.plot()
 
+    tension = load_tension(fp_data, config);
+    if ~tension.is_none
+        tension_mean(i).name = specimen_name;
+        tension_mean(i).(state_clean) = tension.unwrap();
+    end
+
 disp("Done loading data")
 toc
 
