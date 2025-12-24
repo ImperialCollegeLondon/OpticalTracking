@@ -39,18 +39,10 @@ clc; clear; close all;
 %% Load default configuration. Check ./lib/configure/defaults.m if you want to modify them.
 addpath(genpath('lib'))
 addpath(genpath('external'))
-
-path_postprocess = fullfile(pwd, 'external', 'postprocess');
-if ~isfolder(path_postprocess)
-    error(['Post-processing framework not found in "%s".\n' ...
-           'Please download it from https://github.com/ImperialCollegeLondon/opticaltracking-postprocess'] ...
-           , path_postprocess);
-end
-
-
 defaults
-if config.digitisation_correction
-    warning("Rotation of landmarks based on digitisation angle is enabled")
+
+if exist('Trajectory', 'class') ~= 8
+    error(['Could not detect Post-processing framework in %s', '%sexternal%s\nPlease download it from https://github.com/ImperialCollegeLondon/opticaltracking-postprocess'], pwd, filesep, filesep);
 end
 
 disp("Choose the root folder where all the specimens are")
@@ -78,92 +70,25 @@ for i = 1:numel(specimen_folders)
 
     module = Module.Knee;
 
-    digitisation = Digitisation.new(fp_conditions, config, module);
-    if digitisation.is_none()
+    n_digitisation = Digitisation.new(fp_conditions, config, module);
+    if n_digitisation.is_none()
         warning("Failed to complete digitisation");
         continue
     end
-    digitisation = digitisation.unwrap();
+    digitisation(i) = n_digitisation.unwrap();
 
     if config.enable_raw_plot, clf; digitisation.visualise(), keyboard, end
+end
 
     jcs = JCS.new(digitisation);
-    [trajectories, interp_idx] = jcs.trajectories.interpolate(config.fill_missing_raw_data);
-    jcs.plot()
-    %% Load experiment data
-    % knee_states = get_root_files(root, config.digitisation).unwrap();
-    % % try
-    %     for k = 1:numel(knee_states)
-    %         state = knee_states(k);
-    %         
-    %         fp_data = fullfile(state.folder, state.name);
-    %         
-    %         data_raw = load_data(fp_data, config);
-    %         
-    %         if data_raw.is_none()
-    %             warning('No csv files in %s', fp_data)
-    %             continue;
-    %         end
-    %         data_raw = data_raw.unwrap();
-    %         %% Run
-    %         state_clean = clean_specimen_condition(state.name);
-    %         config.specimen.state = state_clean;
-    %         [datum, transforms.(state_clean)] = get_jcs(data_raw, trackers, config);
-    %
-    %         tibiofemoral = setdiff(fieldnames(datum), "name");
-    %         idx_interpol = cell(numel(datum), numel(tibiofemoral));
-    %         for lc = 1:numel(datum)
-    %             for tf = 1:numel(tibiofemoral)
-    %                 [datum(lc).(tibiofemoral(tf)), idx_interpol{lc, tf}] = config.fill_missing_raw_data(datum(lc).(tibiofemoral(tf)));
-    %             end
-    %         end
-    %         if config.enable_raw_plot
-    %             plot_raw(datum, config, idx_interpol);
-    %         end
-    % 
-    %         if config.print_single_runs, print_to_file(datum, fp_data), end
-    %     
-    %         data.(state_clean) = datum;
-    %     end
+    jcs.trajectories.intraspecimen_mean();
+    [trajectories, interp_idx] = jcs.trajectories.interpolate();
+    % jcs.print_to_file();
+    % jcs.plot()
 
-    states = string(fieldnames(data));
-    for k = 1:numel(states)
-        if config.debug
-            fprintf("%s:\n", clean_specimen_condition(states(k)))
-        end
-        data_post_processed = intraspecimen_postprocess(data.(states(k)), config);
-
-        % Unique runs are kept separate because the transforms in global are
-        % unique. Not useful for data. Useful for drawing if not using tibia/patella on femur
-        specimen_with_duplicates(i).name = specimen_name;
-        specimen_with_duplicates(i).(states(k)) = data_post_processed;
-    end
-
-end
 disp("Done loading data")
 toc
-if isempty(specimen_with_duplicates)
-    error("No specimens were run. go to lib/configure/defaults.m, and set config.debug = true.")
-end
-%% Post process
-% Condense data
-specimens = remove_duplicate_specimens(specimen_with_duplicates);
 
-%% Offset specimen specific
-specimens_offset = specimen_specific_offset(specimens, config);
-%%
-states = setdiff(fieldnames(specimens), "name");
-
-for s = 1:numel(states)
-    state = states{s};
-    stats_offset.(state) = interspecimen_stats([specimens_offset.(state)], config);
-end
-
-%% Do the stats
-for s = 1:numel(states)
-    state = states{s};
-    stats.(state) = interspecimen_stats([specimens.(state)], config);
-end
 
 %% Visualise stl
 neutral = strcmpi({transforms.Intact.name}, "neutral");
