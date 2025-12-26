@@ -26,15 +26,12 @@
 % Make sure each folder is called SpecimenName_whatever_(side)_whatever
 % e.g. SN06_right_122024, JJ01 left, XE0_2_left, MA03_333_lk, etc.
 % right, left, lk, rk are the acceptable words.
-% These can be changed in /lib/configure/defaults`
+% These can be changed in ./defaults.m`
 % 
 % lib/configure/clean_specimen_condition.m is a list of regex to help
 % clean up inconsistency in your folders. e.g., between cases (ACL vs acl),
 % in naming (Reconstruction vs repair vs recon), or mistakes (esp instead of Sps)
 
-
-% For plotting, you want to use `specimen`, but if you need to match
-% `transforms` to their specific runs, use `specimen_with_duplicates`
 clc; clear; close all;
 %% Load default configuration. Check ./lib/configure/defaults.m if you want to modify them.
 addpath(genpath('lib'))
@@ -56,13 +53,18 @@ digitisation = Digitisation.new(root, config, module);
 
 jcs = JCS.new(digitisation);
 disp("Loading tension. XLSM files are slooooooow")
+%%
 jcs.load_tension();
+disp("Done loading data");
+%%
 % jcs.print_to_file();
 % jcs.plot()
 
 jcs.trajectories.intraspecimen_mean();
+jcs.trajectories.set_flexion_min(-3);
+jcs.trajectories.cp_sensor_to_kinematics();
 
-disp("Done loading data")
+
 % toc
 
 
