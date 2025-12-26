@@ -54,12 +54,9 @@ module = Module.Knee;
 
 digitisation = Digitisation.new(root, config, module);
 
-digitisation = digitisation(~digitisation.is_none).unwrap();
-
 jcs = JCS.new(digitisation);
 disp("Loading tension. XLSM files are slooooooow")
 jcs.load_tension();
-% [trajectories, interp_idx] = jcs.trajectories.interpolate();
 % jcs.print_to_file();
 % jcs.plot()
 
