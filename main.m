@@ -49,45 +49,21 @@ disp("Choose the root folder where all the specimens are")
 root = uigetdir(".", "Choose the root folder");
 
 %%
-specimen_with_duplicates = [];
-specimen_list = get_root_files(root, {'result', 'problem'}).unwrap(); % Get all files in root and exclude any folders that include `result`
-specimen_folders = fullfile({specimen_list.folder}, {specimen_list.name});
-tic
 
-if config.plot_missing_data
-    config.path_missing_data = fullfile(root, "problematic_data");
-    mkdir(config.path_missing_data);
-end
-for i = 1:numel(specimen_folders)
-    specimen_name = get_specimen_name(specimen_list(i).name);
-    config.specimen.name = specimen_name;
-    fprintf("%d. Specimen: %s\n", i, specimen_name);
-    fp_conditions = get_root_files(specimen_folders{i}, {});
-    if fp_conditions.is_none
-        continue
-    end
-    fp_conditions = fp_conditions.unwrap();
+module = Module.Knee;
 
-    module = Module.Knee;
+digitisation = Digitisation.new(root, config, module);
 
-    n_digitisation = Digitisation.new(fp_conditions, config, module);
-    if n_digitisation.is_none()
-        warning("Failed to complete digitisation");
-        continue
-    end
-    digitisation(i) = n_digitisation.unwrap();
+digitisation = digitisation(~digitisation.is_none).unwrap();
 
-    if config.enable_raw_plot, clf; digitisation.visualise(), keyboard, end
-end
+jcs = JCS.new(digitisation);
+disp("Loading tension. XLSM files are slooooooow")
+jcs.load_tension();
+% [trajectories, interp_idx] = jcs.trajectories.interpolate();
+% jcs.print_to_file();
+% jcs.plot()
 
-    jcs = JCS.new(digitisation);
-    disp("Loading tension. XLSM files are slooooooow")
-    jcs.load_tension();
-    % [trajectories, interp_idx] = jcs.trajectories.interpolate();
-    % jcs.print_to_file();
-    % jcs.plot()
-
-    jcs.trajectories.intraspecimen_mean();
+jcs.trajectories.intraspecimen_mean();
 
 disp("Done loading data")
 % toc
