@@ -81,31 +81,28 @@ for i = 1:numel(specimen_folders)
 end
 
     jcs = JCS.new(digitisation);
-    jcs.trajectories.intraspecimen_mean();
-    [trajectories, interp_idx] = jcs.trajectories.interpolate();
+    disp("Loading tension. XLSM files are slooooooow")
+    jcs.load_tension();
+    % [trajectories, interp_idx] = jcs.trajectories.interpolate();
     % jcs.print_to_file();
     % jcs.plot()
 
-    tension = load_tension(fp_data, config);
-    if ~tension.is_none
-        tension_mean(i).name = specimen_name;
-        tension_mean(i).(state_clean) = tension.unwrap();
-    end
+    jcs.trajectories.intraspecimen_mean();
 
 disp("Done loading data")
-toc
+% toc
 
 
-%% Visualise stl
-neutral = strcmpi({transforms.Intact.name}, "neutral");
-visualise_stl(config, transforms.Intact(neutral).in_femur.tibia, transforms.Intact(neutral).in_femur.femur);
-%% print to file
-print_mean_std_to_file(stats, states, root);
-%% Plot
-truncate_min = -5;
-truncate_max = 90;
-
-% plot_interspecimen(config, stats, states, truncate_min, truncate_max)
-plot_interspecimen(config, stats, stats_offset, states, truncate_min, truncate_max)
-
-diary off;
+% %% Visualise stl
+% neutral = strcmpi({transforms.Intact.name}, "neutral");
+% visualise_stl(config, transforms.Intact(neutral).in_femur.tibia, transforms.Intact(neutral).in_femur.femur);
+% %% print to file
+% print_mean_std_to_file(stats, states, root);
+% %% Plot
+% truncate_min = -5;
+% truncate_max = 90;
+% 
+% % plot_interspecimen(config, stats, states, truncate_min, truncate_max)
+% plot_interspecimen(config, stats, stats_offset, states, truncate_min, truncate_max)
+% 
+% diary off;

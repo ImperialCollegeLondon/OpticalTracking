@@ -16,18 +16,28 @@ function trackers = load_data(folder_path, config)
     for i = 1:numel(files)
         [~, parent_path, ~] = fileparts(files(i).name);
         fp = fullfile(files(i).folder, files(i).name);
-        try_to_read = {@read_default, @read_clean_whitespace, @read_tab};
 
-        for k = 1:numel(try_to_read)
+        try
+            data = readtable(fp, "VariableNamingRule","preserve");
+        catch
+            remove_whitespaces(fp);
             try
-                data = try_to_read{k}(fp);
-                break;
-            catch ME
-                error("Malformed csv file: %s", fp)
+                data = readtable(fp, "VariableNamingRule","preserve");
+            catch
+                try
+                    data = readtable(fp, "VariableNamingRule","preserve", "FileType","text", "Delimiter", '\t');
+                catch
+                    error("Malformed csv file: %s", fp)
+                end
             end
         end
 
-        trackers(:, i) = Camera.load_data(data);
+
+        tracker = Camera.load_data(data);
+        if isempty(tracker)
+            continue
+        end
+        trackers(:, i) = tracker;
         landmark = clean_specimen_condition(parent_path);
         trackers(:, i).add_landmark(landmark);
     end
@@ -35,17 +45,6 @@ function trackers = load_data(folder_path, config)
     trackers.add_labels(config.camera_labels);
 
     trackers = Option.Some(trackers);
-end
-
-function t = read_default(fp)
-    t = readtable(fp, "VariableNamingRule","preserve");
-end
-function t = read_clean_whitespace(fp)
-    remove_whitespaces(fp);
-    t = readtable(fp, "VariableNamingRule","preserve");
-end
-function t = read_tab(fp)
-    t = readtable(fp, "VariableNamingRule","preserve", "FileType","text", "Delimiter", '\t');
 end
 
 function remove_whitespaces(filepath)

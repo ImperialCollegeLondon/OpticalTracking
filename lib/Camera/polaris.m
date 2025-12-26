@@ -2,6 +2,11 @@ function trackers = polaris(data)
     probe_idx = find(contains(data.Properties.VariableNames, "Port"));
 
     n_probes = numel(probe_idx);
+    n_tools = data.Tools(1);
+    if n_tools == 1
+        trackers = [];
+        return
+    end
     if n_probes == 1
         n_cols_between_probes = 0;
     else
@@ -16,6 +21,7 @@ function trackers = polaris(data)
         name = names{k};
         % Get the data and convert the errors into NaN
         datum = standardizeMissing(data(:, 1+id:id+n_cols_between_probes-1), -3.697314E+028);
+        
         headers = datum.Properties.VariableNames;
         
         datum.Properties.VariableNames = clean_headers(headers);
