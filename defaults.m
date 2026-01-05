@@ -1,3 +1,4 @@
+function config = defaults()
 % These are sensible defaults.
 % Please read them anyway, especially Settings and Run flags.
 
@@ -81,3 +82,4 @@ profile on; % Allows you to track performance by running `profile viewer` after 
 diary("log.txt"); % Creates a file called log.txt which tracks everything happening in the console. Good for checking history of your runs.
 warning('off', 'backtrace'); % Removes where warnings are coming from. Remove if you want to figure out the source of warnings without turning them into errors with config.debug
 warning('off', 'MATLAB:MKDIR:DirectoryExists'); % Stop spamming that folders already exist. Do not remove this.
+end

@@ -36,7 +36,7 @@ clc; clear; close all;
 %% Load default configuration. Check ./lib/configure/defaults.m if you want to modify them.
 addpath(genpath('lib'))
 addpath(genpath('external'))
-defaults
+config = defaults();
 
 if exist('Trajectory', 'class') ~= 8
     error(['Could not detect Post-processing framework in %s', '%sexternal%s\nPlease download it from https://github.com/ImperialCollegeLondon/opticaltracking-postprocess'], pwd, filesep, filesep);
@@ -63,7 +63,7 @@ disp("Done loading data");
 jcs.trajectories.intraspecimen_mean();
 jcs.trajectories.set_flexion_min(-3);
 jcs.trajectories.cp_sensor_to_kinematics();
-
+jcs.trajectories.ap
 
 % toc
 
