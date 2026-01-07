@@ -42,18 +42,20 @@ function self = load_tension(self, identifier)
         z = unwrap_windowed(tension_raw.Z);
         
         z(z > 400) = NaN; % Sometimes unwrap thinks it's 2 phases away, so this just removes them.
-        
-
-        if this_state == "KF_cut" && this_specimen == "SN17" && this_loading_condition == "Internal"
+        if diff(z) > 100
             keyboard
         end
         tension.flexion = smoothdata(z, "gaussian", 8); % Fairly low number, but found it to copy the max/min best.
         forces = tension_raw.("Force (N)");
         if isnumeric(forces)
-            tension.force = forces;
+            tension.ACL_Tension = forces;
         else
-            tension.force = str2double(erase(forces, ' N'));
+            tension.ACL_Tension = str2double(erase(forces, ' N'));
         end
+        
+        % if any(diff(tension.force) > 30)
+        %     keyboard
+        % end
 
         mask = is_specimen & is_lc & is_state;
         if ~any(mask)

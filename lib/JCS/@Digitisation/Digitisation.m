@@ -6,13 +6,20 @@ classdef Digitisation < handle
         bone
         transforms
         module
+        angle_offset
     end
     methods (Static)
-        function digitisation = new(root, config, module) % => Option<Digitisation>
+        function digitisations = new(root, config, module, angle) % => Digitisation
+            arguments
+                root
+                config
+                module Module
+                angle = 0  % Digitisation angle. Leave as default if varying angles were used. It is possible to set maximum/minimum flexion angle on data instead
+            end
             specimen_list = get_root_files(root, {'result', 'problem'}).unwrap(); % Get all files in root and exclude any folders that include `result`
             specimen_folders = fullfile({specimen_list.folder}, {specimen_list.name});
             for i = 1:numel(specimen_folders)
-                n_digitisation = Option.None;
+                % digitisations(i) = Option.None;
                 specimen_name = get_specimen_name(specimen_list(i).name);
                 config.specimen.name = specimen_name;
                 fprintf("%d. Specimen: %s\n", i, specimen_name);
@@ -36,19 +43,29 @@ classdef Digitisation < handle
                 if trackers.is_none()
                     continue
                 end
-                n_digitisation = Digitisation(trackers.unwrap(), root, config, module);
+                digitisation = Digitisation(trackers.unwrap(), root, config, module);
                 switch module
                     case Module.Knee
-                        Knee.assign_bone(n_digitisation);
+                        Knee.assign_bone(digitisation);
+
+                        [t, b] = Knee.calculate_transforms(digitisation.trackers(:, 1), "None", digitisation.transforms, config);
+                        [digitisation_position.tf, digitisation_position.pf] = Knee.grood_and_suntay(b.femur, b.tibia, b.patella, t.fTt, t.fTp, config.is_right_knee);
+                        signals = fields(digitisation_position);
+                        for sg = 1:numel(signals)
+                            signal = signals{sg};
+                            if ~isempty(digitisation_position.(signal))
+                                digitisation.angle_offset.(signal) = angle - mean(digitisation_position.(signal).flexion);
+                            end
+                        end
                     case Module.Hip
                         error("Not implemented")
                 end
 
-                if isempty(n_digitisation)
+                if isempty(digitisation)
                     warning("Failed to complete digitisation");
                     continue
                 end
-                digitisation(i) = n_digitisation;
+                digitisations(i) = digitisation;
 
             end
         end
@@ -56,13 +73,14 @@ classdef Digitisation < handle
 
     end
     methods
-        function path = root(self)
-            path = fileparts(self(1).filepath);
+        function path = root(self) % => [&str]
+            paths = {self.filepath};
+            path = fileparts(paths{1});
         end
     end
 
     methods (Access = private)
-        function self = Digitisation(trackers, filepath, config, module)
+        function self = Digitisation(trackers, filepath, config, module) % => Digitisation
             self.trackers = trackers;
             self.config = config;
             self.filepath = filepath;

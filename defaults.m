@@ -73,6 +73,8 @@ config.stl.tibia_right = "models/tibia2.stl";
 
 % config = Config(config);
 
+config.specimen.state = "digitisation";
+
 %% Misc
 % Change the rendering in images from tex to latex.
 % If the serifs annoy you, just comment out this line.

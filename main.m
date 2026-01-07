@@ -52,18 +52,21 @@ module = Module.Knee;
 digitisation = Digitisation.new(root, config, module);
 
 jcs = JCS.new(digitisation);
-disp("Loading tension. XLSM files are slooooooow")
+
+kinematics = jcs.solve();
 %%
-jcs.load_tension();
+disp("Loading tension. XLSM files are slooooooow")
+kinematics.load_tension();
 disp("Done loading data");
 %%
 % jcs.print_to_file();
 % jcs.plot()
 
-jcs.trajectories.intraspecimen_mean();
-jcs.trajectories.set_flexion_min(-3);
-jcs.trajectories.cp_sensor_to_kinematics();
-jcs.trajectories.ap
+kinematics.trajectories.intraspecimen_mean();
+kinematics.trajectories.set_flexion_min(-3);
+kinematics.trajectories.cp_sensor_to_kinematics();
+kinematics.trajectories.path.average.plot()
+% .spm;
 
 % toc
 
