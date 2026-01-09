@@ -84,4 +84,11 @@ profile on; % Allows you to track performance by running `profile viewer` after 
 diary("log.txt"); % Creates a file called log.txt which tracks everything happening in the console. Good for checking history of your runs.
 warning('off', 'backtrace'); % Removes where warnings are coming from. Remove if you want to figure out the source of warnings without turning them into errors with config.debug
 warning('off', 'MATLAB:MKDIR:DirectoryExists'); % Stop spamming that folders already exist. Do not remove this.
+
+addpath(genpath('lib'))
+addpath(genpath('external'))
+if exist('Trajectory', 'class') ~= 8
+    error(['Could not detect Post-processing framework in %s', '%sexternal%s\nPlease download it from https://github.com/ImperialCollegeLondon/opticaltracking-postprocess'], pwd, filesep, filesep);
+end
+
 end

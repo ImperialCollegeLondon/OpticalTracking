@@ -1,3 +1,6 @@
 [submodule "external/postprocess"]
 	path = external/postprocess
 	url = imperial:jonathanjholt/opticaltracking-postprocess.git
+[submodule "external/spm1dmatlab"]
+	path = external/spm1dmatlab
+	url = https://github.com/0todd0000/spm1dmatlab.git

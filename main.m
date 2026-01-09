@@ -34,13 +34,8 @@
 
 clc; clear; close all;
 %% Load default configuration. Check ./lib/configure/defaults.m if you want to modify them.
-addpath(genpath('lib'))
-addpath(genpath('external'))
-config = defaults();
 
-if exist('Trajectory', 'class') ~= 8
-    error(['Could not detect Post-processing framework in %s', '%sexternal%s\nPlease download it from https://github.com/ImperialCollegeLondon/opticaltracking-postprocess'], pwd, filesep, filesep);
-end
+config = defaults();
 
 disp("Choose the root folder where all the specimens are")
 root = uigetdir(".", "Choose the root folder");
@@ -65,8 +60,14 @@ disp("Done loading data");
 kinematics.trajectories.intraspecimen_mean();
 kinematics.trajectories.set_flexion_min(-3);
 kinematics.trajectories.cp_sensor_to_kinematics();
-kinematics.trajectories.path.average.plot()
-% .spm;
+[flex, ext] = kinematics.trajectories.path.split_flex_ext;
+
+flex.spm;
+
+normalised = flex.normalise("Neutral", "Intact", "ACL_recon");
+norm_avg = normalised.average();
+norm_avg.plot();
+
 
 % toc
 
