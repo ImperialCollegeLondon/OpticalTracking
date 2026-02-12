@@ -1,6 +1,6 @@
 function trackers = load_data(folder_path, config)
     csv_files = dir(fullfile(folder_path, "*.csv"));
-    csv_files = csv_files(~contains({csv_files.name}, '3d.csv')); % Certus data files that shouldn't be used
+    csv_files = csv_files(~contains({csv_files.name}, {'3d.csv', 'tension', 'sensor'})); % Certus data files that shouldn't be used
     tsv_files = dir(fullfile(folder_path, "*.tsv"));
     files = [csv_files; tsv_files];
 

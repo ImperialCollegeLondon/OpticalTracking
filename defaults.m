@@ -78,7 +78,7 @@ config.specimen.state = "digitisation";
 %% Misc
 % Change the rendering in images from tex to latex.
 % If the serifs annoy you, just comment out this line.
-set(0,'defaulttextinterpreter','latex')
+% set(0,'defaulttextinterpreter','latex')
 set(groot, 'DefaultLineLineWidth', 1);
 profile on; % Allows you to track performance by running `profile viewer` after the program runs.
 diary("log.txt"); % Creates a file called log.txt which tracks everything happening in the console. Good for checking history of your runs.

@@ -17,6 +17,8 @@ classdef JCS
             jcs_solved = [self.grood_and_suntay()];
         end
         function kinematics = grood_and_suntay(self)
+            trajectories(numel(self)) = Trajectory();
+            
             for i = 1:numel(self)
                 switch self(i).module
                     case Module.Knee
@@ -36,7 +38,6 @@ classdef JCS
                         % if ~isempty(pf)
                         %     pf.flexion = pf.flexion - self.digitisation.angle_offset.pf;
                         % end
-
                         trajectory.add_data('tibiofemoral', tf);
                         trajectory.add_data('patellofemoral', pf);
 

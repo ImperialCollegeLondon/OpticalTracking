@@ -32,7 +32,7 @@
 % clean up inconsistency in your folders. e.g., between cases (ACL vs acl),
 % in naming (Reconstruction vs repair vs recon), or mistakes (esp instead of Sps)
 
-clc; clear; close all;
+% clc; clear; close all;
 %% Load default configuration. Check ./lib/configure/defaults.m if you want to modify them.
 
 config = defaults();
@@ -41,30 +41,29 @@ disp("Choose the root folder where all the specimens are")
 root = uigetdir(".", "Choose the root folder");
 
 %%
-
 module = Module.Knee;
-
 digitisation = Digitisation.new(root, config, module);
-
 jcs = JCS.new(digitisation);
-
 kinematics = jcs.solve();
 %%
-disp("Loading tension. XLSM files are slooooooow")
-kinematics.load_tension();
+disp("Loading tension")
+kinematics.load_tension("**/*tension.csv");
 disp("Done loading data");
 %%
 % jcs.print_to_file();
 % jcs.plot()
-
 kinematics.trajectories.intraspecimen_mean();
 kinematics.trajectories.set_flexion_min(-3);
 kinematics.trajectories.cp_sensor_to_kinematics();
 [flex, ext] = kinematics.trajectories.path.split_flex_ext;
 
-flex.spm;
+% flex.spm;
 
 normalised = flex.normalise("Neutral", "Intact", "ACL_recon");
+spm = normalised.spm();
+dunnett = spm.inference(0.05).dunnett(normalised, "ACL_recon");
+spm.between_subject.tibiofemoral.anterior.inference(0.05).plot('plot_threshold_label',true, 'plot_p_values',true, 'autoset_ylim',true);
+
 norm_avg = normalised.average();
 norm_avg.plot();
 

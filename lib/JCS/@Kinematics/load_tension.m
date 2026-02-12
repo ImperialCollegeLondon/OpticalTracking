@@ -1,7 +1,7 @@
 function self = load_tension(self, identifier)
     arguments
         self
-        identifier = "**/*.xlsm"
+        identifier = "**/*tension.csv"
     end
     digitisation = [self.digitisation];
     path = digitisation.root;
@@ -23,6 +23,7 @@ function self = load_tension(self, identifier)
 
         [~, this_loading_condition, ~] = fileparts(files(f).name);
         this_loading_condition = clean_specimen_condition(this_loading_condition);
+        this_loading_condition = replace(this_loading_condition, '_tension', '');
         words = split(filename, filesep);
         this_state = words{end-1};
         this_specimen_full = words{end-2};
@@ -48,9 +49,9 @@ function self = load_tension(self, identifier)
         tension.flexion = smoothdata(z, "gaussian", 8); % Fairly low number, but found it to copy the max/min best.
         forces = tension_raw.("Force (N)");
         if isnumeric(forces)
-            tension.ACL_Tension = forces;
+            tension.tension = forces;
         else
-            tension.ACL_Tension = str2double(erase(forces, ' N'));
+            tension.tension = str2double(erase(forces, ' N'));
         end
         
         % if any(diff(tension.force) > 30)
