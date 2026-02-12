@@ -83,7 +83,7 @@ classdef Tracker < handle
             r = mean(self.rotations(), "omitmissing");
         end
         function r = translations(self)
-            r = [self.Tx self.Ty self.Tz];
+            r = [vertcat(self.Tx) vertcat(self.Ty) vertcat(self.Tz)];
         end
         function r = translations_mean(self)
             if isempty(self.translations)
@@ -99,9 +99,9 @@ classdef Tracker < handle
                 r = Option.None;
                 return
             end
-            r = Option(self(has_label.unwrap()));
+            labeled = self(has_label.unwrap());
+            r = Option(labeled);
         end
-
 
         function result = contains(self, bone_position)
             % Looks for file names that include, e.g., "tibia" and "medial".
@@ -124,7 +124,7 @@ classdef Tracker < handle
             end
 
             % Attempt increasing lengths of the words
-            substrings = @(word) arrayfun(@(n) word(1:n), length(word):-1:2, 'UniformOutput', false);
+            substrings = @(word) arrayfun(@(n) word(1:n), length(word):-1:1, 'UniformOutput', false);
             all_substrings = cellfun(substrings, bone_position, 'UniformOutput', false);
 
 

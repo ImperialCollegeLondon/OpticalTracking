@@ -26,80 +26,61 @@
 % Make sure each folder is called SpecimenName_whatever_(side)_whatever
 % e.g. SN06_right_122024, JJ01 left, XE0_2_left, MA03_333_lk, etc.
 % right, left, lk, rk are the acceptable words.
-% These can be changed in /lib/configure/defaults`
+% These can be changed in ./defaults.m`
 % 
 % lib/configure/clean_specimen_condition.m is a list of regex to help
 % clean up inconsistency in your folders. e.g., between cases (ACL vs acl),
 % in naming (Reconstruction vs repair vs recon), or mistakes (esp instead of Sps)
 
-
-% For plotting, you want to use `specimen`, but if you need to match
-% `transforms` to their specific runs, use `specimen_with_duplicates`
-clc; clear; close all;
+% clc; clear; close all;
 %% Load default configuration. Check ./lib/configure/defaults.m if you want to modify them.
-addpath(genpath('lib'))
-addpath(genpath('external'))
-defaults
 
-if exist('Trajectory', 'class') ~= 8
-    error(['Could not detect Post-processing framework in %s', '%sexternal%s\nPlease download it from https://github.com/ImperialCollegeLondon/opticaltracking-postprocess'], pwd, filesep, filesep);
-end
+config = defaults();
 
 disp("Choose the root folder where all the specimens are")
 root = uigetdir(".", "Choose the root folder");
 
 %%
-specimen_with_duplicates = [];
-specimen_list = get_root_files(root, {'result', 'problem'}).unwrap(); % Get all files in root and exclude any folders that include `result`
-specimen_folders = fullfile({specimen_list.folder}, {specimen_list.name});
-tic
+module = Module.Knee;
+digitisation = Digitisation.new(root, config, module);
+jcs = JCS.new(digitisation);
+kinematics = jcs.solve();
+%%
+disp("Loading tension")
+kinematics.load_tension("**/*tension.csv");
+disp("Done loading data");
+%%
+% jcs.print_to_file();
+% jcs.plot()
+kinematics.trajectories.intraspecimen_mean();
+kinematics.trajectories.set_flexion_min(-3);
+kinematics.trajectories.cp_sensor_to_kinematics();
+[flex, ext] = kinematics.trajectories.path.split_flex_ext;
 
-if config.plot_missing_data
-    config.path_missing_data = fullfile(root, "problematic_data");
-    mkdir(config.path_missing_data);
-end
-for i = 1:numel(specimen_folders)
-    specimen_name = get_specimen_name(specimen_list(i).name);
-    config.specimen.name = specimen_name;
-    fprintf("%d. Specimen: %s\n", i, specimen_name);
-    fp_conditions = get_root_files(specimen_folders{i}, {});
-    if fp_conditions.is_none
-        continue
-    end
-    fp_conditions = fp_conditions.unwrap();
+% flex.spm;
 
-    module = Module.Knee;
+normalised = flex.normalise("Neutral", "Intact", "ACL_recon");
+spm = normalised.spm();
+dunnett = spm.inference(0.05).dunnett(normalised, "ACL_recon");
+spm.between_subject.tibiofemoral.anterior.inference(0.05).plot('plot_threshold_label',true, 'plot_p_values',true, 'autoset_ylim',true);
 
-    n_digitisation = Digitisation.new(fp_conditions, config, module);
-    if n_digitisation.is_none()
-        warning("Failed to complete digitisation");
-        continue
-    end
-    digitisation(i) = n_digitisation.unwrap();
-
-    if config.enable_raw_plot, clf; digitisation.visualise(), keyboard, end
-end
-
-    jcs = JCS.new(digitisation);
-    jcs.trajectories.intraspecimen_mean();
-    [trajectories, interp_idx] = jcs.trajectories.interpolate();
-    % jcs.print_to_file();
-    % jcs.plot()
-
-disp("Done loading data")
-toc
+norm_avg = normalised.average();
+norm_avg.plot();
 
 
-%% Visualise stl
-neutral = strcmpi({transforms.Intact.name}, "neutral");
-visualise_stl(config, transforms.Intact(neutral).in_femur.tibia, transforms.Intact(neutral).in_femur.femur);
-%% print to file
-print_mean_std_to_file(stats, states, root);
-%% Plot
-truncate_min = -5;
-truncate_max = 90;
+% toc
 
-% plot_interspecimen(config, stats, states, truncate_min, truncate_max)
-plot_interspecimen(config, stats, stats_offset, states, truncate_min, truncate_max)
 
-diary off;
+% %% Visualise stl
+% neutral = strcmpi({transforms.Intact.name}, "neutral");
+% visualise_stl(config, transforms.Intact(neutral).in_femur.tibia, transforms.Intact(neutral).in_femur.femur);
+% %% print to file
+% print_mean_std_to_file(stats, states, root);
+% %% Plot
+% truncate_min = -5;
+% truncate_max = 90;
+% 
+% % plot_interspecimen(config, stats, states, truncate_min, truncate_max)
+% plot_interspecimen(config, stats, stats_offset, states, truncate_min, truncate_max)
+% 
+% diary off;
