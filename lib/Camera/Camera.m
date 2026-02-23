@@ -12,6 +12,10 @@ classdef Camera
             switch camera
                 case Camera.Certus
                     trackers = certus(data);
+                    if isempty(trackers)
+                        trackers = [];
+                        return
+                    end
                     trackers.add_camera(Camera.Certus);
                 case Camera.Polaris
                     trackers = polaris(data);
