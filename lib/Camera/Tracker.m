@@ -128,8 +128,11 @@ classdef Tracker < handle
             all_substrings = cellfun(substrings, bone_position, 'UniformOutput', false);
 
 
-            bone = contains(landmarks, all_substrings{1}, "IgnoreCase",true);
-            pos = contains(landmarks, all_substrings{2}, "IgnoreCase",true);
+            bones_and_pos = split(landmarks, {' ', '_' '-'});
+            bones = bones_and_pos(:, :, 1);
+            positions = bones_and_pos(:, :, 2);
+            bone = contains(bones, all_substrings{1}, "IgnoreCase",true);
+            pos = contains(positions, all_substrings{2}, "IgnoreCase",true);
             result = Option(self(bone & pos));
         end
 
