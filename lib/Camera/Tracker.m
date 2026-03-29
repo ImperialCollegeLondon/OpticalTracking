@@ -48,6 +48,12 @@ classdef Tracker < handle
             end
             [self.Camera] = deal(camera);
         end
+        function ax = visualise(self)
+            x = self.Tx;
+            y = self.Ty;
+            z = self.Tz;
+            ax = scatter3(x,y,z);
+        end
         function self = add_labels(self, labels)
             names = {self.Name};
             for i = 1:numel(names)
@@ -83,7 +89,7 @@ classdef Tracker < handle
             r = mean(self.rotations(), "omitmissing");
         end
         function r = translations(self)
-            r = [self.Tx self.Ty self.Tz];
+            r = [vertcat(self.Tx) vertcat(self.Ty) vertcat(self.Tz)];
         end
         function r = translations_mean(self)
             if isempty(self.translations)
@@ -99,9 +105,9 @@ classdef Tracker < handle
                 r = Option.None;
                 return
             end
-            r = Option(self(has_label.unwrap()));
+            labeled = self(has_label.unwrap());
+            r = Option(labeled);
         end
-
 
         function result = contains(self, bone_position)
             % Looks for file names that include, e.g., "tibia" and "medial".
@@ -124,12 +130,15 @@ classdef Tracker < handle
             end
 
             % Attempt increasing lengths of the words
-            substrings = @(word) arrayfun(@(n) word(1:n), length(word):-1:2, 'UniformOutput', false);
+            substrings = @(word) arrayfun(@(n) word(1:n), length(word):-1:1, 'UniformOutput', false);
             all_substrings = cellfun(substrings, bone_position, 'UniformOutput', false);
 
 
-            bone = contains(landmarks, all_substrings{1}, "IgnoreCase",true);
-            pos = contains(landmarks, all_substrings{2}, "IgnoreCase",true);
+            bones_and_pos = split(landmarks, {' ', '_' '-'});
+            bones = bones_and_pos(:, :, 1);
+            positions = bones_and_pos(:, :, 2);
+            bone = contains(bones, all_substrings{1}, "IgnoreCase",true);
+            pos = contains(positions, all_substrings{2}, "IgnoreCase",true);
             result = Option(self(bone & pos));
         end
 

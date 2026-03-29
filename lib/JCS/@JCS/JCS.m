@@ -1,11 +1,85 @@
 classdef JCS
     properties
-        trajectories
+        specimen
+        loading_condition
+        state
+        transforms
+        bones
+        config
+        module Module
+        digitisation
     end
     properties(Access = private)
-        digitisation
-        config
     end
+    methods
+        function jcs_solved = solve(self)
+            % Alias for grood and suntay
+            jcs_solved = [self.grood_and_suntay()];
+        end
+        function kinematics = grood_and_suntay(self)
+            trajectories(numel(self)) = Trajectory();
+            
+            for i = 1:numel(self)
+                switch self(i).module
+                    case Module.Knee
+                        right = self(i).config.is_right_knee;
+                        fTt  = self(i).transforms.fTt;
+                        fTp  = self(i).transforms.fTp;
+                        femur = self(i).bones.femur;
+                        tibia = self(i).bones.tibia;
+                        patella = self(i).bones.patella;
+
+                        trajectory = Trajectory(self(i).config.specimen.name, self(i).config.specimen.state, self(i).config.specimen.loading_condition, false, right);
+
+                        [tf, pf] = Knee.grood_and_suntay(femur, tibia, patella, fTt, fTp, right);
+                        trajectory.add_data('tibiofemoral', tf);
+                        trajectory.add_data('patellofemoral', pf);
+
+                        trajectory.add_transforms('gTfi', self(i).transforms.gTfi);
+                        trajectory.add_transforms('gTti', self(i).transforms.gTti);
+                        trajectory.add_transforms('gTpi', self(i).transforms.gTpi);
+                        trajectory.add_transforms('fTt', self(i).transforms.fTt);
+                        trajectory.add_transforms('fTp', self(i).transforms.fTp);
+
+                        trajectory.set_root(self(i).digitisation.root);
+                        
+                        trajectories(i) = trajectory;
+                    case Module.Hip
+                        right = self(i).config.is_right_knee;
+                        error("Not yet implemented");
+                        % These are knee definitions. Update to hip
+                        fTt  = self(i).transforms.fTt;
+                        fTp  = self(i).transforms.fTp;
+                        femur = self(i).bones.femur;
+                        tibia = self(i).bones.tibia;
+
+                        trajectory = Trajectory(self(i).config.specimen.name, self(i).config.specimen.state, self(i).config.specimen.loading_condition, false, right);
+
+                        [tf, pf] = Hip.grood_and_suntay(femur, tibia, patella, fTt, fTp, right);
+                        trajectory.add_data('tibiofemoral', tf);
+                        trajectory.add_data('patellofemoral', pf);
+
+                        trajectory.add_transforms('gTfi', self(i).transforms.gTfi);
+                        trajectory.add_transforms('gTti', self(i).transforms.gTti);
+                        trajectory.add_transforms('gTpi', self(i).transforms.gTpi);
+                        trajectory.add_transforms('fTt', self(i).transforms.fTt);
+                        trajectory.add_transforms('fTp', self(i).transforms.fTp);
+
+                        trajectory.set_root(self(i).digitisation.root);
+                        
+                        trajectories(i) = trajectory;
+                end
+            end
+            kinematics = Kinematics(trajectories, [self.digitisation], [self.config]);
+        end
+        function jcs_solved = helical_axis(self)
+            error("Not yet implemented")
+        end
+        function jcs_solved = sara(self)
+            error("Not yet implemented")
+        end
+    end
+
     methods (Static)
         function jcs = new(digitisations)
             i = 1;
@@ -30,38 +104,34 @@ classdef JCS
                     loading_conditions = unique({trackers.Landmark});
                     for lc = 1:numel(loading_conditions)
                         loading_condition = loading_conditions{lc};
+                        config.specimen.loading_condition = loading_condition;
                         switch module
                             case Module.Knee
-                                input.name = loading_condition;
-                                config.specimen.loading_condition = loading_condition;
-
-                                label = trackers(:, lc).camera().get_possible_labels(config.camera_labels);
-
-                                input.tibia = trackers(:, lc).with_label(label.tibia);
-                                input.femur = trackers(:, lc).with_label(label.femur);
-                                input.patella = trackers(:, lc).with_label(label.patella);
-                                if (input.femur.is_none() && input.tibia.is_none()) || (input.femur.is_none() && input.patella.is_none())
-                                    continue
-                                end
-                                trajectory = Knee.grood_and_suntay(input, digitisation_transforms, config);
+                                [transforms, bones] = Knee.calculate_transforms(trackers(:, lc), loading_condition, digitisation_transforms, config);
                             case Module.Hip
                                 error("Not yet implemented");
                         end
-                        trajectories(i) = trajectory;
+
+                        jcs(i) = JCS(transforms, bones, digitisation, config);
+                        jcs(i).module = module;
+                        jcs(i).state = string(clean_specimen_condition(state.name));
+                        jcs(i).specimen = string(config.specimen.name);
+                        jcs(i).loading_condition = string(loading_condition);
                         i = i + 1;
                     end
                 end
             end
 
-            jcs = JCS(trajectories, digitisation, config);
+            
+
         end
     end
     methods
-        function self = JCS(trajectories, digitisation, config)
-            self.trajectories = trajectories;
+        function self = JCS(transforms, bones, digitisation, config)
+            self.bones = bones;
+            self.transforms = transforms;
             self.config = config;
             self.digitisation = digitisation;
         end
     end
 end
-
