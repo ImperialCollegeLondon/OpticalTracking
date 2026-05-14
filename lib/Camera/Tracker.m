@@ -126,14 +126,14 @@ classdef Tracker < handle
             % Attempt increasing lengths of the words
             substrings = @(word) arrayfun(@(n) word(1:n), length(word):-1:1, 'UniformOutput', false);
             all_substrings = cellfun(substrings, bone_position, 'UniformOutput', false);
-            all_substrings = cellfun(@(x) x(2:end-1), all_substrings, 'UniformOutput', false);
+            % all_substrings = cellfun(@(x) x(2:end-1), all_substrings, 'UniformOutput', false);
 
 
-            % bones_and_positions = split(landmarks, {'_', ' '});
-            % bones = bones_and_positions(:, :, 1);
-            % positions = bones_and_positions(:, :, 2);
-            bone = contains(landmarks, all_substrings{1}, "IgnoreCase",true);
-            pos = contains(landmarks, all_substrings{2}, "IgnoreCase",true);
+            bones_and_positions = split(landmarks, {'_', ' ', '-'});
+            bones = bones_and_positions(:, :, 1);
+            positions = bones_and_positions(:, :, 2);
+            bone = contains(bones, all_substrings{1}, "IgnoreCase",true);
+            pos = contains(positions, all_substrings{2}, "IgnoreCase",true);
             result = Option(self(bone & pos));
         end
 
