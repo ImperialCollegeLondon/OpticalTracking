@@ -43,6 +43,7 @@ root = uigetdir(".", "Choose the root folder");
 %%
 module = Module.Knee;
 digitisation = Digitisation.new(root, config, module);
+digitisation.visualise();
 jcs = JCS.new(digitisation);
 kinematics = jcs.solve();
 %%

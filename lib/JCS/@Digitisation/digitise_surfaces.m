@@ -7,7 +7,11 @@ function self = digitise_surfaces(self)
         %% Find files with tibia perimeter data
         root = digitisation.filepath;
         % Find folders that contain tibia and surface or surface in the name
-        folders = dir(fullfile(root, '*surf*'));
+        folders = dir(root);
+        folders = folders([folders.isdir]);
+        is_surface = contains({folders.name}, 'surf', 'IgnoreCase', true);
+        folders = folders(is_surface);
+
         if isempty(folders)
             warning("No surface folders found. Make sure folder name includes 'surf'");
             return
@@ -35,7 +39,8 @@ function self = digitise_surfaces(self)
         end
         for i = 1:numel(bones)
             bone = bones{i};
-            self(d).bone.(bone).surface = trackers.contains({bone, 'surface'}).and_then(@(x) x.with_label(labels.probe));
+            self(d).bone.(bone).surface_medial = trackers.contains({bone, 'medial'}).and_then(@(x) x.with_label(labels.probe));
+            self(d).bone.(bone).surface_lateral = trackers.contains({bone, 'lateral'}).and_then(@(x) x.with_label(labels.probe));
             if self(d).bone.(bone).surface.is_some
                 if numel(self(d).bone.(bone).surface.value) > 1
                     warning("There are multiple %s surface digitisations. call visualise_surfaces() to pick the best one.", bone)
