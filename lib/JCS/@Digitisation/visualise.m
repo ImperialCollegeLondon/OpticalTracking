@@ -16,6 +16,8 @@ function visualise(self)
         grid;
         t = landmarks.tibia;
         fields = fieldnames(t);
+        fields(strcmp(fields, 'surface')) = [];
+        
         for i = 1:numel(fields)
             t.(fields{i}) = t.(fields{i}).unwrap();
         end
