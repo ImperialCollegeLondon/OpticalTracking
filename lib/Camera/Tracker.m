@@ -128,20 +128,20 @@ classdef Tracker < handle
             % If none found, looks for TM (first letters capitalised).
             landmarks = {self.Landmark};
 
-            % Match filename to whole word.
-            bone = contains(landmarks, bone_position{1}, "IgnoreCase",true);
-            pos = contains(landmarks, bone_position{2}, "IgnoreCase",true);
-            if any(bone & pos)
-                result = Option(self(bone & pos));
-                return
-            end
-
-            one_letter = cellfun(@(x) x(1), bone_position);
-            match_one_letter = strcmpi(landmarks, one_letter);
-            if any(match_one_letter)
-                result = Option(self(match_one_letter));
-                return
-            end
+            % % Match filename to whole word.
+            % bone = contains(landmarks, bone_position{1}, "IgnoreCase",true);
+            % pos = contains(landmarks, bone_position{2}, "IgnoreCase",true);
+            % if any(bone & pos)
+            %     result = Option(self(bone & pos));
+            %     return
+            % end
+            %
+            % one_letter = cellfun(@(x) x(1), bone_position);
+            % match_one_letter = strcmpi(landmarks, one_letter);
+            % if any(match_one_letter)
+            %     result = Option(self(match_one_letter));
+            %     return
+            % end
 
             % Attempt increasing lengths of the words
             substrings = @(word) arrayfun(@(n) word(1:n), length(word):-1:1, 'UniformOutput', false);

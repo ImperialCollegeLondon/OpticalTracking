@@ -16,6 +16,8 @@ for d = 1:numel(self)
         
         has_field_surface = any(contains(fields(self(d).bone.(bone)), 'surface'));
         if ~has_field_surface
+            centre.(bone).medial = Option([])
+            centre.(bone).lateral = Option([])
             continue
         end
         trackers = self(d).bone.(bone).surface;
@@ -51,26 +53,30 @@ for d = 1:numel(self)
         [c_med, r_med] = circle_fit(u, v, u < u_mid);
         [c_lat, r_lat] = circle_fit(u, v, u >= u_mid);
 
+        centre_med_3d = mu + c_med * [medial_lateral, anterior_posterior]';
+        centre_lat_3d = mu + c_lat * [medial_lateral, anterior_posterior]';
+
+        centre.(bone).medial =  Option(centre_med_3d);
+        centre.(bone).lateral = Option(centre_lat_3d);
+
+        %% Visualisation
         t = linspace(0, 2*pi, 200)';
 
         % 2D points on each circle
         pts_med = [c_med(1) + r_med*cos(t),  c_med(2) + r_med*sin(t)];  % 200×2
         pts_lat = [c_lat(1) + r_lat*cos(t),  c_lat(2) + r_lat*sin(t)];
 
-        % Back to 3D: each row is mu + u*ml + v*ap
+        % Back to 3D: each row is mu + u*ML + v*AP
         circle_med_3d = mu + pts_med * [medial_lateral, anterior_posterior]';
         circle_lat_3d = mu + pts_lat * [medial_lateral, anterior_posterior]';
 
+        % Circle fit
         plot3(circle_med_3d(:,1), circle_med_3d(:,2), circle_med_3d(:,3), '--', 'LineWidth', 2);
         plot3(circle_lat_3d(:,1), circle_lat_3d(:,2), circle_lat_3d(:,3), '--', 'LineWidth', 2);
 
-        centre_med_3d = mu + c_med * [medial_lateral, anterior_posterior]';
-        centre_lat_3d = mu + c_lat * [medial_lateral, anterior_posterior]';
-
+        % Circle centres
         plot3(centre_med_3d(1), centre_med_3d(2), centre_med_3d(3), 'b+', 'MarkerSize', 12, 'LineWidth', 2);
         plot3(centre_lat_3d(1), centre_lat_3d(2), centre_lat_3d(3), 'b+', 'MarkerSize', 12, 'LineWidth', 2);
-        centre.medial = centre_med_3d;
-        centre.lateral = centre_lat_3d;
     end
 end
 end

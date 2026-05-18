@@ -43,18 +43,18 @@ for d = 1:numel(self)
         bone = bones{i};
 
         self(d).bone.(bone).surface = trackers.contains({bone, 'surface'}).and_then(@(x) x.with_label(labels.probe));
-        if self(d).bone.(bone).surface.is_none
-            warning("No surfaces found. Check that file's name is `%s surface`", bone)
-            return
-        end
+        % if self(d).bone.(bone).surface.is_none
+        %     warning("No surfaces found. Check that file's name is `%s surface`", bone)
+        %     return
+        % end
         % if numel(self(d).bone.(bone).surface.value) > 1
         %     warning("There are multiple %s surface digitisations. call visualise_surfaces() to pick the best one.", bone)
         % end
 
-        track = self(d).bone.(bone).surface.value;
-        if is_range_too_large(track)
-            warning("Unexpectedly large range of values for surface. Check that tracker was not still recording when moved away from surface.")
-        end
+        % track = self(d).bone.(bone).surface.value;
+        % if is_range_too_large(track)
+        %     warning("Unexpectedly large range of values for surface. Check that tracker was not still recording when moved away from surface.")
+        % end
 
     end
 end

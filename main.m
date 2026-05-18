@@ -56,6 +56,11 @@ disp("Done loading data");
 %%
 % jcs.print_to_file();
 % jcs.plot()
+trajectories = kinematics.trajectories;
+path = trajectories.path;
+path.plot();
+
+
 kinematics.trajectories.intraspecimen_mean();
 kinematics.trajectories.set_flexion_min(-3);
 kinematics.trajectories.cp_sensor_to_kinematics();
