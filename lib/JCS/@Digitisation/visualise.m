@@ -11,7 +11,7 @@ function visualise(self)
         landmarks = self(n).bone;
         config = self(n).config;
 
-        figure
+        % figure
         %% Tibia
         grid;
         t = landmarks.tibia;
