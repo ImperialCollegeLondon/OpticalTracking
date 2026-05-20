@@ -11,7 +11,7 @@ classdef RotationsAndTranslations < matlab.unittest.TestCase
         end
 
         function flexion(self, side)
-            motion.rotations = [90, 0, 0];
+            motion.rotations = [30, 0, 0];
             motion.translations    = [0, 0, 0];
             self.verify_round_trip(motion, side);
         end
@@ -67,7 +67,7 @@ classdef RotationsAndTranslations < matlab.unittest.TestCase
             tol = 1e-5;
             T = findTrackerFixedFrames(Option(motion));
             [rxryrz,xyz] = rotationsAndTranslations(T, is_right_knee);
-            self.verifyEqual(rxryrz(1), motion.rotations(1), 'AbsTol', tol)
+            self.verifyEqual(-rxryrz(1), motion.rotations(1), 'AbsTol', tol)
         end
     end
 end
