@@ -34,8 +34,13 @@ gTpt0 = gTpt0.unwrap_or([]);
 transforms.tibia.transform = gTtt0\gTt0; %ttTtc
 transforms.tibia.origin = gTtt0\grt0; %ttrtc
 
-transforms.tibia.surface_transform = gTtt0\gTts0; %ttTts. Tibial surface in tibial tracker
-transforms.tibia.surface_origin = gTtt0\grts0; %ttrts. tibial surface's origin in tibial tracker
+if isempty(gTts0)
+    transforms.tibia.surface_transform = []; %ttTts. Tibial surface in tibial tracker
+    transforms.tibia.surface_origin = []; %ttrts. tibial surface's origin in tibial tracker
+else
+    transforms.tibia.surface_transform = gTtt0\gTts0; %ttTts. Tibial surface in tibial tracker
+    transforms.tibia.surface_origin = gTtt0\grts0; %ttrts. tibial surface's origin in tibial tracker
+end
 
 transforms.femur.transform = gTft0\gTf0; %ftTfc
 transforms.femur.origin = gTft0\grf0; %ftrfc

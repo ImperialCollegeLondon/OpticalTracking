@@ -37,8 +37,13 @@ function [transforms, bones] = calculate_transforms(trackers, loading_condition,
     gTti = pagemtimes(gTtti, ttTtc);%multiply here instead of divide in Pam's method
     fTt = pagemldivide(gTfi, gTti); % Transformation of Tibia relative to the femur
 
-    gTtsi = pagemtimes(gTtti, ttTtscc); % Tibial surface relative to global
-    tTts = pagemldivide(gTti, gTtsi); %% <<<<<<<<< This makes it constant.
+    if isempty(ttTtscc)
+        gTtsi = []; % Tibial surface relative to global
+        tTts = []; %% <<<<<<<<< This makes it constant.
+    else
+        gTtsi = pagemtimes(gTtti, ttTtscc); % Tibial surface relative to global
+        tTts = pagemldivide(gTti, gTtsi); %% <<<<<<<<< This makes it constant.
+    end
     % We want it relative to the initial position, not relative to the new position of the tibia.
 
     % fRt=fTt(1:3,1:3); %Rotations of tibia relative to femur
