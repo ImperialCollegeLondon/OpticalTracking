@@ -19,6 +19,9 @@ function [transforms, bones] = calculate_transforms(trackers, loading_condition,
     ptTtc = digitisation_transforms.patella.transform;
     ptrpc = digitisation_transforms.patella.origin;
 
+    ttTtsc = digitisation_transforms.tibia.surface_transform;
+    % ttrtsc = digitisation_transforms.tibia.surface_origin;
+
     %% Load how tracker moves with time
     gTtti = findTrackerFixedFrames(data.tibia);
     gTfti = findTrackerFixedFrames(data.femur);
@@ -26,11 +29,15 @@ function [transforms, bones] = calculate_transforms(trackers, loading_condition,
     % Create matrices of tracker marker position and rotations in time
 
 
-    %% Calculate transformation matricies from body fixed to global fixed frames and motion relative to initial position
+
+
+    %% Calculate transformation matrices from body fixed to global fixed frames and motion relative to initial position
 
     gTfi = pagemtimes(gTfti, ftTfc);%multiply here instead of multiply by inverse as detailed in Pam's method
     gTti = pagemtimes(gTtti, ttTtc);%multiply here instead of divide in Pam's method
     fTt = pagemldivide(gTfi, gTti); % Transformation of Tibia relative to the femur
+
+    tTts = pagemldivide(ttTtc, ttTtsc); % Tibial surface relative to tibia
 
     % fRt=fTt(1:3,1:3); %Rotations of tibia relative to femur
 
@@ -83,4 +90,5 @@ function [transforms, bones] = calculate_transforms(trackers, loading_condition,
     transforms.gTfi = gTfi;
     transforms.gTti = gTti;
     transforms.gTpi = gTpi;
+    transforms.tTts = tTts;
 end

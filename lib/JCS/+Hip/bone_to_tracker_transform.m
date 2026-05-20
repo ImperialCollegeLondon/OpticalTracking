@@ -1,4 +1,6 @@
-function transforms = bone_to_tracker_transform(trackers, config)
+function transforms = bone_to_tracker_transform(digitisation, config)
+
+trackers = digitisation.bone;
 
 right = config.is_right_knee;
 femur = trackers.femur;

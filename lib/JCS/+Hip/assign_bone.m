@@ -30,5 +30,5 @@ function digitisation = assign_bone(digitisation)
     digitisation.bone.tibia.tracker = trackers(:, 1).with_label(label.tibia);
 
     % Calculate bone to tracker transforms in global coordinate system
-    digitisation.transforms = Hip.bone_to_tracker_transform(digitisation.bone, config);
+    digitisation.transforms = Hip.bone_to_tracker_transform(digitisation, config);
 end

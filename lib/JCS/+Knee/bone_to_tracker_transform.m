@@ -1,4 +1,6 @@
-function transforms = bone_to_tracker_transform(trackers, config)
+function transforms = bone_to_tracker_transform(digitisation, config)
+
+trackers = digitisation.bone;
 
 tibia = trackers.tibia;
 femur = trackers.femur;
@@ -14,6 +16,10 @@ grf0 = origins(gTf0);
 gTp0 = defineBodyFixedFramePatella(patella, right);
 grp0 = origins(gTp0);
 
+surfaces = digitisation.locate_centre();
+gTts0 = surfaces.tibia;
+grts0 = origins(gTts0);
+
 %% Define frame of reference for each of the trackers in global coordinates
 gTft0 = femur.tracker.map(@(x) defineTrackerFixedFrame(x.rotations_mean, x.translations_mean));
 gTtt0 = tibia.tracker.map(@(x) defineTrackerFixedFrame(x.rotations_mean, x.translations_mean));
@@ -27,6 +33,9 @@ gTpt0 = gTpt0.unwrap_or([]);
 % As in, tibia in the tibial tracker's frame of reference.
 transforms.tibia.transform = gTtt0\gTt0; %ttTtc
 transforms.tibia.origin = gTtt0\grt0; %ttrtc
+
+transforms.tibia.surface_transform = gTtt0\gTts0; %ttTts. Tibial surface in tibial tracker
+transforms.tibia.surface_origin = gTtt0\grts0; %ttrts. tibial surface's origin in tibial tracker
 
 transforms.femur.transform = gTft0\gTf0; %ftTfc
 transforms.femur.origin = gTft0\grf0; %ftrfc
