@@ -43,12 +43,14 @@ root = uigetdir(".", "Choose the root folder");
 %%
 module = Module.Knee;
 digitisation = Digitisation.new(root, config, module);
-hold on;
-digitisation.visualise();
+% hold on;
+% digitisation.visualise();
 % digitisation.digitise_surfaces();
 % digitisation.bone.tibia.surface.unwrap().visualise_mean()
 % test = digitisation.locate_centre();
 jcs = JCS.new(digitisation);
+test = jcs.intersect_surface();
+plot(squeeze(test(1).intersection(2, 2, :)))
 kinematics = jcs.solve();
 %%
 disp("Loading tension")
