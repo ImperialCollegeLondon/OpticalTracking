@@ -5,7 +5,6 @@ function [centre_of_rotation, direction] = intersect_surface(self)
     centre_of_rotation = cell(numel(self), 1);
     direction          = cell(numel(self), 1);
     for i = 1:numel(self)
-
         tTts = self(i).transforms.tTts;
 
         if isempty(tTts)

@@ -20,7 +20,6 @@ function [transforms, bones] = calculate_transforms(trackers, loading_condition,
     ptrpc = digitisation_transforms.patella.origin;
 
     ttTtscc = digitisation_transforms.tibia.surface_transform;
-    % ttrtsc = digitisation_transforms.tibia.surface_origin;
 
     %% Load how tracker moves with time
     gTtti = findTrackerFixedFrames(data.tibia);
@@ -38,13 +37,13 @@ function [transforms, bones] = calculate_transforms(trackers, loading_condition,
     fTt = pagemldivide(gTfi, gTti); % Transformation of Tibia relative to the femur
 
     if isempty(ttTtscc)
-            gTtsi = []; 
-            fTts = [];
-            tTts = [];
+        gTtsi = []; 
+        fTts = [];
+        tTts = [];
     else
-            gTtsi = pagemtimes(gTtti, ttTtscc); % Tibial surface relative to global
-            fTts = pagemldivide(gTfi, gTtsi);
-            tTts = pagemldivide(gTti, gTtsi); %% <<<<<<<<< This makes it constant.
+        gTtsi = pagemtimes(gTtti, ttTtscc); % Tibial surface relative to global
+        fTts = pagemldivide(gTfi, gTtsi);
+        tTts = pagemldivide(gTti, gTtsi); %% <<<<<<<<< This makes it constant.
     end
 
     % We want it relative to the initial position, not relative to the new position of the tibia.
