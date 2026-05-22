@@ -18,7 +18,9 @@ classdef JCS
         end
         function kinematics = grood_and_suntay(self)
             trajectories(numel(self)) = Trajectory();
-            
+
+            [centre_of_rotation, direction] = self.intersect_surface();
+
             for i = 1:numel(self)
                 switch self(i).module
                     case Module.Knee
@@ -34,6 +36,9 @@ classdef JCS
                         [tf, pf] = Knee.grood_and_suntay(femur, tibia, patella, fTt, fTp, right);
                         trajectory.add_data('tibiofemoral', tf);
                         trajectory.add_data('patellofemoral', pf);
+
+                        trajectory.add_transforms('centre_of_rotation', centre_of_rotation{i});
+                        trajectory.add_transforms('direction', direction{i});
 
                         trajectory.add_transforms('gTfi', self(i).transforms.gTfi);
                         trajectory.add_transforms('gTti', self(i).transforms.gTti);

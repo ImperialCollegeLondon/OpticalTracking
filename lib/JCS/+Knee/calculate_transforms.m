@@ -45,7 +45,6 @@ function [transforms, bones] = calculate_transforms(trackers, loading_condition,
             gTtsi = pagemtimes(gTtti, ttTtscc); % Tibial surface relative to global
             fTts = pagemldivide(gTfi, gTtsi);
             tTts = pagemldivide(gTti, gTtsi); %% <<<<<<<<< This makes it constant.
-            tTts = tTts(:, :, 1);
     end
 
     % We want it relative to the initial position, not relative to the new position of the tibia.
