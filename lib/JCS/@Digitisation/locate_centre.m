@@ -1,4 +1,4 @@
-function centre = locate_centre(self)
+function [centre, outline] = locate_centre(self)
 arguments
     self Digitisation
 end
@@ -70,7 +70,20 @@ for d = 1:numel(self)
         surface = [i_, anterior_posterior, superior_inferior, origin'; 0 0 0 1];
         centre.(bone) = Option(surface);
 
-        % %% Visualisation
+
+
+        %% Create outline
+
+        outline_about_origin = X_projected - origin;
+        outline = outline_about_origin * [medial_lateral, anterior_posterior, superior_inferior];
+
+        figure; hold on; axis equal;
+        scatter(outline(:,1), outline(:,2), 10, 'k', 'filled');
+
+
+
+
+        %% Visualisation
         % hold on;
         % scatter3(X(:, 1), X(:, 2), X(:, 3), 'k');
         % scatter3(X_projected(:, 1), X_projected(:, 2), X_projected(:, 3), 'b');

@@ -40,7 +40,7 @@ transforms.patella.origin = gTpt0\grp0; %ptrpc
 
 %% Surfaces
 
-surfaces = digitisation.locate_centre();
+[surfaces, outline] = digitisation.locate_centre();
 transforms.tibia.surface_transform = surfaces.tibia.map(@(gTts0) gTtt0 \ gTts0).unwrap_or([]); %ttTts. Tibial surface in tibial tracker
 
 end
