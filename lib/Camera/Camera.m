@@ -5,7 +5,7 @@ classdef Camera
         Unknown
     end
     methods (Static)
-        function trackers = load_data(data)
+        function trackers = load_data(data, filename)
             headers = data.Properties.VariableNames;
             camera = Camera.from_headers(headers);
 
@@ -19,6 +19,9 @@ classdef Camera
                     trackers.add_camera(Camera.Certus);
                 case Camera.Polaris
                     trackers = polaris(data);
+                    if isempty(trackers)
+                        error("Problematic camera data. Check that all trackers are being recorded on the Polaris software.\nFile: %s", filename)
+                    end
                     trackers.add_camera(Camera.Polaris);
                 case Camera.Unknown
                     error("Unknown camera")

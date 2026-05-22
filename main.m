@@ -43,8 +43,16 @@ root = uigetdir(".", "Choose the root folder");
 %%
 module = Module.Knee;
 digitisation = Digitisation.new(root, config, module);
+% hold on;
+% digitisation.visualise();
+% digitisation.digitise_surfaces();
+% digitisation.bone.tibia.surface.unwrap().visualise_mean()
+% test = digitisation.locate_centre();
 jcs = JCS.new(digitisation);
+% test = jcs.intersect_surface;
 kinematics = jcs.solve();
+
+kinematics.trajectories.plot_centre_of_rotation
 %%
 disp("Loading tension")
 kinematics.load_tension("**/*tension.csv");
@@ -52,6 +60,11 @@ disp("Done loading data");
 %%
 % jcs.print_to_file();
 % jcs.plot()
+trajectories = kinematics.trajectories;
+path = trajectories.path;
+path.plot();
+
+
 kinematics.trajectories.intraspecimen_mean();
 kinematics.trajectories.set_flexion_min(-3);
 kinematics.trajectories.cp_sensor_to_kinematics();

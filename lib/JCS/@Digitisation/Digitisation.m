@@ -16,6 +16,7 @@ classdef Digitisation < handle
                 module Module
                 angle = 0  % Digitisation angle. Leave as default if varying angles were used. It is possible to set maximum/minimum flexion angle on data instead
             end
+
             specimen_list = get_root_files(root, {'result', 'problem'}).unwrap(); % Get all files in root and exclude any folders that include `result`
             specimen_folders = fullfile({specimen_list.folder}, {specimen_list.name});
             for i = 1:numel(specimen_folders)
@@ -44,21 +45,25 @@ classdef Digitisation < handle
                     continue
                 end
                 digitisation = Digitisation(trackers.unwrap(), root, config, module);
+
+                if angle ~= 0
+                    warning("Modifying digitisation angle is currently not enabled")
+                end
                 switch module
                     case Module.Knee
                         Knee.assign_bone(digitisation);
 
-                        [t, b] = Knee.calculate_transforms(digitisation.trackers(:, 1), "None", digitisation.transforms, config);
-                        [digitisation_position.tf, digitisation_position.pf] = Knee.grood_and_suntay(b.femur, b.tibia, b.patella, t.fTt, t.fTp, config.is_right_knee);
-                        signals = fields(digitisation_position);
-                        for sg = 1:numel(signals)
-                            signal = signals{sg};
-                            if ~isempty(digitisation_position.(signal))
-                                digitisation.angle_offset.(signal) = angle - mean(digitisation_position.(signal).flexion);
-                            end
-                        end
+                        % [t, b] = Knee.calculate_transforms(digitisation.trackers(:, 1), "None", digitisation.transforms, config);
+                        % [digitisation_position.tf, digitisation_position.pf] = Knee.grood_and_suntay(b.femur, b.tibia, b.patella, t.fTt, t.fTp, config.is_right_knee);
+                        % signals = fields(digitisation_position);
+                        % for sg = 1:numel(signals)
+                        %     signal = signals{sg};
+                        %     if ~isempty(digitisation_position.(signal))
+                        %         digitisation.angle_offset.(signal) = angle - mean(digitisation_position.(signal).flexion);
+                        %     end
+                        % end
                     case Module.Hip
-                        error("Not implemented")
+                        Hip.assign_bone(digitisation);
                 end
 
                 if isempty(digitisation)

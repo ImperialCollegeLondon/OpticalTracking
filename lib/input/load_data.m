@@ -33,7 +33,7 @@ function trackers = load_data(folder_path, config)
         end
 
 
-        tracker = Camera.load_data(data);
+        tracker = Camera.load_data(data, fp);
         if isempty(tracker)
             continue
         end

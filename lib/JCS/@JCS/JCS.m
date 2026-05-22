@@ -18,7 +18,9 @@ classdef JCS
         end
         function kinematics = grood_and_suntay(self)
             trajectories(numel(self)) = Trajectory();
-            
+
+            [centre_of_rotation, direction] = self.intersect_surface();
+
             for i = 1:numel(self)
                 switch self(i).module
                     case Module.Knee
@@ -32,12 +34,33 @@ classdef JCS
                         trajectory = Trajectory(self(i).config.specimen.name, self(i).config.specimen.state, self(i).config.specimen.loading_condition, false, right);
 
                         [tf, pf] = Knee.grood_and_suntay(femur, tibia, patella, fTt, fTp, right);
-                        % if ~isempty(tf)
-                        %     tf.flexion = tf.flexion - self.digitisation.angle_offset.tf;
-                        % end
-                        % if ~isempty(pf)
-                        %     pf.flexion = pf.flexion - self.digitisation.angle_offset.pf;
-                        % end
+                        trajectory.add_data('tibiofemoral', tf);
+                        trajectory.add_data('patellofemoral', pf);
+
+                        trajectory.add_transforms('centre_of_rotation', centre_of_rotation{i});
+                        trajectory.add_transforms('direction', direction{i});
+
+                        trajectory.add_transforms('gTfi', self(i).transforms.gTfi);
+                        trajectory.add_transforms('gTti', self(i).transforms.gTti);
+                        trajectory.add_transforms('gTpi', self(i).transforms.gTpi);
+                        trajectory.add_transforms('fTt', self(i).transforms.fTt);
+                        trajectory.add_transforms('fTp', self(i).transforms.fTp);
+
+                        trajectory.set_root(self(i).digitisation.root);
+                        
+                        trajectories(i) = trajectory;
+                    case Module.Hip
+                        right = self(i).config.is_right_knee;
+                        error("Not yet implemented");
+                        % These are knee definitions. Update to hip
+                        fTt  = self(i).transforms.fTt;
+                        fTp  = self(i).transforms.fTp;
+                        femur = self(i).bones.femur;
+                        tibia = self(i).bones.tibia;
+
+                        trajectory = Trajectory(self(i).config.specimen.name, self(i).config.specimen.state, self(i).config.specimen.loading_condition, false, right);
+
+                        [tf, pf] = Hip.grood_and_suntay(femur, tibia, patella, fTt, fTp, right);
                         trajectory.add_data('tibiofemoral', tf);
                         trajectory.add_data('patellofemoral', pf);
 
@@ -50,8 +73,6 @@ classdef JCS
                         trajectory.set_root(self(i).digitisation.root);
                         
                         trajectories(i) = trajectory;
-                    case Module.Hip
-                        error("Not yet implemented");
                 end
             end
             kinematics = Kinematics(trajectories, [self.digitisation], [self.config]);

@@ -32,6 +32,10 @@ function digitisation = assign_bone(digitisation)
     digitisation.bone.patella.superior = trackers.contains({'patella', 'superior'}).and_then(@(x) x.with_label(label.probe));
     digitisation.bone.patella.tracker  = trackers(:, 1).with_label(label.patella);
 
+
+    % Surfaces
+    digitisation.bone.tibia.surface = trackers.contains({'tibia', 'surface'}).and_then(@(x) x.with_label(label.probe));
+
     % Calculate bone to tracker transforms in global coordinate system
-    digitisation.transforms = Knee.bone_to_tracker_transform(digitisation.bone, config);
+    digitisation.transforms = Knee.bone_to_tracker_transform(digitisation, config);
 end
