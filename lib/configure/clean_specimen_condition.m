@@ -20,13 +20,13 @@ function O = clean_specimen_condition(input)
 
     %% Corrections of the stupid mistakes
     O = replace(O, 'All_states', 'Everything_recon');
-    O = regexprep(O, '_\d', ''); % Removes _2, for example.
+    % O = regexprep(O, '_\d', ''); % Removes _2, for example.
     O = regexprep(O, 'internal .*', 'Internal', 'ignorecase');
     O = regexprep(O, 'external .*', 'External', 'ignorecase');
     O = regexprep(O, '[ _][rR]otation.*', '');
     O = regexprep(O, 'ante[rior]*', 'Anterior', 'ignorecase');
-    O = regexprep(O, '\..*', ''); % A literal dot followed by anything, like a file being called "name.csv.csv".
-    O = regexprep(O, '[se][sp][sp]', 'Sps', 'ignorecase'); % This one is so stupid. makes ESP match Sps.
-    O = regexprep(O, 'int[ern].*[ _]ant', 'Ant Int', 'ignorecase');
-    O = regexprep(O, 'int[ _]ant', 'Ant Int', 'ignorecase'); %
+    % O = regexprep(O, '\..*', ''); % A literal dot followed by anything, like a file being called "name.csv.csv".
+    % O = regexprep(O, '[se][sp][sp]', 'Sps', 'ignorecase'); % This one is so stupid. makes ESP match Sps.
+    % O = regexprep(O, 'int[ern].*[ _]ant', 'Ant Int', 'ignorecase');
+    % O = regexprep(O, 'int[ _]ant', 'Ant Int', 'ignorecase'); %
 end
