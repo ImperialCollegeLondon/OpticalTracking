@@ -34,6 +34,13 @@ classdef JCS
                         trajectory = Trajectory(self(i).config.specimen.name, self(i).config.specimen.state, self(i).config.specimen.loading_condition, false, right);
 
                         [tf, pf] = Knee.grood_and_suntay(femur, tibia, patella, fTt, fTp, right);
+                        if ~isempty(tf)
+                            tf.flexion = tf.flexion - self(i).digitisation.angle_offset.tf;
+                        end
+                        if ~isempty(pf)
+                            pf.flexion = pf.flexion - self(i).digitisation.angle_offset.pf;
+                        end
+
                         trajectory.add_data('tibiofemoral', tf);
                         trajectory.add_data('patellofemoral', pf);
 
