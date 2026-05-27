@@ -41,7 +41,8 @@ Qz(2, 1, :) = sind(Rz);
 Qz(2, 2, :) = cosd(Rz);
 
 
-rot = pagemtimes(Qx, pagemtimes(Qy, Qz));
+% rot = pagemtimes(Qx, pagemtimes(Qy, Qz));
+rot = pagemtimes(pagemtimes(Qz, Qy), Qx);
 
 trans = repmat(eye(4), 1, 1, length(XYZ(:,1)));
 trans(1, 4, :) = XYZ(:,1);
