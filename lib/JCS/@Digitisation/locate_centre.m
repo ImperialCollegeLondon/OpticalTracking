@@ -4,7 +4,7 @@ arguments
 end
 
 uvector=@(a,b) (b-a)/norm(b-a,2); %define a function to find a unit vector from a to b
-
+outline = [];
 for d = 1:numel(self)
     switch self(d).module
         case Module.Knee
