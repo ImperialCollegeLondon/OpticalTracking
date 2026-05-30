@@ -1,4 +1,9 @@
-function transforms = bone_to_tracker_transform(digitisation, config)
+function [transforms, outline]= bone_to_tracker_transform(digitisation, config, previous_digitisation)
+arguments
+    digitisation Digitisation
+    config
+    previous_digitisation = [];
+end
 
 trackers = digitisation.bone;
 
@@ -42,7 +47,12 @@ transforms.patella.origin = gTpt0\grp0; %ptrpc
 
 [surfaces, outline] = digitisation.locate_centre();
 transforms.tibia.surface_transform = surfaces.tibia.map(@(gTts0) gTtt0 \ gTts0).unwrap_or([]); %ttTts. Tibial surface in tibial tracker
+transforms.tibia.surface_relative_to_bone = surfaces.tibia.map(@(gTts0) gTt0 \ gTts0 ).unwrap_or([]);
 
+if isempty(transforms.tibia.surface_relative_to_bone)
+    transforms.tibia.surface_relative_to_bone = previous_digitisation.transforms.tibia.surface_relative_to_bone;
+    outline = previous_digitisation.surface;
+end
 end
 
 function o = origins(tracker)

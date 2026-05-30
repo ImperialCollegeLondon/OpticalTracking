@@ -18,8 +18,8 @@ classdef JCS
         end
         function kinematics = grood_and_suntay(self)
             trajectories(numel(self)) = Trajectory();
-
-            [centre_of_rotation, direction] = self.intersect_surface();
+            [origin, direction] = self.cor_from_tibia();
+            % [centre_of_rotation, direction] = self.cor_from_femur();
 
             for i = 1:numel(self)
                 switch self(i).module
@@ -34,17 +34,17 @@ classdef JCS
                         trajectory = Trajectory(self(i).config.specimen.name, self(i).config.specimen.state, self(i).config.specimen.loading_condition, false, right);
 
                         [tf, pf] = Knee.grood_and_suntay(femur, tibia, patella, fTt, fTp, right);
-                        if ~isempty(tf)
-                            tf.flexion = tf.flexion - self(i).digitisation.angle_offset.tf;
-                        end
-                        if ~isempty(pf)
-                            pf.flexion = pf.flexion - self(i).digitisation.angle_offset.pf;
-                        end
+                        % if ~isempty(tf)
+                        %     tf.flexion = tf.flexion - self(i).digitisation.angle_offset.tf;
+                        % end
+                        % if ~isempty(pf)
+                        %     pf.flexion = pf.flexion - self(i).digitisation.angle_offset.pf;
+                        % end
 
                         trajectory.add_data('tibiofemoral', tf);
                         trajectory.add_data('patellofemoral', pf);
 
-                        trajectory.add_transforms('centre_of_rotation', centre_of_rotation{i});
+                        trajectory.add_transforms('origin', origin{i});
                         trajectory.add_transforms('direction', direction{i});
 
                         trajectory.add_transforms('gTfi', self(i).transforms.gTfi);

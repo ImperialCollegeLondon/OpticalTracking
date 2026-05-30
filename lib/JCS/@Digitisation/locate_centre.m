@@ -4,12 +4,10 @@ arguments
 end
 
 uvector=@(a,b) (b-a)/norm(b-a,2); %define a function to find a unit vector from a to b
-outline = [];
 for d = 1:numel(self)
     switch self(d).module
         case Module.Knee
-            % bones = {'tibia', 'femur', 'patella'};
-            bones = {'tibia'};
+            bones = {'tibia', 'femur', 'patella'};
         case Module.Hip
             error("Not yet implemented")
     end
@@ -22,11 +20,13 @@ for d = 1:numel(self)
         has_field_surface = any(contains(fields(self(d).bone.(bone)), 'surface'));
         if ~has_field_surface
             centre.(bone) = Option.None;
+            outline.(bone) = Option.None;
             continue
         end
         trackers = self(d).bone.(bone).surface;
         if trackers.is_none
             centre.(bone) = Option.None;
+            outline.(bone) = Option.None;
             continue
         end
         trackers = trackers.unwrap();
@@ -75,12 +75,7 @@ for d = 1:numel(self)
         %% Create outline
 
         outline_about_origin = X_projected - origin;
-        outline = outline_about_origin * [medial_lateral, anterior_posterior, superior_inferior];
-
-        figure; hold on; axis equal;
-        scatter(outline(:,1), outline(:,2), 10, 'k', 'filled');
-
-
+        outline.(bone) = Option(outline_about_origin * [medial_lateral, anterior_posterior, superior_inferior]);
 
 
         %% Visualisation

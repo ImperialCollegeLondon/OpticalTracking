@@ -13,20 +13,14 @@ function visualise_surfaces(self)
     
         for i = 1:numel(bones)
             bone = bones{i};
-            trackers = self(d).bone.(bone).surface;
-            if trackers.is_none
+            if self(d).surface.(bone).is_none()
                 continue
             end
-            trackers = trackers.unwrap();
-    
-            for n = 1:numel(trackers)
-                tracker = trackers(n);
-                figure;
-                tracker.visualise
-                axis equal;
-                sgtitle({self(d).config.specimen.name, tracker.Landmark})
-    
-            end
+
+            figure
+            outline = self(d).surface.(bone).unwrap();
+            scatter(outline(:, 1), outline(:, 2), 'k', 'filled');
+            axis equal;
         end
     end
 end

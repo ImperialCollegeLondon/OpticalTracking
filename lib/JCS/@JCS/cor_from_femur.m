@@ -1,7 +1,7 @@
 %% Finds the lines in 3d space, then takes the transverse projection.
 % Lines are skew, so we end up with the approximation of the intersection,
 % which seems to work fine.
-function [centre_of_rotation, direction] = intersect_surface(self)
+function [centre_of_rotation, direction] = cor_from_femur(self)
     centre_of_rotation = cell(numel(self), 1);
     direction          = cell(numel(self), 1);
     for i = 1:numel(self)

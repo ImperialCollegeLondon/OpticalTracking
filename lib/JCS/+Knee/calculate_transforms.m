@@ -18,8 +18,8 @@ function [transforms, bones] = calculate_transforms(trackers, loading_condition,
     ftrfc = digitisation_transforms.femur.origin;
     ptTtc = digitisation_transforms.patella.transform;
     ptrpc = digitisation_transforms.patella.origin;
-
-    ttTtscc = digitisation_transforms.tibia.surface_transform;
+    tTts = digitisation_transforms.tibia.surface_relative_to_bone;
+    % ttTtscc = digitisation_transforms.tibia.surface_transform;
 
     %% Load how tracker moves with time
     gTtti = findTrackerFixedFrames(data.tibia);
@@ -36,15 +36,8 @@ function [transforms, bones] = calculate_transforms(trackers, loading_condition,
     gTti = pagemtimes(gTtti, ttTtc);%multiply here instead of divide in Pam's method
     fTt = pagemldivide(gTfi, gTti); % Transformation of Tibia relative to the femur
 
-    if isempty(ttTtscc)
-        gTtsi = []; 
-        fTts = [];
-        tTts = [];
-    else
-        gTtsi = pagemtimes(gTtti, ttTtscc); % Tibial surface relative to global
-        fTts = pagemldivide(gTfi, gTtsi);
-        tTts = pagemldivide(gTti, gTtsi); %% <<<<<<<<< This makes it constant.
-    end
+
+    fTts = pagemtimes(fTt , tTts);
 
     % We want it relative to the initial position, not relative to the new position of the tibia.
 
@@ -102,3 +95,70 @@ function [transforms, bones] = calculate_transforms(trackers, loading_condition,
     transforms.tTts = tTts;
     transforms.fTts = fTts;
 end
+
+% function [transforms, bones] = calculate_transforms(trackers, loading_condition, digitisation_transforms, config)
+%     error("not yet implemented")
+%     data.name = loading_condition;
+%     config.specimen.loading_condition = loading_condition;
+%
+%     label = trackers.camera().get_possible_labels(config.camera_labels);
+%
+%     bones = {'tibia', 'femur', 'patella'};
+%
+%     for b = 1:numel(bones)
+%         bone = bones{b};
+%         data.(bone) = trackers.with_label(label.(bone));
+%         %% Load how tracker moves with time
+%         if data.(bone).is_none
+%             bones.(bone).i = [];
+%             bones.(bone).j = [];
+%             bones.(bone).k = [];
+%             in_global.(bone) = [];
+%         end
+%         gTtracker = findTrackerFixedFrames(data.(bone));
+%
+%         %% Load the digitisation
+%         trackerTbone = digitisation_transforms.(bone).transform;
+%         trackerrbone = digitisation_transforms.(bone).origin;
+%         trackerTsurface = digitisation_transforms.(bone).surface_transform;
+%
+%         in_global.(bone) = pagemtimes(gTtracker, trackerTbone);
+%
+%         bones.(bone).i = squeeze(in_global.(bone)(1:3, 1, :));
+%         bones.(bone).j = squeeze(in_global.(bone)(1:3, 2, :));
+%         bones.(bone).k = squeeze(in_global.(bone)(1:3, 3, :));
+%         bones.(bone).origin = squeeze(pagemtimes(gTtracker, trackerrbone)); %femur origin in global reference frame
+%
+%
+%         if ~isempty(trackerTsurface)
+%             gTs.(bone) = pagemtimes(gTtracker, trackerTsurface);
+%             boneTsurface.(bone) = pagemldivide(in_global.(bone), gTs.(bone));
+%         end
+%
+%         if isempty(ttTtscc)
+%             gTtsi = []; 
+%             fTts = [];
+%             tTts = [];
+%         else
+%             gTtsi = pagemtimes(gTtti, ttTtscc); % Tibial surface relative to global
+%             fTts = pagemldivide(gTfi, gTtsi);
+%             tTts = pagemldivide(gTti, gTtsi); %% <<<<<<<<< This makes it constant.
+%         end
+%     end
+%
+%
+%     if isempty(in_global.tibia) 
+%         transforms.fTt = []
+%     else
+%         transforms.fTt = pagemldivide(in_global.femur, in_global.tibia);
+%     end
+%
+%     if isempty(in_global.patella) 
+%         transforms.fTp = []
+%     else
+%         transforms.fTp = pagemldivide(in_global.femur, in_global.patella);
+%     end
+%
+%     transforms.tTts = tTts;
+%     transforms.fTts = fTts;
+% end
