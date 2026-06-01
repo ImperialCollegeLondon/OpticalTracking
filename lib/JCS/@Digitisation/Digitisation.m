@@ -1,5 +1,6 @@
 classdef Digitisation < handle
     properties
+        specimen
         config
         trackers Tracker
         filepath
@@ -48,7 +49,7 @@ classdef Digitisation < handle
                 if trackers.is_none()
                     continue
                 end
-                digitisation = Digitisation(trackers.unwrap(), root, config, module);
+                digitisation = Digitisation(specimen_name, trackers.unwrap(), root, config, module);
 
                 % if angle ~= 0
                 %     warning("Modifying digitisation angle is currently not enabled")
@@ -97,7 +98,8 @@ classdef Digitisation < handle
     end
 
     methods (Access = private)
-        function self = Digitisation(trackers, filepath, config, module) % => Digitisation
+        function self = Digitisation(specimen, trackers, filepath, config, module)
+            self.specimen = string(specimen);
             self.trackers = trackers;
             self.config = config;
             self.filepath = filepath;
