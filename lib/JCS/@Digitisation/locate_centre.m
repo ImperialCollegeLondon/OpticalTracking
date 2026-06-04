@@ -1,15 +1,13 @@
-function centre = locate_centre(self)
+function [centre, outline] = locate_centre(self)
 arguments
     self Digitisation
 end
 
 uvector=@(a,b) (b-a)/norm(b-a,2); %define a function to find a unit vector from a to b
-
 for d = 1:numel(self)
     switch self(d).module
         case Module.Knee
-            % bones = {'tibia', 'femur', 'patella'};
-            bones = {'tibia'};
+            bones = {'tibia', 'femur', 'patella'};
         case Module.Hip
             error("Not yet implemented")
     end
@@ -22,11 +20,13 @@ for d = 1:numel(self)
         has_field_surface = any(contains(fields(self(d).bone.(bone)), 'surface'));
         if ~has_field_surface
             centre.(bone) = Option.None;
+            outline.(bone) = Option.None;
             continue
         end
         trackers = self(d).bone.(bone).surface;
         if trackers.is_none
             centre.(bone) = Option.None;
+            outline.(bone) = Option.None;
             continue
         end
         trackers = trackers.unwrap();
@@ -70,7 +70,15 @@ for d = 1:numel(self)
         surface = [i_, anterior_posterior, superior_inferior, origin'; 0 0 0 1];
         centre.(bone) = Option(surface);
 
-        % %% Visualisation
+
+
+        %% Create outline
+
+        outline_about_origin = X_projected - origin;
+        outline.(bone) = Option(outline_about_origin * [medial_lateral, anterior_posterior, superior_inferior]);
+
+
+        %% Visualisation
         % hold on;
         % scatter3(X(:, 1), X(:, 2), X(:, 3), 'k');
         % scatter3(X_projected(:, 1), X_projected(:, 2), X_projected(:, 3), 'b');

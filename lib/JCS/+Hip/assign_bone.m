@@ -15,7 +15,6 @@ function digitisation = assign_bone(digitisation)
     %                                        Looks for label definitions here
 
     %% Femur
-    error("Missing names for bones");
     % .contains() takes two arguments: one that describes the bone and one that describes the position. e.g. {'femur', 'medial'}
     % These must be assigned to digitisation.bone.femur.medial, etc. These name definitions are used in Hip.bone_to_tracker_transform
     digitisation.bone.femur.medial = trackers.contains({'femur', 'medial'}).and_then(@(x) x.with_label(label.probe));
@@ -23,11 +22,17 @@ function digitisation = assign_bone(digitisation)
     digitisation.bone.femur.proximal = trackers.contains({'femur', 'proximal'}).and_then(@(x) x.with_label(label.probe));
     digitisation.bone.femur.tracker = trackers(:, 1).with_label(label.femur);
 
-    %
+    % Tibia
     digitisation.bone.tibia.medial = trackers.contains({'tibia', 'medial'}).and_then(@(x) x.with_label(label.probe));
     digitisation.bone.tibia.lateral = trackers.contains({'tibia', 'lateral'}).and_then(@(x) x.with_label(label.probe));
     digitisation.bone.tibia.distal = trackers.contains({'tibia', 'distal'}).and_then(@(x) x.with_label(label.probe));
     digitisation.bone.tibia.tracker = trackers(:, 1).with_label(label.tibia);
+
+    % Hip
+    digitisation.bone.hip.asis = trackers.contains({'anterior', 'sis'}).and_then(@(x) x.with_label(label.probe)); %dodgy way to get asis
+    digitisation.bone.hip.psis = trackers.contains({'posterior', 'sis'}).and_then(@(x) x.with_label(label.probe)); %dodgy way to get psis
+    digitisation.bone.hip.pubic_tubercle = trackers.contains({'pubic', 'tubercle'}).and_then(@(x) x.with_label(label.probe));
+    digitisation.bone.hip.tracker = trackers(:, 1).with_label(label.hip);
 
     % Calculate bone to tracker transforms in global coordinate system
     digitisation.transforms = Hip.bone_to_tracker_transform(digitisation, config);

@@ -1,5 +1,6 @@
 classdef Digitisation < handle
     properties
+        specimen
         config
         trackers Tracker
         filepath
@@ -7,6 +8,7 @@ classdef Digitisation < handle
         transforms
         module
         angle_offset
+        surface
     end
     methods (Static)
         function digitisations = new(root, config, module, angle) % => Digitisation
@@ -19,9 +21,12 @@ classdef Digitisation < handle
 
             specimen_list = get_root_files(root, {'result', 'problem'}).unwrap(); % Get all files in root and exclude any folders that include `result`
             specimen_folders = fullfile({specimen_list.folder}, {specimen_list.name});
+            prev_specimen = [];
+            curr_specimen = [];
             for i = 1:numel(specimen_folders)
                 % digitisations(i) = Option.None;
                 specimen_name = get_specimen_name(specimen_list(i).name);
+                curr_specimen = specimen_name;
                 config.specimen.name = specimen_name;
                 fprintf("%d. Specimen: %s\n", i, specimen_name);
                 filepath = get_root_files(specimen_folders{i}, {});
@@ -44,14 +49,19 @@ classdef Digitisation < handle
                 if trackers.is_none()
                     continue
                 end
-                digitisation = Digitisation(trackers.unwrap(), root, config, module);
+                digitisation = Digitisation(specimen_name, trackers.unwrap(), root, config, module);
 
-                if angle ~= 0
-                    warning("Modifying digitisation angle is currently not enabled")
-                end
+                % if angle ~= 0
+                %     warning("Modifying digitisation angle is currently not enabled")
+                % end
                 switch module
                     case Module.Knee
-                        Knee.assign_bone(digitisation);
+                        if strcmp(curr_specimen, prev_specimen)
+                            prev_digit = digitisations(i-1);
+                            Knee.assign_bone(digitisation, prev_digit);
+                        else
+                            Knee.assign_bone(digitisation);
+                        end
 
                         % [t, b] = Knee.calculate_transforms(digitisation.trackers(:, 1), "None", digitisation.transforms, config);
                         % [digitisation_position.tf, digitisation_position.pf] = Knee.grood_and_suntay(b.femur, b.tibia, b.patella, t.fTt, t.fTp, config.is_right_knee);
@@ -72,7 +82,10 @@ classdef Digitisation < handle
                 end
                 digitisations(i) = digitisation;
 
+                prev_specimen = curr_specimen;
             end
+
+
         end
 
 
@@ -85,7 +98,8 @@ classdef Digitisation < handle
     end
 
     methods (Access = private)
-        function self = Digitisation(trackers, filepath, config, module) % => Digitisation
+        function self = Digitisation(specimen, trackers, filepath, config, module)
+            self.specimen = string(specimen);
             self.trackers = trackers;
             self.config = config;
             self.filepath = filepath;

@@ -77,6 +77,9 @@ classdef Tracker < handle
 
                 found_label_cells = cellfun(@(x) any(strcmp(x, strsplit(name, ' '))), labels_cell, 'UniformOutput',false);
                 label_idx = cell2mat(found_label_cells);
+                if sum(label_idx) > 1
+                    error("Tracker labels must be unique. Check defaults.m to assign them.")
+                end
                 label = Option(labels_cell{label_idx});
 
                 if label.is_none()

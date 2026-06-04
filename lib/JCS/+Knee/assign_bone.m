@@ -1,4 +1,4 @@
-function digitisation = assign_bone(digitisation)
+function digitisation = assign_bone(digitisation, previous_digitisation)
     % Uses file names and the config definitions (from defaults.m) to determine which file refers to which bone/location.
     % If you want to create this same setup for another set of bones, modify it as follows:
     % digitisation.bone.humerus.medial = trackers.contains({'humerus', 'medial'}).and_then(@(x) x.with_label(label.probe));
@@ -6,6 +6,7 @@ function digitisation = assign_bone(digitisation)
     % Go into defaults.m and make sure there is a label for each of the new bones you want to introduce.
     arguments
         digitisation Digitisation
+        previous_digitisation = []
     end
 
     trackers = digitisation.trackers;
@@ -37,5 +38,5 @@ function digitisation = assign_bone(digitisation)
     digitisation.bone.tibia.surface = trackers.contains({'tibia', 'surface'}).and_then(@(x) x.with_label(label.probe));
 
     % Calculate bone to tracker transforms in global coordinate system
-    digitisation.transforms = Knee.bone_to_tracker_transform(digitisation, config);
+    [digitisation.transforms, digitisation.surface] = Knee.bone_to_tracker_transform(digitisation, config, previous_digitisation);
 end
