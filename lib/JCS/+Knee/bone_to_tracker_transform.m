@@ -49,7 +49,7 @@ transforms.patella.origin = gTpt0\grp0; %ptrpc
 transforms.tibia.surface_transform = surfaces.tibia.map(@(gTts0) gTtt0 \ gTts0).unwrap_or([]); %ttTts. Tibial surface in tibial tracker
 transforms.tibia.surface_relative_to_bone = surfaces.tibia.map(@(gTts0) gTt0 \ gTts0 ).unwrap_or([]);
 
-if isempty(transforms.tibia.surface_relative_to_bone)
+if isempty(transforms.tibia.surface_relative_to_bone) && ~isempty(previous_digitisation)
     transforms.tibia.surface_relative_to_bone = previous_digitisation.transforms.tibia.surface_relative_to_bone;
     outline = previous_digitisation.surface;
 end

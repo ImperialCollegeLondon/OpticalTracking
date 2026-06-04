@@ -37,8 +37,11 @@ function [transforms, bones] = calculate_transforms(trackers, loading_condition,
     fTt = pagemldivide(gTfi, gTti); % Transformation of Tibia relative to the femur
 
 
-    fTts = pagemtimes(fTt , tTts);
-
+    if isempty(tTts)
+        fTts = [];
+    else
+        fTts = pagemtimes(fTt , tTts);
+    end
     % We want it relative to the initial position, not relative to the new position of the tibia.
 
     % fRt=fTt(1:3,1:3); %Rotations of tibia relative to femur
