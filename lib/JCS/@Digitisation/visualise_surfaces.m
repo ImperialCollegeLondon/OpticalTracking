@@ -17,9 +17,9 @@ function visualise_surfaces(self)
                 continue
             end
 
-            figure
+            % figure
             outline = self(d).surface.(bone).unwrap();
-            scatter(outline(:, 1), outline(:, 2), 'k', 'filled');
+            scatter(outline(:, 1), outline(:, 2), 'k', 'filled', 'HandleVisibility', 'off');
             axis equal;
         end
     end

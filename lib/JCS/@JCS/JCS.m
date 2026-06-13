@@ -52,6 +52,7 @@ classdef JCS
                         trajectory.add_transforms('gTpi', self(i).transforms.gTpi);
                         trajectory.add_transforms('fTt', self(i).transforms.fTt);
                         trajectory.add_transforms('fTp', self(i).transforms.fTp);
+                        trajectory.add_transforms('fTts', self(i).transforms.fTts);
 
                         trajectory.set_root(self(i).digitisation.root);
                         
