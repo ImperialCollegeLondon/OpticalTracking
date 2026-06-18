@@ -1,6 +1,6 @@
-function [tf, fh] = grood_and_suntay(femur, tibia, hip, fTt, hTf, right)
+function [tf, fa] = grood_and_suntay(femur, tibia, hip, fTt, hTf, right)
     tf = tibiofemoral(fTt, femur, tibia, right);
-    fh = femoralhip(hTf, hip, femur, right);
+    fa = femoracetabular(hTf, hip, femur, right);
 end
 
 function result = tibiofemoral(relative_position, femur, tibia, right)
@@ -66,7 +66,7 @@ function result = tibiofemoral(relative_position, femur, tibia, right)
 
 end
 
-function result = femoralhip(relative_position, hip, femur, right)
+function result = femoracetabular(relative_position, hip, femur, right)
     if isempty(relative_position)
         result = array2table([], 'VariableNames', {'flexion', 'abduction', 'external', 'lateral', 'anterior', 'superior'});
         return;
