@@ -49,8 +49,9 @@ config.digitisation = {'digit', 'calibr'}; % Case insensitive digitisation file 
 % Polaris labels: determined by either looking at its name
 % (e.g., Brainlab Y Junction) or the label defined in the .tbr file.
 config.camera_labels.polaris.tibia = 'T';
-config.camera_labels.polaris.femur = 'Y';
+config.camera_labels.polaris.femur = '';
 config.camera_labels.polaris.patella = '';
+config.camera_labels.polaris.hip = 'Y';
 config.camera_labels.polaris.probe = 'Probe';
 
 % Certus labels: Names used for each tracker in the data files.
