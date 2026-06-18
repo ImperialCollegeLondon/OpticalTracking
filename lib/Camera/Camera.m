@@ -5,22 +5,45 @@ classdef Camera
         Unknown
     end
     methods (Static)
-        function trackers = load_data(data, filename)
-            headers = data.Properties.VariableNames;
+        function trackers = load_data(path)
+
+            fid = fopen(path, 'rb');
+            if fid == -1
+                error('read_ndi_csv:fileNotFound', 'Cannot open file: %s', path);
+            end
+            raw = fread(fid, '*uint8')';
+            fclose(fid);
+
+            raw  = strrep(raw, uint8([13 13 10]), uint8(10)); % Can maybe remove. Converts \r\r\n into \n
+            text = native2unicode(raw, 'UTF-8');
+
+            lines = strsplit(text, newline);
+            lines = lines(~cellfun(@isempty, strtrim(lines)));
+
+            if numel(lines) < 2
+                error('read_ndi_csv:emptyFile', 'File contains no data rows.');
+            end
+
+
+            headers = strsplit(lines{1}, ',');
+
+
+            % headers = data.Properties.VariableNames;
             camera = Camera.from_headers(headers);
 
             switch camera
                 case Camera.Certus
-                    trackers = certus(data);
+                    warning("Requires updating to Camera/certus.m to load from loaded files. Currently opens the file a second time.")
+                    trackers = certus(path);
                     if isempty(trackers)
                         trackers = [];
                         return
                     end
                     trackers.add_camera(Camera.Certus);
                 case Camera.Polaris
-                    trackers = polaris(data);
+                    trackers = polaris(headers, lines);
                     if isempty(trackers)
-                        error("Problematic camera data. Check that all trackers are being recorded on the Polaris software.\nFile: %s", filename)
+                        error("Problematic camera data. Check that all trackers are being recorded on the Polaris software.\nFile: %s", path)
                     end
                     trackers.add_camera(Camera.Polaris);
                 case Camera.Unknown
