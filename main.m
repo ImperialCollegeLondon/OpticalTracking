@@ -49,33 +49,25 @@ digitisation.visualise();
 % digitisation.bone.tibia.surface.unwrap().visualise_mean()
 % test = digitisation.locate_centre();
 jcs = JCS.new(digitisation);
-% test = jcs.intersect_surface;
 kinematics = jcs.solve();
 
-% kinematics.trajectories.plot();
+trajectories = kinematics.trajectories;
+is_intact_neutral = [trajectories.LoadingCondition] == "Neutral" & [trajectories.SpecimenState] == "Intact_50N";
+digitisation.optimise(trajectories(is_intact_neutral))
 
-%% Visualising Tracker Positions
-trackers = load_data("data full/HF04_RK/Intact_50N", config);
-run = trackers.value(:, 6);
-run(2).visualise();
-hold on;
-run(3).visualise();
-
-legend({'tibia', 'femur'})
-
-%% Plotting matrices
-
-trans = kinematics.trajectories(88).Transform;
-
-    visualise_matrix(trans.gTfi(:, :, 1:20:end), '--');
-    visualise_matrix(trans.gTfi, '--');
-    visualise_matrix(trans.gTti, ':');
-
-
-%%
-
-
-kinematics.trajectories.plot_centre_of_rotation();
+% digitisation.visualise_surfaces;
+% hold on;
+% kinematics.trajectories.plot_centre_of_rotation();
+assignments(1) = Assignments("Anterior", "Neutral");
+assignments(2) = Assignments("External", "Neutral");
+assignments(3) = Assignments("Internal", "Neutral");
+assignments(4) = Assignments("Anterior_External", "Anterior");
+assignments(5) = Assignments("Anterior_Internal", "Anterior");
+assignments(6) = Assignments("SPS", "Valgus");
+is_cor = contains(trajectories.states, "cor", "IgnoreCase", true);
+cor = trajectories(is_cor).piecewise_centre_of_rotation(assignments, "Intact", "Neutral") ...
+    .plot();    
+% .cross_validate();
 %%
 disp("Loading tension")
 kinematics.load_tension("**/*tension.csv");

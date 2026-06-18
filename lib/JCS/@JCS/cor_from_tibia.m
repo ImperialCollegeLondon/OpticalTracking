@@ -5,9 +5,13 @@ function [origin, direction] = cor_from_tibia(self)
 
     transforms = [self.transforms];
     fTts = {transforms.fTts};
+    % origin = cellfun(@(x) safe_apply(get_origin, x), fTts, UniformOutput=false);
+    % direction = cellfun(@(x) safe_apply(get_ml, x), fTts, UniformOutput=false);
 
-    origin = cellfun(@(x) safe_apply(get_origin, x), fTts, UniformOutput=false);
-    direction = cellfun(@(x) safe_apply(get_ml, x), fTts, UniformOutput=false);
+    tsTf = cellfun(@(x) pageinv(x), fTts, UniformOutput=false);
+    origin = cellfun(@(x) safe_apply(get_origin, x), tsTf, UniformOutput=false);
+    direction = cellfun(@(x) safe_apply(get_ml, x), tsTf, UniformOutput=false);
+
 end
 
 function out = safe_apply(fn, x)
