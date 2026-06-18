@@ -71,8 +71,23 @@ function [trackers, strays] = polaris(raw_headers, lines)
             strays(n) = PassiveStrays(tx, ty, tz);
         end
     else
-    strays = [];
+        strays = [];
     end
+
+    trackers(n_trackers) = Tracker();
+    for n = 1:n_trackers
+        name = names{n};
+        q0 = squeeze(data_tracker(n, Q0, :));
+        qx = squeeze(data_tracker(n, QX, :));
+        qy = squeeze(data_tracker(n, QY, :));
+        qz = squeeze(data_tracker(n, QZ, :));
+        tx = squeeze(data_tracker(n, TX, :));
+        ty = squeeze(data_tracker(n, TY, :));
+        tz = squeeze(data_tracker(n, TZ, :));
+        error = squeeze(data_tracker(n, ERR, :));
+        trackers(n) = Tracker(name, q0, qx, qy, qz, tx, ty, tz, error);
+    end
+    strays = [];
 end
 
 
