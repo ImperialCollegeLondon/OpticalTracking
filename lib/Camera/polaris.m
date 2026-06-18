@@ -49,7 +49,6 @@ function [trackers, strays] = polaris(raw_headers, lines)
 
     end
 
-    trackers(n_trackers) = Tracker();
     for n = 1:n_trackers
         name = names{n};
         q0 = squeeze(data_tracker(n, Q0, :));
