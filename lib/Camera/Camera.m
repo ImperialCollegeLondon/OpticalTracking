@@ -5,7 +5,7 @@ classdef Camera
         Unknown
     end
     methods (Static)
-        function trackers = load_data(path)
+        function [trackers, strays] = load_data(path)
 
             fid = fopen(path, 'rb');
             if fid == -1
@@ -40,8 +40,9 @@ classdef Camera
                         return
                     end
                     trackers.add_camera(Camera.Certus);
+                    strays = [];
                 case Camera.Polaris
-                    trackers = polaris(headers, lines);
+                    [trackers, strays] = polaris(headers, lines);
                     if isempty(trackers)
                         error("Problematic camera data. Check that all trackers are being recorded on the Polaris software.\nFile: %s", path)
                     end
