@@ -9,8 +9,8 @@ function [transforms, bones] = calculate_transforms(trackers, loading_condition,
 
     data.tibia = trackers.with_label(label.tibia);
     data.femur = trackers.with_label(label.femur);
-    data.patella = trackers.with_label(label.patella);
-    if (data.femur.is_none() && data.tibia.is_none()) || (data.femur.is_none() && data.patella.is_none())
+    data.hip = trackers.with_label(label.hip);
+    if (data.femur.is_none() && data.tibia.is_none()) || (data.femur.is_none() && data.hip.is_none())
         return
     end
 
@@ -18,13 +18,13 @@ function [transforms, bones] = calculate_transforms(trackers, loading_condition,
     ttrtc = digitisation_transforms.tibia.origin;
     ftTfc = digitisation_transforms.femur.transform;
     ftrfc = digitisation_transforms.femur.origin;
-    ptTtc = digitisation_transforms.patella.transform;
-    ptrpc = digitisation_transforms.patella.origin;
+    htThc = digitisation_transforms.hip.transform;
+    htrpc = digitisation_transforms.hip.origin;
 
     %% Load how tracker moves with time
     gTtti = findTrackerFixedFrames(data.tibia);
     gTfti = findTrackerFixedFrames(data.femur);
-    gTpti = findTrackerFixedFrames(data.patella);
+    gThti = findTrackerFixedFrames(data.hip);
     % Create matrices of tracker marker position and rotations in time
 
 
@@ -43,29 +43,29 @@ function [transforms, bones] = calculate_transforms(trackers, loading_condition,
     grti = squeeze(pagemtimes(gTtti, ttrtc)); %tibia origin in global reference frame
     tibia.origin=grti;
     % frti = squeeze(fTt(:, 4, :));%tibial origin point in the femoral reference frame, note this also equals gTfi{i,1}(1:3,1:3)'*(grti{i,1}(1:3)-grfi{i,1}(1:3); as in Woltring et al. It also equals fTt{i,1}(:,4) and equals gTfi{i,1}\grti{i,1} as gTfi, grfi{1,1} = [0,0,0,1]' which makes sense as the femoral origin in the femoral reference frame is 0,0,0);
-    % Creates the structures the code expects, but all with empty data. Necessary to handle a missing patella without crashing.
-    if isempty(gTpti) || isempty(ptTtc)
+    % Creates the structures the code expects, but all with emhty data. Necessary to handle a missing hip without crashing.
+    if isemhty(gThti) || isemhty(htThc)
         gTpi = [];
         fTp = [];
         grpi = [];
         % frpi = [];
-        patella.i = [];
-        patella.j = [];
-        patella.k = [];
+        hip.i = [];
+        hip.j = [];
+        hip.k = [];
     else
-        gTpi = pagemtimes(gTpti, ptTtc);%multiply here instead of divide in Pam's method
-        fTp = pagemldivide(gTfi, gTpi); % Patella relative to the femur
-        grpi = pagemtimes(gTpti, ptrpc); % Patellar origin (patellar tendon insertion) in the global frame of reference
+        gThi = pagemtimes(gThti, htThc);%multiply here instead of divide in Pam's method
+        hTf = pagemldivide(gTfi, gTpi); % Patella relative to the femur
+        grpi = pagemtimes(gThti, htrpc); % Patellar origin (hipr tendon insertion) in the global frame of reference
         %convert the points to the femoral reference plane
-        % grtPTi=pagemtimes(gTtti,ttrtPTc); %tibial patella tendon insertion point in global frame of reference
-        % frtPTi=pagemldivide(gTfi,grtPTi); %tibial patella tendon insertion point in femoral frame of reference
-        % frpi = squeeze(fTp(:, 4, :)); %patella patella tendon insertion point in femoral frame of reference (fTp(:,4) == gTfi\grpi)
+        % grtPTi=pagemtimes(gTtti,ttrtPTc); %tibial hip tendon insertion point in global frame of reference
+        % frtPTi=pagemldivide(gTfi,grtPTi); %tibial hip tendon insertion point in femoral frame of reference
+        % frpi = squeeze(fTp(:, 4, :)); %hip hip tendon insertion point in femoral frame of reference (fTp(:,4) == gTfi\grpi)
         % Patellar x, y, z axis unit vector, Grood and Suntay definition
-        patella.i  = squeeze( gTpi(1:3, 1, :));
-        patella.j  = squeeze( gTpi(1:3, 2, :));
-        patella.k  = squeeze( gTpi(1:3, 3, :));
+        hip.i  = squeeze( gTpi(1:3, 1, :));
+        hip.j  = squeeze( gTpi(1:3, 2, :));
+        hip.k  = squeeze( gTpi(1:3, 3, :));
     end
-    patella.origin = grpi;
+    hip.origin = grpi;
 
     % Femoral x, y, z unit vector, Grood and Suntay definition
     femur.i = squeeze(gTfi(1:3, 1, :));
@@ -81,7 +81,7 @@ function [transforms, bones] = calculate_transforms(trackers, loading_condition,
     transforms.fTp = fTp;
     bones.femur = femur;
     bones.tibia = tibia;
-    bones.patella = patella;
+    bones.hip = hip;
     transforms.gTfi = gTfi;
     transforms.gTti = gTti;
     transforms.gTpi = gTpi;

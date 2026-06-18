@@ -22,7 +22,12 @@ gTft0 = femur.tracker.map(@(x) defineTrackerFixedFrame(x.rotations_mean, x.trans
 gTtt0 = tibia.tracker.map(@(x) defineTrackerFixedFrame(x.rotations_mean, x.translations_mean));
 gTht0 = hip.tracker.map(@(x) defineTrackerFixedFrame(x.rotations_mean, x.translations_mean));
 
+
 gTft0 = gTft0.unwrap_or([]);
+if isempty(gTft0)
+    warning("If this warning is here, Lara has fucked up the code")
+    gTft0 = eye(4);
+end
 gTtt0 = gTtt0.unwrap_or([]);
 gTht0 = gTht0.unwrap_or([]);
 %% Relate body fixed frames and origin to the tracker rigid body

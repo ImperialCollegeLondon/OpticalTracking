@@ -53,7 +53,7 @@ function visualise_hip(landmarks, config)
             quiver3(h.psis.Tx(1), h.psis.Ty(1), h.psis.Tz(1), med_lat(1), med_lat(2), med_lat(3), 0, 'b')
         else
             med_lat = h.psis.translations_mean - h.asis.translations_mean;
-            quiver3(h.asis.Tx(1), h.lateral.Ty(1), h.lateral.Tz(1), med_lat(1), med_lat(2), med_lat(3), 0, 'b')
+            quiver3(h.asis.Tx(1), h.asis.Ty(1), h.asis.Tz(1), med_lat(1), med_lat(2), med_lat(3), 0, 'b')
         end
         % Proximal-distal axis
         prox_dist = h.pubic_tubercle.translations_mean - o;
@@ -62,6 +62,7 @@ function visualise_hip(landmarks, config)
         %% Femur
         f = landmarks.femur;
         fields = fieldnames(f);
+        fields = setdiff(fields, 'tracker');
         for i = 1:numel(fields)
             f.(fields{i}) = f.(fields{i}).unwrap();
         end
