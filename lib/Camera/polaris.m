@@ -71,7 +71,7 @@ function [trackers, strays] = polaris(raw_headers, lines)
             strays(n) = PassiveStrays(tx, ty, tz);
         end
     else
-    strays = [];
+        strays = [];
     end
 
     trackers(n_trackers) = Tracker();
