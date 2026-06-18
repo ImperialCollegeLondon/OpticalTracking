@@ -1,5 +1,4 @@
 function gTf0 = defineBodyFixedFrameHip(hip,right)
-    error("Not correctly implemented");
 asis = hip.asis.map(@(x) x.translations_mean);
 psis = hip.psis.map(@(x) x.translations_mean);
 pt = hip.pubic_tubercle.map(@(x) x.translations_mean);
@@ -17,9 +16,9 @@ uvector=@(a,b) (b-a)/norm(b-a,2); %define a function to find a unit vector from 
 
 origin = (asis+psis)/2;
 if right
-    I_ = uvector(asis,psis)'; %RIGHT KNEE, X Axis
-else
     I_ = uvector(psis,asis)'; %LEFT KNEE, X Axis
+else
+    I_ = uvector(asis,psis)'; %RIGHT KNEE, X Axis
 end
 
 tempK_= uvector(origin,pt)'; %the pubic_tubercle point is approximate and thus this axis is not necessarily perpendicular to epicondylar axis
