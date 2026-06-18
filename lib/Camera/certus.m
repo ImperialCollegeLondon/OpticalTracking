@@ -1,4 +1,11 @@
-function trackers = certus(data)
+function trackers = certus(path)
+    try
+        data = readtable(path, "VariableNamingRule","preserve");
+    catch
+        remove_whitespaces(path);
+        data = readtable(path, "VariableNamingRule", "preserve");
+    end
+
     probe_idx = find(contains(data.Properties.VariableNames, "q0", "IgnoreCase",true));
     if isempty(probe_idx)
         error("Matlab was unable to read the headers from the csv. Try removing the spaces before the numbers.");
