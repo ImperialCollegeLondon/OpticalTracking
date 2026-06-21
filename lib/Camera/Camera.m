@@ -7,27 +7,12 @@ classdef Camera
     methods (Static)
         function [trackers, strays] = load_data(path)
 
-            fid = fopen(path, 'rb');
+            fid = fopen(path, 'r');
             if fid == -1
                 error('read_ndi_csv:fileNotFound', 'Cannot open file: %s', path);
             end
-            raw = fread(fid, '*uint8')';
-            fclose(fid);
-
-            text = native2unicode(raw, 'UTF-8');
-
-            lines = strsplit(text, newline);
-            lines = lines(~cellfun(@isempty, strtrim(lines)));
-
-            if numel(lines) < 2
-                error('read_ndi_csv:emptyFile', 'File contains no data rows.');
-            end
-
-
-            headers = strsplit(lines{1}, ',');
-
-
-            % headers = data.Properties.VariableNames;
+            header_line = fgetl(fid);
+            headers = strsplit(header_line, ',');
             camera = Camera.from_headers(headers);
 
             switch camera
@@ -41,7 +26,7 @@ classdef Camera
                     trackers.add_camera(Camera.Certus);
                     strays = [];
                 case Camera.Polaris
-                    [trackers, strays] = polaris(headers, lines);
+                    [trackers, strays] = polaris(headers, fid);
                     if isempty(trackers)
                         error("Problematic camera data. Check that all trackers are being recorded on the Polaris software.\nFile: %s", path)
                     end
@@ -49,6 +34,8 @@ classdef Camera
                 case Camera.Unknown
                     error("Unknown camera")
             end
+
+            fclose(fid);
 
             if numel(trackers) < 2
                 warning("Fewer than two trackers found.");
