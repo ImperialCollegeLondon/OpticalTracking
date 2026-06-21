@@ -52,8 +52,10 @@ jcs = JCS.new(digitisation);
 kinematics = jcs.solve();
 
 trajectories = kinematics.trajectories;
-path = trajectories.path;
-path_avg = path.average;
+path = trajectories.path();
+path_avg = path.average();
+norm = path.normalise("Neutral", "Intact_50N");
+ie = norm.exclude_state("COR").ie();
 norm_avg = path.normalise("Neutral", "Intact_50N").average();
 keyboard
 norm_avg.exclude_state("COR").plot

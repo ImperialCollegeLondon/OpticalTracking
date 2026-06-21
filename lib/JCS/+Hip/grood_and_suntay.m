@@ -6,7 +6,8 @@ end
 
 function result = tibiofemoral(relative_position, femur, tibia, right)
     if isempty(relative_position)
-        result = array2table([], 'VariableNames', {'flexion', 'varus', 'external', 'lateral', 'anterior', 'superior'});
+        result = table('Size', [0 6], 'VariableTypes', repmat("double", 1, 6), 'VariableNames', ...
+        {'flexion', 'varus', 'external', 'lateral', 'anterior', 'superior'});
         return;
     end
 

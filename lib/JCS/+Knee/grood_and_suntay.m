@@ -5,7 +5,8 @@ end
 
 function result = tibiofemoral(relative_position, femur, tibia, right)
     if isempty(relative_position)
-        result = array2table([], 'VariableNames', {'flexion', 'varus', 'external', 'lateral', 'anterior', 'superior'});
+        result = table('Size', [0 6], 'VariableTypes', repmat("double", 1, 6), 'VariableNames', ...
+        {'flexion', 'varus', 'external', 'lateral', 'anterior', 'superior'});
         return;
     end
 
@@ -69,7 +70,8 @@ end
 function result = patellofemoral(relative_position, femur, patella, right)
     result = table();
     if isempty(relative_position)
-        result = array2table([], 'VariableNames', {'flexion', 'medial_rotation', 'lateral_tilt', 'medial_shift', 'anterior', 'superior'});
+        result = table('Size', [0 6], 'VariableTypes', repmat("double", 1, 6), 'VariableNames', ...
+            {'flexion', 'medial_rotation', 'lateral_tilt', 'medial_shift', 'anterior', 'superior'});
         return;
     end
     e1_=femur.i;%Femoral X axis in global reference frame, Grood and Suntay definition
