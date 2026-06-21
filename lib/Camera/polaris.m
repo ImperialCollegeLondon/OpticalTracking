@@ -1,23 +1,41 @@
-function [trackers, strays] = polaris(raw_headers, lines)
-    idx_tracker = find(contains(raw_headers, "Port"));
-    names = raw_headers(idx_tracker);
-    n_trackers = numel(idx_tracker);
-    idx_q0 = find(contains(raw_headers, 'Q0'));
+function [trackers, strays] = polaris(headers, fid)
+    % Manually reading files because strays caused malformed CSVs
+    fgetl(fid); % Discard the first empty line
+    first_line = fgetl(fid);
+
+    [fmt, is_numeric] = tokeniser(first_line);
+
+    frewind(fid);
+    fgetl(fid); % Skip header again
+    data = textscan(fid, fmt, 'Delimiter', ',', 'EmptyValue', NaN);
+    data = [data{:}];
+    data(abs(data) > 1e20) = nan;
+
+    stray_idx = find(strcmp(headers, 'Passive Strays'), 1);
     
-
-    passive_strays_idx = find(strcmp(raw_headers, 'Passive Strays'), 1);
-    has_strays = ~isempty(passive_strays_idx);
-    if has_strays
-        idx_q0 = idx_q0(idx_q0 < passive_strays_idx);
-
-        stray_headers = raw_headers(passive_strays_idx: end);
-        stray_tz = find(strcmp(stray_headers, 'Tz'));
-        idx_stray = stray_tz(:) - (0:2);
+    if isempty(stray_idx)
+        sentinel = numel(headers) + 1;
+        idx_stray_data = width(data);
+    else
+        sentinel = stray_idx;
+        idx_stray_data = sum(is_numeric(1:stray_idx-1)) + 1;
     end
 
-    % Assumes they are sequential and in this order: Q0, Qx, Qy, Qz, Tx, Ty, Tz, Error
-    idx = idx_q0(:) + (0:7);
+    idx_markers = find(contains(headers, 'Port'));
+    idx_tracker = idx_markers;
+    idx_markers(end+1) = sentinel;
 
+    for k = 1:numel(idx_markers) - 1
+        in_port = false(1, numel(headers));
+        in_port(idx_markers(k)+1 : idx_markers(k+1)-1) = true;
+        tracker_mask{k} = in_port(is_numeric);
+    end
+
+    names = headers(idx_tracker);
+    headers_numeric = headers(is_numeric);
+    idx_q0 = find(contains(headers_numeric(1:idx_stray_data), 'Q0'));
+    
+    %% Assumes they are sequential and in this order: Q0, Qx, Qy, Qz, Tx, Ty, Tz, Error
     Q0 = 1;
     QX = 2;
     QY = 3;
@@ -26,65 +44,56 @@ function [trackers, strays] = polaris(raw_headers, lines)
     TY = 6;
     TZ = 7;
     ERR = 8;
+    idx = idx_q0(:) + (0:7);
 
-    n_rows = numel(lines) - 1;
-    data_tracker = nan(size(idx, 1), size(idx, 2), n_rows);
-
-    if has_strays
-        data_stray = nan(size(idx_stray, 1), size(idx_stray, 2), n_rows);
-    end
-
-    for n = 1:n_rows
-        row = strsplit(lines{n + 1}, ',');
-
-        datum = str2double(row(idx));
-        datum(abs(datum) > 1e20) = nan;
-        data_tracker(:, :, n) = datum;
-
-        if has_strays
-            row_stray = row(passive_strays_idx:end);
-            datum_stray = extract_strays(stray_headers, idx_stray, row_stray);
-            data_stray(:, :, n) = datum_stray;
-        end
-
-    end
-
-    for n = 1:n_trackers
+    for n = 1:numel(idx_tracker)
         name = names{n};
-        q0 = squeeze(data_tracker(n, Q0, :));
-        qx = squeeze(data_tracker(n, QX, :));
-        qy = squeeze(data_tracker(n, QY, :));
-        qz = squeeze(data_tracker(n, QZ, :));
-        tx = squeeze(data_tracker(n, TX, :));
-        ty = squeeze(data_tracker(n, TY, :));
-        tz = squeeze(data_tracker(n, TZ, :));
-        error = squeeze(data_tracker(n, ERR, :));
+        q0 = data(:, idx(n, Q0));
+        qx = data(:, idx(n, QX));
+        qy = data(:, idx(n, QY));
+        qz = data(:, idx(n, QZ));
+        tx = data(:, idx(n, TX));
+        ty = data(:, idx(n, TY));
+        tz = data(:, idx(n, TZ));
+        error = data(:, idx(n, ERR));
         trackers(n) = Tracker(name, q0, qx, qy, qz, tx, ty, tz, error);
     end
 
+    has_strays = ~isempty(stray_idx);
     if has_strays
-        for n = 1:size(data_stray, 1)
-            tz = squeeze(data_stray(n, 1, :));
-            ty = squeeze(data_stray(n, 2, :));
-            tx = squeeze(data_stray(n, 3, :));
+        data_strays = data(:, idx_stray_data+1:end);
+        header_stray = headers_numeric(idx_stray_data+1:end);
+        stray_tz = find(strcmp(header_stray, 'Tz'));
+        idx_stray = stray_tz(:) - (0:2);
 
+        strays(length(stray_tz)) = PassiveStrays();
+        for n = 1:length(idx_stray)
+            tz = data_strays(:, idx_stray(n, 1));
+            ty = data_strays(:, idx_stray(n, 2));
+            tx = data_strays(:, idx_stray(n, 3));
             strays(n) = PassiveStrays(tx, ty, tz);
         end
+
     else
-    strays = [];
+        strays = [];
     end
+
+
+
 end
 
-
-function datum = extract_strays(headers, idx, row)
-
-    if numel(row) < numel(headers)
-        row(length(row)+1:length(headers)) = {nan};
+function [fmt, is_numeric] = tokeniser(line)
+        tokens = strsplit(line, ',');
+        fmt_parts = cell(1, numel(tokens));
+        is_numeric = true(1, numel(tokens));
+        for k = 1:numel(tokens)
+            v = str2double(tokens{k});
+            if isnan(v) && ~strcmpi(strtrim(tokens{k}), 'nan')
+                fmt_parts{k} = '%*s';
+                is_numeric(k) = false;
+            else
+                fmt_parts{k} = '%f';
+            end
+        end
+        fmt = strjoin(fmt_parts, '');
     end
-
-    if numel(row) > numel(headers)
-        row = row(1:length(headers));
-    end
-
-    datum = str2double(row(idx));
-end
