@@ -36,9 +36,6 @@ function [transforms, bones] = calculate_transforms(trackers, loading_condition,
     gTti = pagemtimes(gTtti, ttTtc);%multiply here instead of divide in Pam's method
     fTt = pagemldivide(gTfi, gTti); % Transformation of Tibia relative to the femur
 
-
-    fTts = pagemtimes(fTt , tTts);
-
     if isempty(tTts)
         fTts = [];
     else
