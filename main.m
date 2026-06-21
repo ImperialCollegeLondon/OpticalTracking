@@ -52,6 +52,12 @@ jcs = JCS.new(digitisation);
 kinematics = jcs.solve();
 
 trajectories = kinematics.trajectories;
+path = trajectories.path;
+path_avg = path.average;
+norm_avg = path.normalise("Neutral", "Intact_50N").average();
+keyboard
+norm_avg.exclude_state("COR").plot
+
 is_intact_neutral = [trajectories.LoadingCondition] == "Neutral" & [trajectories.SpecimenState] == "Intact_50N";
 digitisation.optimise(trajectories(is_intact_neutral))
 
