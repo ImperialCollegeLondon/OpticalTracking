@@ -63,6 +63,16 @@ classdef Digitisation < handle
                             Knee.assign_bone(digitisation);
                         end
 
+                        [t, b] = Knee.calculate_transforms(digitisation.trackers(:, 1), "None", digitisation.transforms, config);
+                        [digitisation_position.tf, digitisation_position.pf] = Knee.grood_and_suntay(b.femur, b.tibia, b.patella, t.fTt, t.fTp, config.is_right_knee);
+                        signals = fields(digitisation_position);
+                        for sg = 1:numel(signals)
+                            signal = signals{sg};
+                            if ~isempty(digitisation_position.(signal))
+                                digitisation.angle_offset.(signal) = angle - mean(digitisation_position.(signal).flexion);
+                            end
+                        end
+
                         % [t, b] = Knee.calculate_transforms(digitisation.trackers(:, 1), "None", digitisation.transforms, config);
                         % [digitisation_position.tf, digitisation_position.pf] = Knee.grood_and_suntay(b.femur, b.tibia, b.patella, t.fTt, t.fTp, config.is_right_knee);
                         % signals = fields(digitisation_position);

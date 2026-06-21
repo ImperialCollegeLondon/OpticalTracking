@@ -78,8 +78,6 @@ function [trackers, strays] = polaris(headers, fid)
         strays = [];
     end
 
-
-
 end
 
 function [fmt, is_numeric] = tokeniser(line)
