@@ -14,7 +14,6 @@ classdef Camera
             raw = fread(fid, '*uint8')';
             fclose(fid);
 
-            raw  = strrep(raw, uint8([13 13 10]), uint8(10)); % Can maybe remove. Converts \r\r\n into \n
             text = native2unicode(raw, 'UTF-8');
 
             lines = strsplit(text, newline);
