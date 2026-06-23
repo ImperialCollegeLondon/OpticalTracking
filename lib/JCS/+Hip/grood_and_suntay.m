@@ -12,6 +12,14 @@ function result = tibiofemoral(relative_position, femur, tibia, right)
     result = table();
 
     fTt = relative_position;
+
+    n_data = size(fTt, 3);
+    if size(femur.i, 2) ~= n_data
+        femur.i = repmat(femur.i', n_data, 1)';
+        femur.j = repmat(femur.j', n_data, 1)';
+        femur.k = repmat(femur.k', n_data, 1)';
+    end
+
     e1_=femur.i;%Femoral X axis in global reference frame, Grood and Suntay definition
     e3_=tibia.k;%Tibial z axis in global reference frame, Grood and Suntay definition
     e2_=ucross(e3_,e1_);%Floating axis in global reference frame, Grood and Suntay definition
@@ -75,6 +83,14 @@ function result = femoracetabular(relative_position, hip, femur, right)
     result = table();
 
     fTt = relative_position;
+
+    n_data = size(fTt, 3);
+    if size(femur.i, 2) ~= n_data
+        femur.i = repmat(femur.i', n_data, 1)';
+        femur.j = repmat(femur.j', n_data, 1)';
+        femur.k = repmat(femur.k', n_data, 1)';
+    end
+
     e1_=hip.i;%Femoral X axis in global reference frame, Grood and Suntay definition
     e3_=femur.k;%Tibial z axis in global reference frame, Grood and Suntay definition
     e2_=ucross(e3_,e1_);%Floating axis in global reference frame, Grood and Suntay definition
