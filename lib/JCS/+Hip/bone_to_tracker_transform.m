@@ -14,6 +14,9 @@ grt0 = origins(gTt0);
 gTf0 = defineBodyFixedFrameFemur(femur, right);
 grf0 = origins(gTf0);
 gTh0 = defineBodyFixedFrameHip(hip, right);
+if hip.asis.is_none || hip.psis.is_none
+    error("Missing digitisation of hip landmarks");
+end
 grh0 = origins(gTh0);
 
 
