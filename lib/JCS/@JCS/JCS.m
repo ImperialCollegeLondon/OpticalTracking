@@ -104,6 +104,7 @@ classdef JCS
                 digitisation_transforms = digitisation.transforms;
                 module = digitisation.module;
                 states = get_root_files(digitisation.filepath, config.digitisation).unwrap();
+                states = states([states.isdir]);
                 for st = 1:numel(states)
                     state = states(st);
                     fp_data = fullfile(state.folder, state.name);
