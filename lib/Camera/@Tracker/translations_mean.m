@@ -3,5 +3,5 @@ if isempty(self.translations)
     r = [];
     return
 end
-r = mean(self.translations(), "omitmissing");
+r = mean(self.translations(), 1, "omitmissing");
 end
