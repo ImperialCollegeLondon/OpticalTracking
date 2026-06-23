@@ -68,9 +68,9 @@ function visualise_hip(landmarks, config)
         end
 
         plot_f = scatter3(f.medial.Tx(1), f.medial.Ty(1), f.medial.Tz(1), 'r');
-        text_mean(calc_means(f.medial), '  Medial')
+        text_mean(calc_means(f.medial), '  Medial');
         scatter3(f.lateral.Tx(1), f.lateral.Ty(1), f.lateral.Tz(1), 'r');
-        text_mean(calc_means(f.lateral), '  Lateral')
+        text_mean(calc_means(f.lateral), '  Lateral');
 
 
         for td = 1:numel(f.proximal)
@@ -81,7 +81,7 @@ function visualise_hip(landmarks, config)
         scatter_mean(calc_means(f.proximal), 'r');
 
         % scatter3(f.proximal.Tx(1), f.proximal.Ty(1), f.proximal.Tz(1), 'r');
-        text_mean(calc_means(f.proximal), "  Proximal")
+        text_mean(calc_means(f.proximal), "  Proximal");
 
         % Medial-lateral axis
         o = (f.medial.translations_mean + f.lateral.translations_mean)/2;
@@ -169,9 +169,9 @@ function visualise_knee(landmarks, config)
         end
 
         plot_f = scatter3(f.medial.Tx(1), f.medial.Ty(1), f.medial.Tz(1), 'r', 'DisplayName', 'Femur');
-        text_mean(calc_means(f.medial), '  Medial')
+        text_mean(calc_means(f.medial), '  Medial');
         scatter3(f.lateral.Tx(1), f.lateral.Ty(1), f.lateral.Tz(1), 'r');
-        text_mean(calc_means(f.lateral), '  Lateral')
+        text_mean(calc_means(f.lateral), '  Lateral');
 
 
         for td = 1:numel(f.proximal)
@@ -182,7 +182,7 @@ function visualise_knee(landmarks, config)
         scatter_mean(calc_means(f.proximal), 'r');
 
         % scatter3(f.proximal.Tx(1), f.proximal.Ty(1), f.proximal.Tz(1), 'r');
-        text_mean(calc_means(f.proximal), "  Proximal")
+        text_mean(calc_means(f.proximal), "  Proximal");
 
         % Medial-lateral axis
         o = (f.medial.translations_mean + f.lateral.translations_mean)/2;

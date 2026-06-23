@@ -20,6 +20,8 @@ classdef Digitisation < handle
             end
 
             specimen_list = get_root_files(root, {'result', 'problem'}).unwrap(); % Get all files in root and exclude any folders that include `result`
+            is_dir = [specimen_list.isdir];
+            specimen_list = specimen_list(is_dir);
             specimen_folders = fullfile({specimen_list.folder}, {specimen_list.name});
             prev_specimen = [];
             curr_specimen = [];
@@ -61,6 +63,16 @@ classdef Digitisation < handle
                             Knee.assign_bone(digitisation, prev_digit);
                         else
                             Knee.assign_bone(digitisation);
+                        end
+
+                        [t, b] = Knee.calculate_transforms(digitisation.trackers(:, 1), "None", digitisation.transforms, config);
+                        [digitisation_position.tf, digitisation_position.pf] = Knee.grood_and_suntay(b.femur, b.tibia, b.patella, t.fTt, t.fTp, config.is_right_knee);
+                        signals = fields(digitisation_position);
+                        for sg = 1:numel(signals)
+                            signal = signals{sg};
+                            if ~isempty(digitisation_position.(signal))
+                                digitisation.angle_offset.(signal) = angle - mean(digitisation_position.(signal).flexion);
+                            end
                         end
 
                         % [t, b] = Knee.calculate_transforms(digitisation.trackers(:, 1), "None", digitisation.transforms, config);

@@ -1,6 +1,6 @@
 function [ gTtiF ] = findTrackerFixedFrames(rigid_body)
 if rigid_body.is_none
-    gTtiF = [];
+    gTtiF = eye(4);
     return
 end
 rigid_body = rigid_body.unwrap();

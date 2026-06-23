@@ -18,7 +18,9 @@ classdef JCS
         end
         function kinematics = grood_and_suntay(self)
             trajectories(numel(self)) = Trajectory();
-            [origin, direction] = self.cor_from_tibia();
+            if unique([self.module]) == Module.Knee
+                [origin, direction] = self.cor_from_tibia();
+            end
             % [centre_of_rotation, direction] = self.cor_from_femur();
 
             for i = 1:numel(self)
@@ -74,7 +76,7 @@ classdef JCS
 
                         trajectory.add_transforms('gTfi', self(i).transforms.gTfi);
                         trajectory.add_transforms('gTti', self(i).transforms.gTti);
-                        trajectory.add_transforms('gTpi', self(i).transforms.gTpi);
+                        trajectory.add_transforms('gThi', self(i).transforms.gThi);
                         trajectory.add_transforms('fTt', self(i).transforms.fTt);
                         trajectory.add_transforms('hTf', self(i).transforms.hTf);
 
@@ -102,6 +104,7 @@ classdef JCS
                 digitisation_transforms = digitisation.transforms;
                 module = digitisation.module;
                 states = get_root_files(digitisation.filepath, config.digitisation).unwrap();
+                states = states([states.isdir]);
                 for st = 1:numel(states)
                     state = states(st);
                     fp_data = fullfile(state.folder, state.name);
