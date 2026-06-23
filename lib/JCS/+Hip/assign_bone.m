@@ -19,7 +19,7 @@ function digitisation = assign_bone(digitisation)
     % These must be assigned to digitisation.bone.femur.medial, etc. These name definitions are used in Hip.bone_to_tracker_transform
     digitisation.bone.femur.medial = trackers.contains({'femur', 'medial'}).and_then(@(x) x.with_label(label.probe));
     digitisation.bone.femur.lateral = trackers.contains({'femur', 'lateral'}).and_then(@(x) x.with_label(label.probe));
-    digitisation.bone.femur.proximal = trackers.contains({'femur', 'proximal'}).and_then(@(x) x.with_label(label.probe));
+    digitisation.bone.femur.proximal = trackers.contains({'femur', 'proximal'}).and_then(@(x) x.with_label(label.hip)).map(@(x) x.sphere_fit());
     digitisation.bone.femur.tracker = trackers(:, 1).with_label(label.femur);
 
     % Tibia
