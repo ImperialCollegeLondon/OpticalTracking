@@ -3,12 +3,19 @@ function [trackers, strays] = polaris(headers, fid)
     fgetl(fid); % Discard the first empty line
     first_line = fgetl(fid);
 
-    [fmt, is_numeric] = tokeniser(first_line);
+    [fmt, is_numeric] = tokeniser(first_line, headers);
 
     frewind(fid);
     fgetl(fid); % Skip header again
     data = textscan(fid, fmt, 'Delimiter', ',', 'EmptyValue', NaN);
+    try
     data = [data{:}];
+    catch
+        sizes = cellfun(@size, data, 'UniformOutput', false);
+        sizes = vertcat(sizes{:});
+        n_lines = diff(unique(sizes(:, 1)));
+        error('Malformed CSV with incomplete lines. Consider deleting last %i lines', n_lines)
+    end
     data(abs(data) > 1e20) = nan;
 
     stray_idx = find(strcmp(headers, 'Passive Strays'), 1);
@@ -25,10 +32,14 @@ function [trackers, strays] = polaris(headers, fid)
     idx_tracker = idx_markers;
     idx_markers(end+1) = sentinel;
 
+    try
     for k = 1:numel(idx_markers) - 1
         in_port = false(1, numel(headers));
         in_port(idx_markers(k)+1 : idx_markers(k+1)-1) = true;
         tracker_mask{k} = in_port(is_numeric);
+    end
+    catch
+        keyboard
     end
 
     names = headers(idx_tracker);
@@ -55,8 +66,8 @@ function [trackers, strays] = polaris(headers, fid)
         tx = data(:, idx(n, TX));
         ty = data(:, idx(n, TY));
         tz = data(:, idx(n, TZ));
-        error = data(:, idx(n, ERR));
-        trackers(n) = Tracker(name, q0, qx, qy, qz, tx, ty, tz, error);
+        err = data(:, idx(n, ERR));
+        trackers(n) = Tracker(name, q0, qx, qy, qz, tx, ty, tz, err);
     end
 
     has_strays = ~isempty(stray_idx);
@@ -66,8 +77,8 @@ function [trackers, strays] = polaris(headers, fid)
         stray_tz = find(strcmp(header_stray, 'Tz'));
         idx_stray = stray_tz(:) - (0:2);
 
-        strays(length(stray_tz)) = PassiveStrays();
-        for n = 1:length(idx_stray)
+        strays(numel(stray_tz)) = PassiveStrays();
+        for n = 1:numel(stray_tz)
             tz = data_strays(:, idx_stray(n, 1));
             ty = data_strays(:, idx_stray(n, 2));
             tx = data_strays(:, idx_stray(n, 3));
@@ -80,7 +91,7 @@ function [trackers, strays] = polaris(headers, fid)
 
 end
 
-function [fmt, is_numeric] = tokeniser(line)
+function [fmt, is_numeric] = tokeniser(line, headers)
     tokens = strsplit(line, ',');
     fmt_parts = cell(1, numel(tokens));
     is_numeric = true(1, numel(tokens));
@@ -93,5 +104,8 @@ function [fmt, is_numeric] = tokeniser(line)
             fmt_parts{k} = '%f';
         end
     end
+    % Filtering required because first line might have extra strays
+    fmt_parts = fmt_parts(1:numel(headers));
+    is_numeric = is_numeric(1:numel(headers));
     fmt = strjoin(fmt_parts, '');
 end
