@@ -42,6 +42,9 @@ root = uigetdir(".", "Choose the root folder");
 
 %%
 module = Module.Knee;
+
+config = pick_labels(config, module);
+
 digitisation = Digitisation.new(root, config, module);
 % hold on;
 digitisation.visualise();
@@ -120,3 +123,4 @@ norm_avg.plot();
 % plot_interspecimen(config, stats, stats_offset, states, truncate_min, truncate_max)
 % 
 % diary off;
+
