@@ -81,17 +81,17 @@ function [trackers, strays] = polaris(headers, fid)
 end
 
 function [fmt, is_numeric] = tokeniser(line)
-        tokens = strsplit(line, ',');
-        fmt_parts = cell(1, numel(tokens));
-        is_numeric = true(1, numel(tokens));
-        for k = 1:numel(tokens)
-            v = str2double(tokens{k});
-            if isnan(v) && ~strcmpi(strtrim(tokens{k}), 'nan')
-                fmt_parts{k} = '%*s';
-                is_numeric(k) = false;
-            else
-                fmt_parts{k} = '%f';
-            end
+    tokens = strsplit(line, ',');
+    fmt_parts = cell(1, numel(tokens));
+    is_numeric = true(1, numel(tokens));
+    for k = 1:numel(tokens)
+        v = str2double(tokens{k});
+        if isnan(v) && ~strcmpi(strtrim(tokens{k}), 'nan')
+            fmt_parts{k} = '%*s';
+            is_numeric(k) = false;
+        else
+            fmt_parts{k} = '%f';
         end
-        fmt = strjoin(fmt_parts, '');
     end
+    fmt = strjoin(fmt_parts, '');
+end

@@ -14,6 +14,9 @@ grt0 = origins(gTt0);
 gTf0 = defineBodyFixedFrameFemur(femur, right);
 grf0 = origins(gTf0);
 gTh0 = defineBodyFixedFrameHip(hip, right);
+if hip.asis.is_none || hip.psis.is_none
+    error("Missing digitisation of hip landmarks");
+end
 grh0 = origins(gTh0);
 
 
@@ -22,9 +25,10 @@ gTft0 = femur.tracker.map(@(x) defineTrackerFixedFrame(x.rotations_mean, x.trans
 gTtt0 = tibia.tracker.map(@(x) defineTrackerFixedFrame(x.rotations_mean, x.translations_mean));
 gTht0 = hip.tracker.map(@(x) defineTrackerFixedFrame(x.rotations_mean, x.translations_mean));
 
-gTft0 = gTft0.unwrap_or([]);
-gTtt0 = gTtt0.unwrap_or([]);
-gTht0 = gTht0.unwrap_or([]);
+
+gTft0 = gTft0.unwrap_or(eye(4));
+gTtt0 = gTtt0.unwrap_or(eye(4));
+gTht0 = gTht0.unwrap_or(eye(4));
 %% Relate body fixed frames and origin to the tracker rigid body
 % A constant transform of the body fixed frame in the tracker frame of reference (assumes rigid body)
 % As in, tibia in the tibial tracker's frame of reference.

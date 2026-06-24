@@ -1,29 +1,29 @@
 function gTf0 = defineBodyFixedFrameHip(hip,right)
-    error("Not correctly implemented");
-asis = hip.asis.map(@(x) x.translations_mean);
-psis = hip.psis.map(@(x) x.translations_mean);
-pt = hip.pubic_tubercle.map(@(x) x.translations_mean);
+asis = hip.asis;
+psis = hip.psis;
+pt = hip.pubic_tubercle;
+origin = hip.origin;
 if asis.is_none || psis.is_none || pt.is_none
     gTf0 = [];
     return
 end
-asis = asis.unwrap();
-psis = psis.unwrap();
-pt = pt.unwrap();
+asis = asis.map(@(x) x.translations_mean).unwrap();
+psis = psis.map(@(x) x.translations_mean).unwrap();
+pt = pt.map(@(x) x.translations_mean).unwrap();
+origin = origin.map(@(x) x.translations_mean).unwrap();
 
-angle = @(u_,v_) acosd(dot(u_,v_)/(norm(u_,2)*norm(v_,2))); %define a function to calculate the angle between two vectors
 ucross=@(u_,v_) cross(u_,v_)/norm(cross(u_,v_),2); %define function to find unit cross product
 uvector=@(a,b) (b-a)/norm(b-a,2); %define a function to find a unit vector from a to b
 
-origin = (asis+psis)/2;
+J_ = uvector(psis, asis)';
+tempK_= uvector(origin,pt)'; %the pubic_tubercle point is approximate and thus this axis is not necessarily perpendicular to the psis-asis axis.
+% This needs to be double checked:
 if right
-    I_ = uvector(asis,psis)'; %RIGHT KNEE, X Axis
+    I_ = ucross(J_, tempK_);
 else
-    I_ = uvector(psis,asis)'; %LEFT KNEE, X Axis
+    I_ = ucross(tempK_, J_);
 end
 
-tempK_= uvector(origin,pt)'; %the pubic_tubercle point is approximate and thus this axis is not necessarily perpendicular to epicondylar axis
-J_ = ucross(tempK_,I_); % Y-axis
 K_ = ucross(I_,J_);%%recalculate K so perpendicular to give orthogonal coordinate system.
 
 if all(cross(tempK_, I_) == zeros(3,1)) || all(cross(I_, J_) == zeros(3,1))
@@ -43,6 +43,7 @@ gTf0=trans*rot; % Note this is the same as gTf0=[rot,origin';0 0 0 1];
 
 
 %check for orthogonality
+% angle = @(u_,v_) acosd(dot(u_,v_)/(norm(u_,2)*norm(v_,2))); %define a function to calculate the angle between two vectors
 % angle(I_,J_)
 % angle(J_,K_)
 % angle(I_,K_)
