@@ -3,7 +3,7 @@ med = femur.medial.map(@(x) x.translations_mean);
 lat = femur.lateral.map(@(x) x.translations_mean);
 prox = femur.proximal.map(@(x) x.translations_mean);
 if med.is_none || lat.is_none || prox.is_none
-    gTf0 = [];
+    gTf0 = Option.None;
     return
 end
 med = med.unwrap();
@@ -54,6 +54,8 @@ trans=[1 0 0 origin(1);
 
 
 gTf0=trans*rot; % Note this is the same as gTf0=[rot,origin';0 0 0 1];
+
+gTf0 = Option(gTf0);
 
 
 %check for orthogonality

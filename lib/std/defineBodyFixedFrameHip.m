@@ -4,7 +4,7 @@ psis = hip.psis;
 pt = hip.pubic_tubercle;
 origin = hip.origin;
 if asis.is_none || psis.is_none || pt.is_none
-    gTf0 = [];
+    gTf0 = Option.None;
     return
 end
 asis = asis.map(@(x) x.translations_mean).unwrap();
@@ -41,6 +41,7 @@ trans=[1 0 0 origin(1);
 
 gTf0=trans*rot; % Note this is the same as gTf0=[rot,origin';0 0 0 1];
 
+gTf0 = Option(gTf0);
 
 %check for orthogonality
 % angle = @(u_,v_) acosd(dot(u_,v_)/(norm(u_,2)*norm(v_,2))); %define a function to calculate the angle between two vectors

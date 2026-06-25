@@ -47,7 +47,7 @@ config = pick_labels(config, module);
 
 digitisation = Digitisation.new(root, config, module);
 % hold on;
-digitisation.visualise();
+% digitisation.visualise();
 % digitisation.digitise_surfaces();
 % digitisation.bone.tibia.surface.unwrap().visualise_mean()
 % test = digitisation.locate_centre();
@@ -55,6 +55,9 @@ jcs = JCS.new(digitisation);
 kinematics = jcs.solve();
 
 trajectories = kinematics.trajectories;
+
+optimised = digitisation.optimise(trajectories.intact_neutral());
+keyboard
 path = trajectories.path();
 path_avg = path.average();
 norm = path.normalise("Neutral", "Intact_50N");
@@ -62,9 +65,6 @@ ie = norm.exclude_state("COR").ie();
 norm_avg = path.normalise("Neutral", "Intact_50N").average();
 keyboard
 norm_avg.exclude_state("COR").plot
-
-is_intact_neutral = [trajectories.LoadingCondition] == "Neutral" & [trajectories.SpecimenState] == "Intact_50N";
-digitisation.optimise(trajectories(is_intact_neutral))
 
 % digitisation.visualise_surfaces;
 % hold on;

@@ -1,11 +1,12 @@
-function optimise(self, trajectories)
+function optimised = optimise(self, trajectories)
     arguments
         self Digitisation
         trajectories Trajectory
     end
 
     if isempty(trajectories)
-        warning("No trajectories ")
+        optimised = [];
+        warning("No trajectories")
         return
     end
 
@@ -19,7 +20,7 @@ function optimise(self, trajectories)
 
             switch digitisation.module
                 case Module.Knee
-                    optimise_knee(digitisation, trajectory)
+                    optimised(d) = optimise_knee(digitisation, trajectory);
                 case Module.Hip
                     error("not yet implemented");
             end
@@ -34,8 +35,11 @@ function optimised = optimise_knee(digitisation, trajectory)
     gTfi = trajectory.Transform.gTfi;
     gTti = trajectory.Transform.gTti;
 
-[~, flex] = max(flexion);
-[~, ext] = min(flexion);
+    gTfti = trajectory.Transform.gTfti;
+    gTft0 = digitisation.bone.femur.gTft0;
+
+    [~, flex] = max(flexion);
+    [~, ext] = min(flexion);
 
     %Screw axis from min to max flexion, using SARA approach (Ehrig 2007)
     R1=gTfi(1:3,1:3,flex);%pose of femoral reference frame in global coordinates when in deep flexion
@@ -57,6 +61,6 @@ function optimised = optimise_knee(digitisation, trajectory)
 %mu.  Using formula from here https://en.wikipedia.org/wiki/Lineplane_intersection to find mu.
     mu=dot(([0,0,0]'-point),[1,0,0])/dot(SARAfullROM,[1,0,0]);%in femoral reference frame noting that sagittal plane normal is just the femoral X axis I.e. [1,0,0] in femoral reference frame,  and noting that 0,0,0 is a point on the mid femoral sagittal plane
     isp=point+mu*SARAfullROM;%intersection point in femoral reference frame
-    gTf0 = defineBodyFixedFrameFemur(optimised.bone.femur, optimised.config.is_right_knee);
+    gTf0 = defineBodyFixedFrameFemur(digitisation.bone.femur, digitisation.config.is_right_knee).unwrap();
     gOf0=gTf0*[isp;1];%convert isp from femoral frame to global frame to find the new femoral origin in the global reference frame
 end

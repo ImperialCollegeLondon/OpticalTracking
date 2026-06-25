@@ -96,6 +96,7 @@ function [transforms, bones] = calculate_transforms(trackers, loading_condition,
     transforms.gTpi = gTpi;
     transforms.tTts = tTts;
     transforms.fTts = fTts;
+    transforms.gTfti = gTfti;
 end
 
 % function [transforms, bones] = calculate_transforms(trackers, loading_condition, digitisation_transforms, config)
