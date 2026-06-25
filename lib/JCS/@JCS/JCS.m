@@ -28,14 +28,14 @@ classdef JCS
                     case Module.Knee
                         right = self(i).config.is_right_knee;
                         fTt  = self(i).transforms.fTt;
-                        fTp  = self(i).transforms.fTp;
+                        hTf  = self(i).transforms.fTp;
                         femur = self(i).bones.femur;
                         tibia = self(i).bones.tibia;
                         patella = self(i).bones.patella;
 
                         trajectory = Trajectory(self(i).config.specimen.name, self(i).config.specimen.state, self(i).config.specimen.loading_condition, false, right);
 
-                        [tf, pf] = Knee.grood_and_suntay(femur, tibia, patella, fTt, fTp, right);
+                        [tf, pf] = Knee.grood_and_suntay(femur, tibia, patella, fTt, hTf, right);
                         % if ~isempty(tf)
                         %     tf.flexion = tf.flexion - self(i).digitisation.angle_offset.tf;
                         % end

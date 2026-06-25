@@ -46,20 +46,31 @@ config.digitisation = {'digit', 'calibr'}; % Case insensitive digitisation file 
 %% Tracker labels
 % These should be changed if the labels used for the trackers change.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%% Knee labels %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Polaris labels: determined by either looking at its name
 % (e.g., Brainlab Y Junction) or the label defined in the .tbr file.
-config.camera_labels.polaris.tibia = 'T';
-config.camera_labels.polaris.femur = '';
-config.camera_labels.polaris.patella = '';
-config.camera_labels.polaris.hip = 'Y';
-config.camera_labels.polaris.probe = 'Probe';
+config.knee.camera_labels.polaris.tibia = 'T';
+config.knee.camera_labels.polaris.femur = 'Y';
+config.knee.camera_labels.polaris.patella = '';
+config.knee.camera_labels.polaris.probe = 'Probe';
 
 % Certus labels: Names used for each tracker in the data files.
 % The way we find the Certus probe is defined in lib/configure/is_certus_probe.
-config.camera_labels.certus.tibia = 'tibia';
-config.camera_labels.certus.femur = 'femur';
-config.camera_labels.certus.patella = 'patella';
-config.camera_labels.certus.probe = 'Probe'; % Don't change this even if the probe is called something else.
+config.knee.camera_labels.certus.tibia = 'tibia';
+config.knee.camera_labels.certus.femur = 'femur';
+config.knee.camera_labels.certus.patella = 'patella';
+config.knee.camera_labels.certus.probe = 'Probe'; % Don't change this even if the probe is called something else.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%% Hip labels %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+config.hip.camera_labels.polaris.tibia = 'T';
+config.hip.camera_labels.polaris.femur = '';
+config.hip.camera_labels.polaris.hip = 'Y';
+config.hip.camera_labels.polaris.probe = 'Probe';
+
+config.hip.camera_labels.certus.tibia = 'tibia';
+config.hip.camera_labels.certus.femur = 'femur';
+config.hip.camera_labels.certus.hip = 'hip';
+config.hip.camera_labels.certus.probe = 'Probe'; % Don't change this even if the probe is called something else.
 
 %% STL files
 config.stl.femur_right = "models/femur2.stl";

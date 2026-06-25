@@ -25,10 +25,10 @@ gTft0 = femur.tracker.map(@(x) defineTrackerFixedFrame(x.rotations_mean, x.trans
 gTtt0 = tibia.tracker.map(@(x) defineTrackerFixedFrame(x.rotations_mean, x.translations_mean));
 gTht0 = hip.tracker.map(@(x) defineTrackerFixedFrame(x.rotations_mean, x.translations_mean));
 
+gTft0 = unwrap_transform(gTf0, gTft0);
+gTtt0 = unwrap_transform(gTt0, gTtt0);
+gTht0 = unwrap_transform(gTh0, gTht0);
 
-gTft0 = gTft0.unwrap_or(eye(4));
-gTtt0 = gTtt0.unwrap_or(eye(4));
-gTht0 = gTht0.unwrap_or(eye(4));
 %% Relate body fixed frames and origin to the tracker rigid body
 % A constant transform of the body fixed frame in the tracker frame of reference (assumes rigid body)
 % As in, tibia in the tibial tracker's frame of reference.
@@ -54,5 +54,13 @@ function o = origins(tracker)
         o = [];
     else
         o = tracker(:,4);
+    end
+end
+
+function res = unwrap_transform(body, tracker)
+    if ~isempty(body) && tracker.is_none()
+        res = eye(4);
+    else
+        res = body.unwrap_or([]);
     end
 end

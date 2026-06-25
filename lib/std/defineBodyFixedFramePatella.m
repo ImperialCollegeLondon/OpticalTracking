@@ -1,20 +1,20 @@
 function gTp0 = defineBodyFixedFramePatella(patella,right)
-med = patella.medial.map(@(x) x.translations_mean);
-lat = patella.lateral.map(@(x) x.translations_mean);
-dist = patella.distal.map(@(x) x.translations_mean);
-inf = patella.inferior.map(@(x) x.translations_mean);
-sup = patella.superior.map(@(x) x.translations_mean);
+med = patella.medial;
+lat = patella.lateral;
+dist = patella.distal;
+inf = patella.inferior;
+sup = patella.superior;
 if med.is_none || lat.is_none
-    gTp0 = [];
+    gTp0 = Option.None;
     return
 end
-med = med.unwrap();
-lat = lat.unwrap();
+med = med.map(@(x) x.translations_mean).unwrap();
+lat = lat.map(@(x) x.translations_mean).unwrap();
 try
-    dist = dist.unwrap();
+    dist = dist.map(@(x) x.translations_mean).unwrap();
 catch
-    inf = inf.unwrap();
-    sup = sup.unwrap();
+    inf = inf.map(@(x) x.translations_mean).unwrap();
+    sup = sup.map(@(x) x.translations_mean).unwrap();
 end
 
 %defines a body fixed frame for the patella.  
@@ -64,6 +64,8 @@ trans=[1 0 0 origin(1);
 
 
 gTp0=trans*rot; %same as gTp0=[rot,origin';0 0 0 1];
+
+gTp0 = Option(gTp0);
 
 %check for orthogonality
 % angle(i_,j_)

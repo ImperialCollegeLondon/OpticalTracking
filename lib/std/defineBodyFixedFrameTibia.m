@@ -3,7 +3,7 @@ med = tibia.medial.map(@(x) x.translations_mean);
 lat = tibia.lateral.map(@(x) x.translations_mean);
 dist = tibia.distal.map(@(x) x.translations_mean);
 if med.is_none || lat.is_none || dist.is_none
-    gTt0 = [];
+    gTt0 = Option.None;
     return
 end
 med = med.unwrap();
@@ -57,6 +57,7 @@ trans=[1 0 0 origin(1);
 
 
 gTt0=trans*rot; %Note this is the same as gTt0=[rot,origin';0 0 0 1];
+gTt0 = Option(gTt0);
 
 
 

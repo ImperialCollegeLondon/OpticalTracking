@@ -9,6 +9,7 @@ classdef Digitisation < handle
         module
         angle_offset
         surface
+        optimisation
     end
     methods (Static)
         function digitisations = new(root, config, module, angle) % => Digitisation
@@ -116,6 +117,7 @@ classdef Digitisation < handle
             self.config = config;
             self.filepath = filepath;
             self.module = module;
+            self.optimisation = eye(4);
         end
     end
 end

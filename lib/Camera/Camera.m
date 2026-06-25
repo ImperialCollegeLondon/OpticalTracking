@@ -26,7 +26,11 @@ classdef Camera
                     trackers.add_camera(Camera.Certus);
                     strays = [];
                 case Camera.Polaris
+                    try
                     [trackers, strays] = polaris(headers, fid);
+                    catch ME
+                        error("%s\nIn file: %s", ME.message, path)
+                    end
                     if isempty(trackers)
                         error("Problematic camera data. Check that all trackers are being recorded on the Polaris software.\nFile: %s", path)
                     end

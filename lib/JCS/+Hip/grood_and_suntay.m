@@ -5,7 +5,8 @@ end
 
 function result = tibiofemoral(relative_position, femur, tibia, right)
     if isempty(relative_position)
-        result = array2table([], 'VariableNames', {'flexion', 'varus', 'external', 'lateral', 'anterior', 'superior'});
+        result = table('Size', [0 6], 'VariableTypes', repmat("double", 1, 6), 'VariableNames', ...
+        {'flexion', 'varus', 'external', 'lateral', 'anterior', 'superior'});
         return;
     end
 
@@ -18,6 +19,12 @@ function result = tibiofemoral(relative_position, femur, tibia, right)
         femur.i = repmat(femur.i', n_data, 1)';
         femur.j = repmat(femur.j', n_data, 1)';
         femur.k = repmat(femur.k', n_data, 1)';
+    end
+
+    if size(tibia.i, 2) ~= n_data
+        tibia.i = repmat(tibia.i', n_data, 1)';
+        tibia.j = repmat(tibia.j', n_data, 1)';
+        tibia.k = repmat(tibia.k', n_data, 1)';
     end
 
     e1_=femur.i;%Femoral X axis in global reference frame, Grood and Suntay definition
@@ -89,6 +96,11 @@ function result = femoracetabular(relative_position, hip, femur, right)
         femur.i = repmat(femur.i', n_data, 1)';
         femur.j = repmat(femur.j', n_data, 1)';
         femur.k = repmat(femur.k', n_data, 1)';
+    end
+    if size(hip.i, 2) ~= n_data
+        hip.i = repmat(hip.i', n_data, 1)';
+        hip.j = repmat(hip.j', n_data, 1)';
+        hip.k = repmat(hip.k', n_data, 1)';
     end
 
     e1_=hip.i;%Femoral X axis in global reference frame, Grood and Suntay definition
