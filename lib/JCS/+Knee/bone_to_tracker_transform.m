@@ -46,7 +46,6 @@ function [transforms, outline]= bone_to_tracker_transform(digitisation, config, 
     transforms.patella.transform = gTp0.map(@(gTp0) gTpt0\gTp0).unwrap_or([]); %ttTpc
     transforms.patella.origin = gTpt0\grp0; %ptrpc
 
-
     %% For optimisation
     transforms.femur.gTft0 = gTft0;
 
