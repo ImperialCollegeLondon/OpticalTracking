@@ -1,8 +1,12 @@
 function gTf0 = defineBodyFixedFrameHip(hip,right)
+ucross=@(u_,v_) cross(u_,v_)/norm(cross(u_,v_),2); %define function to find unit cross product
+uvector=@(a,b) (b-a)/norm(b-a,2); %define a function to find a unit vector from a to b
+
 asis = hip.asis;
 psis = hip.psis;
 pt = hip.pubic_tubercle;
 origin = hip.origin;
+pot = hip.pot;
 if asis.is_none || psis.is_none || pt.is_none
     gTf0 = Option.None;
     return
@@ -12,10 +16,24 @@ psis = psis.map(@(x) x.translations_mean).unwrap();
 pt = pt.map(@(x) x.translations_mean).unwrap();
 origin = origin.map(@(x) x.translations_mean).unwrap();
 
-ucross=@(u_,v_) cross(u_,v_)/norm(cross(u_,v_),2); %define function to find unit cross product
-uvector=@(a,b) (b-a)/norm(b-a,2); %define a function to find a unit vector from a to b
 
-J_ = uvector(psis, asis)';
+%% Create plane from pot digitisation. Make asis-asis axis the normal to this plane
+centroid = pot.map(@(x) x.translations_mean).unwrap();
+pts_c = -centroid + pot.map(@(x) x.translations).unwrap();
+[~, ~, V] = svd(pts_c, 0);
+I_ = V(:, end)';
+I_ = I_/norm(I_);
+
+if xor(dot(I_, ASIS - centroid) > 0, right)
+    I_ = -I_;
+end
+
+t_foot = dot(centroid - asis, I_);
+axis_origin = asis + f_foot * I_;
+keyboard
+
+
+J_ = uvector(psis, asis)'; % Is this approximate? Don't think so
 tempK_= uvector(origin,pt)'; %the pubic_tubercle point is approximate and thus this axis is not necessarily perpendicular to the psis-asis axis.
 % This needs to be double checked:
 if right

@@ -32,6 +32,7 @@ function digitisation = assign_bone(digitisation)
     digitisation.bone.hip.asis = trackers.contains({'anterior', 'sis'}).and_then(@(x) x.with_label(label.probe)); %dodgy way to get asis
     digitisation.bone.hip.psis = trackers.contains({'posterior', 'sis'}).and_then(@(x) x.with_label(label.probe)); %dodgy way to get psis
     digitisation.bone.hip.pubic_tubercle = trackers.contains({'pubic', 'tubercle'}).and_then(@(x) x.with_label(label.probe));
+    digitisation.bone.hip.pot = trackers.contains({'hip', 'pot'}).and_then(@(x) x.with_label(label.probe));
     digitisation.bone.hip.origin = digitisation.bone.femur.proximal;
     digitisation.bone.hip.tracker = trackers(:, 1).with_label(label.hip);
 
