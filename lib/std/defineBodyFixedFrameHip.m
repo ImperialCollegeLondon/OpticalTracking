@@ -4,16 +4,16 @@ uvector=@(a,b) (b-a)/norm(b-a,2); %define a function to find a unit vector from 
 
 asis = hip.asis;
 psis = hip.psis;
-pt = hip.pubic_tubercle;
+% pt = hip.pubic_tubercle;
 origin = hip.origin;
 pot = hip.pot;
-if asis.is_none || psis.is_none || pt.is_none
+if asis.is_none || psis.is_none
     gTf0 = Option.None;
     return
 end
 asis = asis.map(@(x) x.translations_mean).unwrap();
 psis = psis.map(@(x) x.translations_mean).unwrap();
-pt = pt.map(@(x) x.translations_mean).unwrap();
+% pt = pt.map(@(x) x.translations_mean).unwrap();
 origin = origin.map(@(x) x.translations_mean).unwrap();
 
 
@@ -21,34 +21,27 @@ origin = origin.map(@(x) x.translations_mean).unwrap();
 centroid = pot.map(@(x) x.translations_mean).unwrap();
 pts_c = -centroid + pot.map(@(x) x.translations).unwrap();
 [~, ~, V] = svd(pts_c, 0);
-I_ = V(:, end)';
-I_ = I_/norm(I_);
+normal = V(:, end)';
+normal = normal/norm(normal);
 
-if xor(dot(I_, ASIS - centroid) > 0, right)
-    I_ = -I_;
+if dot(normal, asis - centroid) < 0
+    normal = -normal;
 end
 
-t_foot = dot(centroid - asis, I_);
-axis_origin = asis + f_foot * I_;
-keyboard
+t_foot = dot(centroid - asis, normal);
+axis_origin = asis + t_foot * normal;
+
+if right
+    I_ = uvector(axis_origin, asis);
+else
+    I_ = uvector(asis, axis_origin);
+end
 
 
 J_ = uvector(psis, asis)'; % Is this approximate? Don't think so
-tempK_= uvector(origin,pt)'; %the pubic_tubercle point is approximate and thus this axis is not necessarily perpendicular to the psis-asis axis.
-% This needs to be double checked:
-if right
-    I_ = ucross(J_, tempK_);
-else
-    I_ = ucross(tempK_, J_);
-end
+K_ = ucross(I_,J_);
 
-K_ = ucross(I_,J_);%%recalculate K so perpendicular to give orthogonal coordinate system.
-
-if all(cross(tempK_, I_) == zeros(3,1)) || all(cross(I_, J_) == zeros(3,1))
-error("Cross product in Femur is zero. Double check femoral digitisation!!")
-end
-
-rot=[I_,J_,K_];
+rot=[I_',J_',K_'];
 rot=[rot,[0 0 0]';0 0 0 1];
 
 trans=[1 0 0 origin(1);

@@ -68,4 +68,6 @@ function tracker = sphere_fit(self)
     rmse      = rmse_norm * scale;              % RMSE in original units
 
     tracker = Tracker(self.Name, 1, 0, 0, 0, tx, ty, tz, rmse);
+    tracker.Landmark = self.Landmark;
+    tracker.Label = self.Label;
 end

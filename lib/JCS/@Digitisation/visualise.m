@@ -30,20 +30,20 @@ function visualise_hip(landmarks, config)
         fields(strcmp(fields, 'surface')) = [];
         
         for i = 1:numel(fields)
-            h.(fields{i}) = h.(fields{i}).unwrap();
+            h.(fields{i}) = h.(fields{i}).unwrap_or([]);
         end
         plot_h = scatter3(h.asis.Tx(1), h.asis.Ty(1), h.asis.Tz(1), 'b');
         hold on;
         text_mean(calc_means(h.asis), "  ASIS");
         scatter3(h.psis.Tx(1), h.psis.Ty(1), h.psis.Tz(1), 'b');
         text_mean(calc_means(h.psis), "  PSIS");
-        for td = 1:numel(h.pubic_tubercle)
-            tdis = h.pubic_tubercle(td);
+        for td = 1:numel(h.pot)
+            tdis = h.pot(td);
             scatter3(tdis.Tx(1), tdis.Ty(1), tdis.Tz(1), 'k');
         end
-        % scatter3(mean(h.pubic_tubercle.Tx, "all", "omitnan"), mean(h.pubic_tubercle.Ty, "all", "omitnan"), mean(h.pubic_tubercle.Tz, "all", "omitnan"), 'b');
-        scatter_mean(calc_means(h.pubic_tubercle), 'b');
-        text_mean(calc_means(h.pubic_tubercle), "  Pubic Tubercle");
+        % scatter3(mean(h.pot.Tx, "all", "omitnan"), mean(h.pot.Ty, "all", "omitnan"), mean(h.pot.Tz, "all", "omitnan"), 'b');
+        scatter_mean(calc_means(h.pot), 'b');
+        text_mean(calc_means(h.pot), "  Pot (sagital plane)");
 
         % Medial-psis axis
         o = (h.asis.translations_mean + h.psis.translations_mean)/2;
@@ -56,7 +56,7 @@ function visualise_hip(landmarks, config)
             quiver3(h.asis.Tx(1), h.asis.Ty(1), h.asis.Tz(1), med_lat(1), med_lat(2), med_lat(3), 0, 'b')
         end
         % Proximal-distal axis
-        prox_dist = h.pubic_tubercle.translations_mean - o;
+        prox_dist = h.pot.translations_mean - o;
         quiver3(o(1), o(2), o(3), prox_dist(1), prox_dist(2), prox_dist(3), 0, 'b');
 
         %% Femur
