@@ -3,7 +3,6 @@ function [trackers, strays] = polaris(headers, fid)
     fgetl(fid); % Discard the first empty line
     first_line = fgetl(fid);
 
-    try
     [fmt, is_numeric] = tokeniser(first_line, headers);
 
     frewind(fid);
@@ -12,16 +11,11 @@ function [trackers, strays] = polaris(headers, fid)
     try
     data = [data{:}];
     catch
-        sizes = cellfun(@size, data, 'UniformOutput', false);
-        sizes = vertcat(sizes{:});
-        n_lines = diff(unique(sizes(:, 1)));
-        error('Malformed CSV with incomplete lines. Consider deleting last %i lines', n_lines)
+        n = min(cellfun(@numel, data));
+        data = cellfun(@(c) c(1:n), data, 'UniformOutput', false);
+        data = [data{:}];
     end
     data(abs(data) > 1e20) = nan;
-
-    catch
-        keyboard
-    end
 
     stray_idx = find(strcmp(headers, 'Passive Strays'), 1);
     
@@ -93,21 +87,14 @@ function [trackers, strays] = polaris(headers, fid)
 end
 
 function [fmt, is_numeric] = tokeniser(line, headers)
+    % Determines whether each column contains a string or float
     tokens = strsplit(line, ',');
-    fmt_parts = cell(1, numel(tokens));
-    is_numeric = true(1, numel(tokens));
-    for k = 1:numel(tokens)
-        v = str2double(tokens{k});
-        if isnan(v) && ~strcmpi(strtrim(tokens{k}), 'nan')
-            fmt_parts{k} = '%*s';
-            is_numeric(k) = false;
-        else
-            fmt_parts{k} = '%f';
-        end
-    end
-    n = min([numel(fmt_parts) numel(headers)]);
-    % Filtering required because first line might have extra strays
-    fmt_parts = fmt_parts(1:n);
-    is_numeric = is_numeric(1:n);
+    n = min([numel(tokens) numel(headers)]);
+    tokens = tokens(1:n);
+
+    vals = str2double(tokens);
+    is_numeric = ~isnan(vals) | strcmpi(strtrim(tokens), 'nan');
+    fmt_parts = repmat({'%*s'}, 1, n);
+    fmt_parts(is_numeric) = {'%f'};
     fmt = strjoin(fmt_parts, '');
 end
