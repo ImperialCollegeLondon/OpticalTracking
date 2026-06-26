@@ -3,6 +3,7 @@ function [trackers, strays] = polaris(headers, fid)
     fgetl(fid); % Discard the first empty line
     first_line = fgetl(fid);
 
+    try
     [fmt, is_numeric] = tokeniser(first_line, headers);
 
     frewind(fid);
@@ -18,6 +19,10 @@ function [trackers, strays] = polaris(headers, fid)
     end
     data(abs(data) > 1e20) = nan;
 
+    catch
+        keyboard
+    end
+
     stray_idx = find(strcmp(headers, 'Passive Strays'), 1);
     
     if isempty(stray_idx)
@@ -32,14 +37,10 @@ function [trackers, strays] = polaris(headers, fid)
     idx_tracker = idx_markers;
     idx_markers(end+1) = sentinel;
 
-    try
     for k = 1:numel(idx_markers) - 1
         in_port = false(1, numel(headers));
         in_port(idx_markers(k)+1 : idx_markers(k+1)-1) = true;
         tracker_mask{k} = in_port(is_numeric);
-    end
-    catch
-        keyboard
     end
 
     names = headers(idx_tracker);
@@ -104,8 +105,9 @@ function [fmt, is_numeric] = tokeniser(line, headers)
             fmt_parts{k} = '%f';
         end
     end
+    n = min([numel(fmt_parts) numel(headers)]);
     % Filtering required because first line might have extra strays
-    fmt_parts = fmt_parts(1:numel(headers));
-    is_numeric = is_numeric(1:numel(headers));
+    fmt_parts = fmt_parts(1:n);
+    is_numeric = is_numeric(1:n);
     fmt = strjoin(fmt_parts, '');
 end

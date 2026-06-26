@@ -17,8 +17,11 @@ function trackers = load_data(folder_path, config)
         [~, parent_path, ~] = fileparts(files(i).name);
         path = fullfile(files(i).folder, files(i).name);
 
-
+        try
         tracker = Camera.load_data(path);
+        catch
+            keyboard
+        end
         if isempty(tracker)
             continue
         end
