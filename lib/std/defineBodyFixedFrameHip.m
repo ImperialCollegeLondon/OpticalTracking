@@ -38,8 +38,9 @@ else
 end
 
 
-J_ = uvector(psis, asis)'; % Is this approximate? Don't think so
-K_ = ucross(I_,J_);
+tempJ_ = uvector(psis, asis)'; % Is this approximate? Don't think so
+K_ = ucross(I_,tempJ_);
+J_ = ucross(K_, I_); % Make psis-asis orthogonal
 
 rot=[I_',J_',K_'];
 rot=[rot,[0 0 0]';0 0 0 1];

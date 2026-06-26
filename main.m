@@ -41,7 +41,7 @@ disp("Choose the root folder where all the specimens are")
 root = uigetdir(".", "Choose the root folder");
 
 %%
-module = Module.Knee;
+module = Module.Hip;
 
 config = pick_labels(config, module);
 
