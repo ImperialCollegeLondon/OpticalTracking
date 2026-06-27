@@ -13,6 +13,7 @@ function O = clean_specimen_condition(input)
     O = replace(O, "ant", "Ant");
     O = replace(O, "ext", "Ext");
     O = replace(O, "neut", "Neut");
+    O = replace(O, "sps", "SPS");
     O = replace(O, " ", "_");
     O = replace(O, "COR_", "COR");
     O = replace(O, "Ld", "LD");  % Correct case for ACLd to ACLD
@@ -23,6 +24,8 @@ function O = clean_specimen_condition(input)
     % O = replace(O, 'repair', 'recon');
     % O = replace(O, 'every', 'Every');
     O = replace(O, 'varus', 'Varus');
+    O = replace(O, 'External Anterior', 'Anterior External');
+    O = replace(O, 'Internal Anterior', 'Anterior Internal');
 
     %% Corrections of the stupid mistakes
     % O = replace(O, 'All_states', 'Everything_recon');

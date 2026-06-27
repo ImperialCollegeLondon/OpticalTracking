@@ -41,7 +41,7 @@ disp("Choose the root folder where all the specimens are")
 root = uigetdir(".", "Choose the root folder");
 
 %%
-module = Module.Hip;
+module = Module.Knee;
 
 config = pick_labels(config, module);
 
@@ -52,7 +52,6 @@ disp("Now loading trajectories");
 jcs = JCS.new(digitisation);
 trajectories = jcs.solve();
 
-disp("Done loading trajectories")
 % optimised = digitisation.optimise(trajectories.intact_neutral());
 path = trajectories.path();
 path_avg = path.average();
