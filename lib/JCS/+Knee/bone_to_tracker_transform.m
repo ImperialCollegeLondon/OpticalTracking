@@ -1,7 +1,6 @@
-function [transforms, outline]= bone_to_tracker_transform(digitisation, config, previous_digitisation)
+function [transforms, outline]= bone_to_tracker_transform(digitisation, previous_digitisation)
 arguments
     digitisation Digitisation
-    config
     previous_digitisation = [];
 end
 
@@ -10,7 +9,7 @@ trackers = digitisation.bone;
 tibia = trackers.tibia;
 femur = trackers.femur;
 patella = trackers.patella;
-right = config.is_right_knee;
+right = digitisation.is_right_knee;
 
 %% Define coordinate systems for each bone using digitised points
 % For tibia

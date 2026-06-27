@@ -26,14 +26,14 @@ classdef JCS
             for i = 1:numel(self)
                 switch self(i).module
                     case Module.Knee
-                        right = self(i).config.is_right_knee;
+                        right = self(i).digitisation.is_right_knee;
                         fTt  = self(i).transforms.fTt;
                         hTf  = self(i).transforms.fTp;
                         femur = self(i).bones.femur;
                         tibia = self(i).bones.tibia;
                         patella = self(i).bones.patella;
 
-                        trajectory = Trajectory(self(i).config.specimen.name, self(i).config.specimen.state, self(i).config.specimen.loading_condition, false, right);
+                        trajectory = Trajectory(self(i).digitisation.specimen, self(i).config.specimen.state, self(i).config.specimen.loading_condition, false, right);
 
                         [tf, pf] = Knee.grood_and_suntay(femur, tibia, patella, fTt, hTf, right);
                         % if ~isempty(tf)
@@ -58,7 +58,7 @@ classdef JCS
 
                         trajectories(i) = trajectory;
                     case Module.Hip
-                        right = self(i).config.is_right_knee;
+                        right = self(i).digitisation.is_right_knee;
                         % These are knee definitions. Update to hip
                         fTt  = self(i).transforms.fTt;
                         hTf  = self(i).transforms.hTf;
@@ -66,7 +66,7 @@ classdef JCS
                         tibia = self(i).bones.tibia;
                         hip = self(i).bones.hip;
 
-                        trajectory = Trajectory(self(i).config.specimen.name, self(i).config.specimen.state, self(i).config.specimen.loading_condition, false, right);
+                        trajectory = Trajectory(self(i).digitisation.specimen, self(i).config.specimen.state, self(i).config.specimen.loading_condition, false, right);
 
                         [tf, fa] = Hip.grood_and_suntay(femur, tibia, hip, fTt, hTf, right);
                         trajectory.add_data('tibiofemoral', tf);
@@ -126,7 +126,7 @@ classdef JCS
                         jcs(i) = JCS(transforms, bones, digitisation, config);
                         jcs(i).module = module;
                         jcs(i).state = string(clean_specimen_condition(state.name));
-                        jcs(i).specimen = string(config.specimen.name);
+                        jcs(i).specimen = digitisation.specimen;
                         jcs(i).loading_condition = string(loading_condition);
                         i = i + 1;
                     end
