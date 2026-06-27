@@ -14,6 +14,11 @@ function O = clean_specimen_condition(input)
     O = replace(O, "ext", "Ext");
     O = replace(O, "neut", "Neut");
     O = replace(O, " ", "_");
+    O = replace(O, "COR_", "COR");
+    O = replace(O, "Ld", "LD");  % Correct case for ACLd to ACLD
+    O = replace(O, "Lr", "LR");  % Correct case for ACLr to ACLR
+    O = replace(O, "Sd", "SD");  % Correct case for ALSd to ALSD
+    O = replace(O, "Sr", "SR");  % Correct case for ALSr to ALSR
     % O = replace(O, "Cut", "cut");
     % O = replace(O, 'repair', 'recon');
     % O = replace(O, 'every', 'Every');
@@ -21,7 +26,7 @@ function O = clean_specimen_condition(input)
 
     %% Corrections of the stupid mistakes
     % O = replace(O, 'All_states', 'Everything_recon');
-    % O = regexprep(O, '_\d', ''); % Removes _2, for example.
+    O = regexprep(O, '_\d$', ''); % Removes _2, for example.
     % O = regexprep(O, 'internal .*', 'Internal', 'ignorecase');
     % O = regexprep(O, 'external .*', 'External', 'ignorecase');
     % O = regexprep(O, '[ _][rR]otation.*', '');

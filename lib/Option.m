@@ -96,5 +96,12 @@ classdef Option
                 self.value = val;
             end
         end
+        function r = zip(self, other)
+            if self.is_none || other.is_none
+                r = Option.None();
+                return
+            end
+            r = Option.Some({self.value, other.value});
+        end
     end
 end

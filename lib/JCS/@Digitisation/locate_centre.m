@@ -12,7 +12,7 @@ for d = 1:numel(self)
             error("Not yet implemented")
     end
 
-    is_right_knee = self.config.is_right_knee;
+    is_right_knee = self.is_right_knee;
 
     for i = 1:numel(bones)
         bone = bones{i};

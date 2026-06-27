@@ -1,17 +1,15 @@
-function [transforms, outline]= bone_to_tracker_transform(digitisation, config, previous_digitisation)
-    % Create the transforms that describe the relationship between rigid bodies and their respective trackers
-    arguments
-        digitisation Digitisation
-        config
-        previous_digitisation = [];
-    end
+function [transforms, outline]= bone_to_tracker_transform(digitisation, previous_digitisation)
+arguments
+    digitisation Digitisation
+    previous_digitisation = [];
+end
 
     trackers = digitisation.bone;
 
     tibia = trackers.tibia;
     femur = trackers.femur;
     patella = trackers.patella;
-    right = config.is_right_knee;
+    right = digitisation.is_right_knee;
 
     %% Define coordinate systems for each bone using digitised points
     % For tibia
@@ -37,14 +35,14 @@ function [transforms, outline]= bone_to_tracker_transform(digitisation, config, 
     %% Relate body fixed frames and origin to the tracker rigid body
     % A constant transform of the body fixed frame in the tracker frame of reference (assumes rigid body)
     % As in, tibia in the tibial tracker's frame of reference.
-    transforms.tibia.transform = gTt0.map(@(gTt0) gTtt0\gTt0).unwrap_or([]); %ttTtc
-    transforms.tibia.origin = gTtt0\grt0; %ttrtc
+    transforms.tibia.transform = gTt0.map(@(gTt0) gTtt0\gTt0); %ttTtc
+    transforms.tibia.origin = Option(gTtt0\grt0); %ttrtc
 
-    transforms.femur.transform = gTf0.map(@(gTf0) gTft0\gTf0).unwrap_or([]); %ftTfc
-    transforms.femur.origin = gTft0\grf0; %ftrfc
+    transforms.femur.transform = gTf0.map(@(gTf0) gTft0\gTf0); %ftTfc
+    transforms.femur.origin = Option(gTft0\grf0); %ftrfc
 
-    transforms.patella.transform = gTp0.map(@(gTp0) gTpt0\gTp0).unwrap_or([]); %ttTpc
-    transforms.patella.origin = gTpt0\grp0; %ptrpc
+    transforms.patella.transform = gTp0.map(@(gTp0) gTpt0\gTp0); %ttTpc
+    transforms.patella.origin = Option(gTpt0\grp0); %ptrpc
 
     %% For optimisation
     transforms.femur.gTft0 = gTft0;
@@ -52,10 +50,10 @@ function [transforms, outline]= bone_to_tracker_transform(digitisation, config, 
     %% Surfaces
 
     [surfaces, outline] = digitisation.locate_centre();
-    transforms.tibia.surface_transform = surfaces.tibia.map(@(gTts0) gTtt0 \ gTts0).unwrap_or([]); %ttTts. Tibial surface in tibial tracker
-    transforms.tibia.surface_relative_to_bone = surfaces.tibia.map(@(gTts0) gTt0.unwrap_or([]) \ gTts0 ).unwrap_or([]);
+    transforms.tibia.surface_transform = surfaces.tibia.map(@(gTts0) gTtt0 \ gTts0); %ttTts. Tibial surface in tibial tracker
+    transforms.tibia.surface_relative_to_bone = surfaces.tibia.map(@(gTts0) gTt0.unwrap_or([]) \ gTts0 );
 
-    if isempty(transforms.tibia.surface_relative_to_bone) && ~isempty(previous_digitisation)
+    if transforms.tibia.surface_relative_to_bone.is_none() && ~isempty(previous_digitisation)
         transforms.tibia.surface_relative_to_bone = previous_digitisation.transforms.tibia.surface_relative_to_bone;
         outline = previous_digitisation.surface;
     end

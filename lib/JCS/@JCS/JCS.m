@@ -16,7 +16,7 @@ classdef JCS
             % Alias for grood and suntay
             jcs_solved = [self.grood_and_suntay()];
         end
-        function kinematics = grood_and_suntay(self)
+        function trajectories = grood_and_suntay(self)
             trajectories(numel(self)) = Trajectory();
             if unique([self.module]) == Module.Knee
                 [origin, direction] = self.cor_from_tibia();
@@ -26,14 +26,14 @@ classdef JCS
             for i = 1:numel(self)
                 switch self(i).module
                     case Module.Knee
-                        right = self(i).config.is_right_knee;
+                        right = self(i).digitisation.is_right_knee;
                         fTt  = self(i).transforms.fTt;
                         hTf  = self(i).transforms.fTp;
                         femur = self(i).bones.femur;
                         tibia = self(i).bones.tibia;
                         patella = self(i).bones.patella;
 
-                        trajectory = Trajectory(self(i).config.specimen.name, self(i).config.specimen.state, self(i).config.specimen.loading_condition, false, right);
+                        trajectory = Trajectory(self(i).digitisation.specimen, self(i).config.specimen.state, self(i).config.specimen.loading_condition, false, right);
 
                         [tf, pf] = Knee.grood_and_suntay(femur, tibia, patella, fTt, hTf, right);
                         % if ~isempty(tf)
@@ -56,11 +56,9 @@ classdef JCS
                         trajectory.add_transforms('fTp', self(i).transforms.fTp);
                         trajectory.add_transforms('fTts', self(i).transforms.fTts);
 
-                        trajectory.set_root(self(i).digitisation.root);
-                        
                         trajectories(i) = trajectory;
                     case Module.Hip
-                        right = self(i).config.is_right_knee;
+                        right = self(i).digitisation.is_right_knee;
                         % These are knee definitions. Update to hip
                         fTt  = self(i).transforms.fTt;
                         hTf  = self(i).transforms.hTf;
@@ -68,7 +66,7 @@ classdef JCS
                         tibia = self(i).bones.tibia;
                         hip = self(i).bones.hip;
 
-                        trajectory = Trajectory(self(i).config.specimen.name, self(i).config.specimen.state, self(i).config.specimen.loading_condition, false, right);
+                        trajectory = Trajectory(self(i).digitisation.specimen, self(i).config.specimen.state, self(i).config.specimen.loading_condition, false, right);
 
                         [tf, fa] = Hip.grood_and_suntay(femur, tibia, hip, fTt, hTf, right);
                         trajectory.add_data('tibiofemoral', tf);
@@ -80,12 +78,9 @@ classdef JCS
                         trajectory.add_transforms('fTt', self(i).transforms.fTt);
                         trajectory.add_transforms('hTf', self(i).transforms.hTf);
 
-                        trajectory.set_root(self(i).digitisation.root);
-                        
                         trajectories(i) = trajectory;
                 end
             end
-            kinematics = Kinematics(trajectories, [self.digitisation], [self.config]);
         end
         function jcs_solved = helical_axis(self)
             error("Not yet implemented")
@@ -131,7 +126,7 @@ classdef JCS
                         jcs(i) = JCS(transforms, bones, digitisation, config);
                         jcs(i).module = module;
                         jcs(i).state = string(clean_specimen_condition(state.name));
-                        jcs(i).specimen = string(config.specimen.name);
+                        jcs(i).specimen = digitisation.specimen;
                         jcs(i).loading_condition = string(loading_condition);
                         i = i + 1;
                     end

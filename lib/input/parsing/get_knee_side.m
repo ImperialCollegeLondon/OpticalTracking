@@ -12,7 +12,6 @@ function is_right_knee = get_knee_side(root, right_text, left_text)
         % if isscalar(files)
         try
             is_right_knee = get_knee_side(files, right_text, left_text);
-            is_right_knee = Option(is_right_knee);
         catch
             is_right_knee = Option.None;
         end

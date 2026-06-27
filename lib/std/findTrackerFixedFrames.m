@@ -1,11 +1,16 @@
 function [ gTtiF ] = findTrackerFixedFrames(rigid_body)
 if rigid_body.is_none
-    gTtiF = eye(4);
+    gTtiF = Option.None;
     return
 end
 rigid_body = rigid_body.unwrap();
 eulerAngles = rigid_body.rotations;
 XYZ = rigid_body.translations;
+
+if all(isnan(XYZ), "all")
+    gTtiF = Option.None;
+    return
+end
 
 % Creates 4 x 4 x m matrices, where each page is gTtiF (tracker in global
 % frame of reference)
@@ -50,5 +55,5 @@ trans(2, 4, :) = XYZ(:,2);
 trans(3, 4, :) = XYZ(:,3);
 
 gTtiF = pagemtimes(trans, rot);
-
+gTtiF = Option(gTtiF);
 end

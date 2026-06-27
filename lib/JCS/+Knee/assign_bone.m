@@ -38,5 +38,5 @@ function digitisation = assign_bone(digitisation, previous_digitisation)
     digitisation.bone.tibia.surface = trackers.contains({'tibia', 'surface'}).and_then(@(x) x.with_label(label.probe));
 
     % Calculate bone to tracker transforms in global coordinate system
-    [digitisation.transforms, digitisation.surface] = Knee.bone_to_tracker_transform(digitisation, config, previous_digitisation);
+    [digitisation.transforms, digitisation.surface] = Knee.bone_to_tracker_transform(digitisation, previous_digitisation);
 end
