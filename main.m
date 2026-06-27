@@ -52,6 +52,7 @@ disp("Now loading trajectories");
 jcs = JCS.new(digitisation);
 trajectories = jcs.solve();
 
+disp("Done loading trajectories")
 % optimised = digitisation.optimise(trajectories.intact_neutral());
 path = trajectories.path();
 path_avg = path.average();
