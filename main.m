@@ -46,18 +46,13 @@ module = Module.Knee;
 config = pick_labels(config, module);
 
 digitisation = Digitisation.new(root, config, module);
-% hold on;
 % digitisation.visualise();
-% digitisation.digitise_surfaces();
-% digitisation.bone.tibia.surface.unwrap().visualise_mean()
-% test = digitisation.locate_centre();
+
+disp("Now loading trajectories");
 jcs = JCS.new(digitisation);
-kinematics = jcs.solve();
+trajectories = jcs.solve();
 
-trajectories = kinematics.trajectories;
-
-optimised = digitisation.optimise(trajectories.intact_neutral());
-keyboard
+% optimised = digitisation.optimise(trajectories.intact_neutral());
 path = trajectories.path();
 path_avg = path.average();
 norm = path.normalise("Neutral", "Intact_50N");

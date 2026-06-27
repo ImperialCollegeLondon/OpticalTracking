@@ -16,7 +16,7 @@ classdef JCS
             % Alias for grood and suntay
             jcs_solved = [self.grood_and_suntay()];
         end
-        function kinematics = grood_and_suntay(self)
+        function trajectories = grood_and_suntay(self)
             trajectories(numel(self)) = Trajectory();
             if unique([self.module]) == Module.Knee
                 [origin, direction] = self.cor_from_tibia();
@@ -56,8 +56,6 @@ classdef JCS
                         trajectory.add_transforms('fTp', self(i).transforms.fTp);
                         trajectory.add_transforms('fTts', self(i).transforms.fTts);
 
-                        trajectory.set_root(self(i).digitisation.root);
-                        
                         trajectories(i) = trajectory;
                     case Module.Hip
                         right = self(i).config.is_right_knee;
@@ -80,12 +78,9 @@ classdef JCS
                         trajectory.add_transforms('fTt', self(i).transforms.fTt);
                         trajectory.add_transforms('hTf', self(i).transforms.hTf);
 
-                        trajectory.set_root(self(i).digitisation.root);
-                        
                         trajectories(i) = trajectory;
                 end
             end
-            kinematics = Kinematics(trajectories, [self.digitisation], [self.config]);
         end
         function jcs_solved = helical_axis(self)
             error("Not yet implemented")
