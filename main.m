@@ -52,6 +52,23 @@ disp("Now loading trajectories");
 jcs = JCS.new(digitisation);
 trajectories = jcs.solve();
 
+assignments(1) = Assignments("Anterior", "Neutral");
+assignments(2) = Assignments("External", "Neutral");
+assignments(3) = Assignments("Internal", "Neutral");
+assignments(4) = Assignments("Anterior_External", "Anterior");
+assignments(5) = Assignments("Anterior_Internal", "Anterior");
+assignments(6) = Assignments("SPS", "Valgus");
+
+% trajectories = [
+%     trajectories.include_state("COR").split_piecewise(assignments),...
+%     trajectories.exclude_state("COR")
+% ];
+
+traj_cor = trajectories.include_state("COR").split_piecewise(assignments).split_states("_COR");
+cor = traj_cor.centre_of_rotation(angles);
+% .cross_validate();
+cor.plot()
+
 % optimised = digitisation.optimise(trajectories.intact_neutral());
 path = trajectories.path();
 path_avg = path.average();
@@ -63,16 +80,9 @@ norm_avg.exclude_state("COR").plot
 % digitisation.visualise_surfaces;
 % hold on;
 % kinematics.trajectories.plot_centre_of_rotation();
-assignments(1) = Assignments("Anterior", "Neutral");
-assignments(2) = Assignments("External", "Neutral");
-assignments(3) = Assignments("Internal", "Neutral");
-assignments(4) = Assignments("Anterior_External", "Anterior");
-assignments(5) = Assignments("Anterior_Internal", "Anterior");
-assignments(6) = Assignments("SPS", "Valgus");
-is_cor = contains(trajectories.states, "cor", "IgnoreCase", true);
-cor = trajectories(is_cor).piecewise_centre_of_rotation(assignments, "Intact", "Neutral") ...
-    .plot();    
-% .cross_validate();
+
+
+
 %%
 disp("Loading tension")
 kinematics.load_tension("**/*tension.csv");
