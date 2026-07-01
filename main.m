@@ -52,6 +52,22 @@ disp("Now loading trajectories");
 jcs = JCS.new(digitisation);
 trajectories = jcs.solve();
 
+assignments(1) = Assignments("Anterior", "Neutral");
+assignments(2) = Assignments("External", "Neutral");
+assignments(3) = Assignments("Internal", "Neutral");
+assignments(4) = Assignments("Anterior_External", "Anterior");
+assignments(5) = Assignments("Anterior_Internal", "Anterior");
+assignments(6) = Assignments("SPS", "Valgus");
+
+[traj_cor, angles] = trajectories...
+    .include_state("COR")...
+    .exclude_state("ACLR")...
+    .split_piecewise(assignments)...
+    .split_states("_COR");
+cor = traj_cor.centre_of_rotation(angles);
+cor.plot(digitisation);
+
+keyboard
 % optimised = digitisation.optimise(trajectories.intact_neutral());
 path = trajectories.path();
 path_avg = path.average();
@@ -63,12 +79,7 @@ norm_avg.exclude_state("COR").plot
 % digitisation.visualise_surfaces;
 % hold on;
 % kinematics.trajectories.plot_centre_of_rotation();
-assignments(1) = Assignments("Anterior", "Neutral");
-assignments(2) = Assignments("External", "Neutral");
-assignments(3) = Assignments("Internal", "Neutral");
-assignments(4) = Assignments("Anterior_External", "Anterior");
-assignments(5) = Assignments("Anterior_Internal", "Anterior");
-assignments(6) = Assignments("SPS", "Valgus");
+
 is_cor = contains(trajectories.states, "cor", "IgnoreCase", true);
 cor = trajectories(is_cor).piecewise_centre_of_rotation(assignments, "Intact", "Neutral") ...
     .plot();    
@@ -117,4 +128,27 @@ norm_avg.plot();
 % plot_interspecimen(config, stats, stats_offset, states, truncate_min, truncate_max)
 % 
 % diary off;
+function specimen = getSgtitleSpecimen(fig)
+%GETSGTITLESPECIMEN Extract the first line of a figure's sgtitle.
+%   SPECIMEN = GETSGTITLESPECIMEN(FIG) returns the first line of the
+%   sgtitle text for figure handle FIG, trimmed of whitespace. Returns
+%   an empty string if the figure has no sgtitle.
 
+    sgt = findobj(fig, 'Type', 'subplottext');
+
+    if isempty(sgt)
+        specimen = '';
+        return
+    end
+
+    titleStr = sgt(1).String;
+
+    if iscell(titleStr)
+        firstLine = titleStr{1};
+    else
+        lines = strsplit(titleStr, newline);
+        firstLine = lines{1};
+    end
+
+    specimen = strtrim(firstLine);
+end
