@@ -59,13 +59,27 @@ assignments(4) = Assignments("Anterior_External", "Anterior");
 assignments(5) = Assignments("Anterior_Internal", "Anterior");
 assignments(6) = Assignments("SPS", "Valgus");
 
+% trajectories = [
+%     trajectories.include_state("COR").split_piecewise(assignments),...
+%     trajectories.exclude_state("COR")
+% ];
+
 [traj_cor, angles] = trajectories...
     .include_state("COR")...
     .exclude_state("ACLR")...
     .split_piecewise(assignments)...
     .split_states("_COR");
 cor = traj_cor.centre_of_rotation(angles);
-cor.plot(digitisation);
+% cor.plot(digitisation);
+cor_avg = cor.average();
+model = stlread("models/tibia2.stl");
+
+    pts = model.Points;
+    z_max = max(pts(:, 3));
+    pts(:, 3) = pts(:, 3) - (z_max + 1);
+    pts = pts*1.80;
+    model_shifted = triangulation(model.ConnectivityList, pts);
+cor_avg.plot(model_shifted);
 
 keyboard
 % optimised = digitisation.optimise(trajectories.intact_neutral());
@@ -80,10 +94,6 @@ norm_avg.exclude_state("COR").plot
 % hold on;
 % kinematics.trajectories.plot_centre_of_rotation();
 
-is_cor = contains(trajectories.states, "cor", "IgnoreCase", true);
-cor = trajectories(is_cor).piecewise_centre_of_rotation(assignments, "Intact", "Neutral") ...
-    .plot();    
-% .cross_validate();
 %%
 disp("Loading tension")
 kinematics.load_tension("**/*tension.csv");

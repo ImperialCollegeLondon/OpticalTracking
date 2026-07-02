@@ -18,9 +18,10 @@ classdef JCS
         end
         function trajectories = grood_and_suntay(self)
             trajectories(numel(self)) = Trajectory();
-            if unique([self.module]) == Module.Knee
-                [origin, direction] = self.cor_from_tibia();
-            end
+
+            % if unique([self.module]) == Module.Knee
+            %     [origin, direction] = self.cor_from_tibia();
+            % end
             % [centre_of_rotation, direction] = self.cor_from_femur();
 
             for i = 1:numel(self)
@@ -46,8 +47,8 @@ classdef JCS
                         trajectory.add_data('tibiofemoral', tf);
                         trajectory.add_data('patellofemoral', pf);
 
-                        trajectory.add_transforms('origin', origin{i});
-                        trajectory.add_transforms('direction', direction{i});
+                        % trajectory.add_transforms('origin', origin{i});
+                        % trajectory.add_transforms('direction', direction{i});
 
                         trajectory.add_transforms('gTfi', self(i).transforms.gTfi);
                         trajectory.add_transforms('gTti', self(i).transforms.gTti);
