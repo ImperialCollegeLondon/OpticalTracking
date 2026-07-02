@@ -9,9 +9,6 @@ function O = clean_specimen_condition(input)
 
 %% Consistency of case
     O = replace(input, 'reconstruction', 'recon');
-    O = replace(O, "int", "Int");
-    O = replace(O, "ant", "Ant");
-    O = replace(O, "ext", "Ext");
     O = replace(O, "neut", "Neut");
     O = replace(O, " ", "_");
     O = replace(O, "COR_", "COR");
@@ -24,19 +21,19 @@ function O = clean_specimen_condition(input)
     % O = replace(O, 'repair', 'recon');
     % O = replace(O, 'every', 'Every');
     O = replace(O, 'varus', 'Varus');
+    O = replace(O, 'ASLD', 'ALSD');
+    O = replace(O, 'ACLD_dMCLD_ALSD', 'ACLD_ALSD_dMCLD');
 
     %% Corrections of the stupid mistakes
     % O = replace(O, 'All_states', 'Everything_recon');
-    O = regexprep(O, 'int[er]+nal .*', 'Internal', 'ignorecase');
     O = regexprep(O, "[sS][pP][sS]", "SPS");
-    O = regexprep(O, "[Ee]x.*nal", "External");
-    O = regexprep(O, "[Ii]n.*nal", "Internal");
-    O = regexprep(O, 'External.*Anterior', 'Anterior_External');
+    O = regexprep(O, '_\d$', ''); % Removes _2, for example.
+    O = regexprep(O, 'ex.*nal', 'External', 'ignorecase');
+    O = regexprep(O, 'in.*nal', 'Internal', 'ignorecase');
     O = regexprep(O, 'Internal.*Anterior', 'Anterior_Internal');
+    O = regexprep(O, 'External.*Anterior', 'Anterior_External');
     O = regexprep(O, 'Anterior.*External', 'Anterior_External');
     O = regexprep(O, 'Anterior.*Internal', 'Anterior_Internal');
-    O = regexprep(O, '_\d$', ''); % Removes _2, for example.
-    % O = regexprep(O, 'external .*', 'External', 'ignorecase');
     % O = regexprep(O, '[ _][rR]otation.*', '');
     % O = regexprep(O, 'ante[rior]*', 'Anterior', 'ignorecase');
     % O = regexprep(O, '\..*', ''); % A literal dot followed by anything, like a file being called "name.csv.csv".

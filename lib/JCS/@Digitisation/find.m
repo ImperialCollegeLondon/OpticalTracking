@@ -1,5 +1,4 @@
 function digitisation = find(self, specimen)
-    is_spc = [self.specimen] == specimen;
-    first = find(is_spc, 1);
-    digitisation = self(first);
+    is_specimen = [self.specimen] == specimen;
+    digitisation = self(find(is_specimen, 1));
 end
