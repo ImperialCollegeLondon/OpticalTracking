@@ -29,6 +29,7 @@ function O = clean_specimen_condition(input)
     O = regexprep(O, "[sS][pP][sS]", "SPS");
     O = regexprep(O, '_\d$', ''); % Removes _2, for example.
     O = regexprep(O, 'ex.*nal', 'External', 'ignorecase');
+    O = regexprep(O, 'an.*or', 'Anterior', 'ignorecase');
     O = regexprep(O, 'in.*nal', 'Internal', 'ignorecase');
     O = regexprep(O, 'Internal.*Anterior', 'Anterior_Internal');
     O = regexprep(O, 'External.*Anterior', 'Anterior_External');
