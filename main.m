@@ -70,6 +70,7 @@ assignments(6) = Assignments("SPS", "Valgus");
     .split_piecewise(assignments)...
     .split_states("_COR");
 cor = traj_cor.centre_of_rotation(angles);
+cor.plot(digitisation)
 % cor.plot(digitisation);
 cor_avg = cor.average();
 model = stlread("models/tibia2.stl");
@@ -78,8 +79,10 @@ model = stlread("models/tibia2.stl");
     z_max = max(pts(:, 3));
     pts(:, 3) = pts(:, 3) - (z_max + 1);
     pts = pts*1.80;
+    pts(:, 2) = -pts(:, 2);
+    pts(:, 1) = -pts(:, 1);
     model_shifted = triangulation(model.ConnectivityList, pts);
-cor_avg.plot(model_shifted);
+cor_avg.plot(model_shifted, root);
 
 keyboard
 % optimised = digitisation.optimise(trajectories.intact_neutral());
