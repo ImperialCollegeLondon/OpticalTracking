@@ -1,4 +1,4 @@
-classdef Tracker < handle
+classdef Tracker < handle & matlab.mixin.Copyable
     properties
         Landmark
         Name
@@ -39,5 +39,23 @@ classdef Tracker < handle
             self.Error = error;
         end
     end
+
+    methods (Access = private)
+        function keep(self, mask)
+            % Mutates self in place - only ever called on a copy.
+            self.Q0    = self.Q0(mask);
+            self.Qx    = self.Qx(mask);
+            self.Qy    = self.Qy(mask);
+            self.Qz    = self.Qz(mask);
+            self.Rx    = self.Rx(mask);
+            self.Ry    = self.Ry(mask);
+            self.Rz    = self.Rz(mask);
+            self.Tx    = self.Tx(mask);
+            self.Ty    = self.Ty(mask);
+            self.Tz    = self.Tz(mask);
+            self.Error = self.Error(mask);
+        end
+    end
+
 end
 

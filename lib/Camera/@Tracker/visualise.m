@@ -1,10 +1,6 @@
-function ax = visualise(selves)
-    hold on;
-    for s = numel(selves)
-        self = selves(s);
-        x = self.Tx;
-        y = self.Ty;
-        z = self.Tz;
-        ax = scatter3(x,y,z);
-    end
+function ax = visualise(self)
+    x = vertcat(self.Tx);
+    y = vertcat(self.Ty);
+    z = vertcat(self.Tz);
+    ax = scatter3(x,y,z);
 end
