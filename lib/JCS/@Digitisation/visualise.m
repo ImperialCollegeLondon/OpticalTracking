@@ -6,22 +6,26 @@ function visualise(self)
         end
 
         landmarks = self(n).bone;
-        config = self(n).config;
+        is_right_knee = self(n).is_right_knee;
 
-        for m = 1:numel(self(n).module)
-            switch self(n).module(m)
-                case Module.Knee
-                    visualise_knee(landmarks, config)
-                case Module.Hip
-                    visualise_hip(landmarks, config)
-            end
+        switch self(n).module
+            case Module.Knee
+                visualise_knee(landmarks, is_right_knee)
+            case Module.Hip
+                visualise_hip(landmarks, is_right_knee)
         end
 
-
+        if is_right_knee
+            title_str = [self(n).specimen '. Right'];
+        else
+            title_str = [self(n).specimen '. Left'];
+        end
+        title(title_str);
+        hold off;
     end
 end
 
-function visualise_hip(landmarks, config)
+function visualise_hip(landmarks, is_right_knee)
         % figure
         %% Tibia
         grid;
@@ -48,7 +52,7 @@ function visualise_hip(landmarks, config)
         % Medial-psis axis
         o = (h.asis.translations_mean + h.psis.translations_mean)/2;
         scatter3(o(1), o(2), o(3), 8, 'b', 'filled')
-        if config.is_right_knee
+        if is_right_knee
             med_lat = h.asis.translations_mean - h.psis.translations_mean;
             quiver3(h.psis.Tx(1), h.psis.Ty(1), h.psis.Tz(1), med_lat(1), med_lat(2), med_lat(3), 0, 'b')
         else
@@ -86,7 +90,7 @@ function visualise_hip(landmarks, config)
         % Medial-lateral axis
         o = (f.medial.translations_mean + f.lateral.translations_mean)/2;
         scatter3(o(1), o(2), o(3), 8, 'r', 'filled')
-        if config.is_right_knee
+        if is_right_knee
             med_lat = f.lateral.translations_mean - f.medial.translations_mean;
             quiver3(f.medial.Tx(1), f.medial.Ty(1), f.medial.Tz(1), med_lat(1), med_lat(2), med_lat(3), 0, 'r')
         else
@@ -97,33 +101,11 @@ function visualise_hip(landmarks, config)
         prox_dist = f.proximal.translations_mean - o;
         quiver3(o(1), o(2), o(3), prox_dist(1), prox_dist(2), prox_dist(3), 0, 'r');
         % grid;
-        if config.is_right_knee
-            title_str = [config.specimen.name '. Right knee'];
-        else
-            title_str = [config.specimen.name '. Left knee'];
-        end
         axis square;
-        title(title_str);
         legend([plot_h, plot_f], {"Hip", "Femur"})
-        hold off;
-
-
-        % if config.debug
-        %     femur = eye(4);
-        %     femur(1) = f.medial.Rx(1);
-        %     femur(2) = f.medial.Ry(1);
-        %     femur(3) = f.medial.Rz(1);
-        %     tibia = eye(4);
-        %     tibia(1) = t.medial.Rx(1);
-        %     tibia(2) = t.medial.Ry(1);
-        %     tibia(3) = t.medial.Rz(1);
-        %     [f_ang, ~] = rotationsAndTranslations(femur, config.is_right_knee);
-        %     [t_ang, ~] = rotationsAndTranslations(tibia, config.is_right_knee);
-        %     t_ang - f_ang
-        % end
 end
 
-function visualise_knee(landmarks, config)
+function visualise_knee(landmarks, is_right_knee)
         % figure
         %% Tibia
         grid;
@@ -150,7 +132,7 @@ function visualise_knee(landmarks, config)
         % Medial-lateral axis
         o = (t.medial.translations_mean + t.lateral.translations_mean)/2;
         scatter3(o(1), o(2), o(3), 8, 'b', 'filled')
-        if config.is_right_knee
+        if is_right_knee
             med_lat = t.lateral.translations_mean - t.medial.translations_mean;
             quiver3(t.medial.Tx(1), t.medial.Ty(1), t.medial.Tz(1), med_lat(1), med_lat(2), med_lat(3), 0, 'b')
         else
@@ -187,7 +169,7 @@ function visualise_knee(landmarks, config)
         % Medial-lateral axis
         o = (f.medial.translations_mean + f.lateral.translations_mean)/2;
         scatter3(o(1), o(2), o(3), 8, 'r', 'filled')
-        if config.is_right_knee
+        if is_right_knee
             med_lat = f.lateral.translations_mean - f.medial.translations_mean;
             quiver3(f.medial.Tx(1), f.medial.Ty(1), f.medial.Tz(1), med_lat(1), med_lat(2), med_lat(3), 0, 'r')
         else
@@ -198,30 +180,10 @@ function visualise_knee(landmarks, config)
         prox_dist = f.proximal.translations_mean - o;
         quiver3(o(1), o(2), o(3), prox_dist(1), prox_dist(2), prox_dist(3), 0, 'r');
         % grid;
-        if config.is_right_knee
-            title_str = [config.specimen.name '. Right knee'];
-        else
-            title_str = [config.specimen.name '. Left knee'];
-        end
         axis square;
-        title(title_str);
         legend([plot_h, plot_f], {"Tibia", "Femur"})
-        hold off;
 
 
-        % if config.debug
-        %     femur = eye(4);
-        %     femur(1) = f.medial.Rx(1);
-        %     femur(2) = f.medial.Ry(1);
-        %     femur(3) = f.medial.Rz(1);
-        %     tibia = eye(4);
-        %     tibia(1) = t.medial.Rx(1);
-        %     tibia(2) = t.medial.Ry(1);
-        %     tibia(3) = t.medial.Rz(1);
-        %     [f_ang, ~] = rotationsAndTranslations(femur, config.is_right_knee);
-        %     [t_ang, ~] = rotationsAndTranslations(tibia, config.is_right_knee);
-        %     t_ang - f_ang
-        % end
 end
 
 function y = calc_means(x)

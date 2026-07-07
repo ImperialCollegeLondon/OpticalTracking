@@ -21,7 +21,6 @@ function visualise_surfaces(self)
             outline = self(d).surface.(bone).unwrap();
             if self(d).is_right_knee
                 outline(:,2) = -outline(:,2);
-            else
                 outline(:,1) = -outline(:,1);
             end
             scatter(outline(:, 1), outline(:, 2), 5, 'k', 'filled', 'HandleVisibility', 'off');

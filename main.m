@@ -69,8 +69,8 @@ assignments(6) = Assignments("SPS", "Valgus");
     .exclude_state("ACLR")...
     .split_piecewise(assignments)...
     .split_states("_COR");
-cor = traj_cor.centre_of_rotation(angles);
-cor.plot(digitisation)
+cor = traj_cor.centre_of_rotation(angles).correct_side();
+% cor.plot(digitisation)
 % cor.plot(digitisation);
 cor_avg = cor.average();
 model = stlread("models/tibia2.stl");
