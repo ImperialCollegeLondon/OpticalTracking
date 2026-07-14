@@ -49,9 +49,10 @@ end
 
     %% Surfaces
 
-    [surfaces, outline] = digitisation.locate_centre();
+    [surfaces, outline, width] = digitisation.locate_centre();
     transforms.tibia.surface_transform = surfaces.tibia.map(@(gTts0) gTtt0 \ gTts0); %ttTts. Tibial surface in tibial tracker
     transforms.tibia.surface_relative_to_bone = surfaces.tibia.map(@(gTts0) gTt0.unwrap_or([]) \ gTts0 );
+    transforms.tibia.width = width.tibia;
 
     if transforms.tibia.surface_relative_to_bone.is_none() && ~isempty(previous_digitisation)
         transforms.tibia.surface_relative_to_bone = previous_digitisation.transforms.tibia.surface_relative_to_bone;

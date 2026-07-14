@@ -24,7 +24,7 @@ classdef Camera
                         return
                     end
                     trackers.add_camera(Camera.Certus);
-                    strays = [];
+                    strays = Option.None;
                 case Camera.Polaris
                     try
                     [trackers, strays] = polaris(headers, fid);

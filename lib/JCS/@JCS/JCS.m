@@ -104,7 +104,7 @@ classdef JCS
                 for st = 1:numel(states)
                     state = states(st);
                     fp_data = fullfile(state.folder, state.name);
-                    trackers = load_data(fp_data, config);
+                    [trackers, strays] = load_dir(fp_data, config);
                     if trackers.is_none()
                         warning('No csv files in %s', fp_data)
                         continue;
@@ -119,9 +119,9 @@ classdef JCS
                         config.specimen.loading_condition = loading_condition;
                         switch module
                             case Module.Knee
-                                [transforms, bones] = Knee.calculate_transforms(trackers(:, lc), loading_condition, digitisation_transforms, config);
+                                [transforms, bones] = Knee.calculate_transforms(trackers(:, lc), strays{lc}, loading_condition, digitisation_transforms, config);
                             case Module.Hip
-                                [transforms, bones] = Hip.calculate_transforms(trackers(:, lc), loading_condition, digitisation_transforms, config);
+                                [transforms, bones] = Hip.calculate_transforms(trackers(:, lc), strays{lc}, loading_condition, digitisation_transforms, config);
                         end
 
                         jcs(i) = JCS(transforms, bones, digitisation, config);

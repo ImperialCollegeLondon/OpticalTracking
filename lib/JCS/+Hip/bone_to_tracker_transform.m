@@ -16,6 +16,31 @@ function transforms = bone_to_tracker_transform(digitisation)
     gTh0 = defineBodyFixedFrameHip(hip, right);
     grh0 = gTh0.map(@(x) origins(x)).unwrap_or([]);
 
+        % There was no pot. Do Lara bullshit
+    if gTh0.is_none
+        this_gTf0 = gTf0.unwrap();
+        gTh0 = eye(4);
+        % Z
+        gTh0(1:3, 3) = this_gTf0(1:3, 3);
+
+        % Y
+        asis = hip.asis.map(@(x) x.translations_mean).unwrap();
+        psis = hip.psis.map(@(x) x.translations_mean).unwrap();
+        uvector=@(a,b) (b-a)/norm(b-a,2); %define a function to find a unit vector from a to b
+        j = uvector(psis, asis);
+        gTh0(1:3, 2) = j;
+
+        % X
+        gTh0(1:3, 1) = cross(gTh0(1:3, 2), gTh0(1:3, 3)); % Calculate X-axis using cross product
+        gTh0(1:3, 1) = gTh0(1:3, 1) / norm(gTh0(1:3, 1), 2); % Normalize X-axis
+
+        % Origin
+        gTh0(1:3, 4) = this_gTf0(1:3, 4);
+        grh0 = origins(gTh0);
+
+        gTh0 = Option(gTh0);
+    end
+
     %% Define frame of reference for each of the trackers in global coordinates
     gTft0 = femur.tracker.map(@(x) defineTrackerFixedFrame(x.rotations_mean, x.translations_mean));
     gTtt0 = tibia.tracker.map(@(x) defineTrackerFixedFrame(x.rotations_mean, x.translations_mean));

@@ -72,18 +72,30 @@ assignments(6) = Assignments("SPS", "Valgus");
 cor = traj_cor.centre_of_rotation(angles).correct_side();
 % cor.plot(digitisation)
 % cor.plot(digitisation);
-cor_avg = cor.average();
+% Get widths for cor normalisation
+widths = get_widths(cor, digitisation);
+cor_norm = cor.normalise(widths);
+cor_avg = cor_norm.average();
+
+%% Prepare stl model for centre of rotation average
 model = stlread("models/tibia2.stl");
 
-    pts = model.Points;
-    z_max = max(pts(:, 3));
-    pts(:, 3) = pts(:, 3) - (z_max + 1);
-    pts = pts*1.80;
-    pts(:, 2) = -pts(:, 2);
-    pts(:, 1) = -pts(:, 1);
-    model_shifted = triangulation(model.ConnectivityList, pts);
+pts = model.Points;
+% Normalise
+x = pts(:, 1);
+width = max(x) - min(x);
+pts = pts/width;
+
+% Shift down
+z_max = max(pts(:, 3));
+pts(:, 3) = pts(:, 3) - (z_max + 1);
+pts(:, 2) = -pts(:, 2);
+pts(:, 1) = -pts(:, 1);
+model_shifted = triangulation(model.ConnectivityList, pts);
+
 cor_avg.plot(model_shifted, root);
 
+%% Kinematics
 keyboard
 % optimised = digitisation.optimise(trajectories.intact_neutral());
 path = trajectories.path();
@@ -141,27 +153,19 @@ norm_avg.plot();
 % plot_interspecimen(config, stats, stats_offset, states, truncate_min, truncate_max)
 % 
 % diary off;
-function specimen = getSgtitleSpecimen(fig)
-%GETSGTITLESPECIMEN Extract the first line of a figure's sgtitle.
-%   SPECIMEN = GETSGTITLESPECIMEN(FIG) returns the first line of the
-%   sgtitle text for figure handle FIG, trimmed of whitespace. Returns
-%   an empty string if the figure has no sgtitle.
 
-    sgt = findobj(fig, 'Type', 'subplottext');
 
-    if isempty(sgt)
-        specimen = '';
-        return
+function widths = get_widths(cor, digitisation)
+    arguments
+        cor CentreOfRotation
+        digitisation Digitisation
     end
 
-    titleStr = sgt(1).String;
-
-    if iscell(titleStr)
-        firstLine = titleStr{1};
-    else
-        lines = strsplit(titleStr, newline);
-        firstLine = lines{1};
+    widths = nan(numel(cor), 1);
+    for n = 1:numel(cor)
+        specimen = cor(n).specimen;
+        idx = find(digitisation.specimen == specimen, 1);
+        width = digitisation(idx).transforms.tibia.width.unwrap();
+        widths(n) = width;
     end
-
-    specimen = strtrim(firstLine);
 end

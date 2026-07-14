@@ -1,4 +1,11 @@
-function [transforms, bones] = calculate_transforms(trackers, loading_condition, digitisation_transforms, config)
+function [transforms, bones] = calculate_transforms(trackers, strays, loading_condition, digitisation_transforms, config)
+    arguments
+        trackers Tracker
+        strays Option
+        loading_condition
+        digitisation_transforms
+        config
+    end
     %% Apply the tracker transforms to the data
     data.name = loading_condition;
     config.specimen.loading_condition = loading_condition;
@@ -75,12 +82,15 @@ function [transforms, bones] = calculate_transforms(trackers, loading_condition,
         hip.k = squeeze(h(1:3, 3, :));
     end
 
+    keyboard
+    strays_homo = strays.map(@translations_homogeneous);
 
     transforms.fTt = fTt.unwrap_or([]);
     transforms.hTf = hTf.unwrap_or([]);
     bones.femur = femur;
     bones.tibia = tibia;
     bones.hip = hip;
+    bones.strays = strays;
     transforms.gTfi = gTfi.unwrap_or([]);
     transforms.gTti = gTti.unwrap_or([]);
     transforms.gThi = gThi.unwrap_or([]);

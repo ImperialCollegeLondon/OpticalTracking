@@ -19,6 +19,7 @@ function visualise_surfaces(self)
 
             % figure
             outline = self(d).surface.(bone).unwrap();
+            % outline = self(d).transforms.(bone).width.map(@(l) outline/l).expect("This cannot fail");
             if self(d).is_right_knee
                 outline(:,2) = -outline(:,2);
                 outline(:,1) = -outline(:,1);

@@ -7,7 +7,7 @@ psis = hip.psis;
 % pt = hip.pubic_tubercle;
 origin = hip.origin;
 pot = hip.pot;
-if asis.is_none || psis.is_none
+if asis.is_none || psis.is_none || pot.is_none
     gTf0 = Option.None;
     return
 end
@@ -18,8 +18,7 @@ origin = origin.map(@(x) x.translations_mean).unwrap();
 
 
 %% Create plane from pot digitisation. Make asis-asis axis the normal to this plane
-centroid = pot.map(@(x) x.translations_mean).unwrap();
-pts_c = -centroid + pot.map(@(x) x.translations).unwrap();
+pts_c = pot.map(@(x) -x.translations_mean + x.translations).unwrap();
 [~, ~, V] = svd(pts_c, 0);
 normal = V(:, end)';
 normal = normal/norm(normal);

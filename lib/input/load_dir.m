@@ -1,4 +1,4 @@
-function trackers = load_data(folder_path, config)
+function [trackers, strays] = load_dir(folder_path, config)
     csv_files = dir(fullfile(folder_path, "*.csv"));
     csv_files = csv_files(~contains({csv_files.name}, {'3d.csv', 'tension', 'sensor'})); % Certus data files that shouldn't be used
     tsv_files = dir(fullfile(folder_path, "*.tsv"));
@@ -17,17 +17,15 @@ function trackers = load_data(folder_path, config)
         [~, parent_path, ~] = fileparts(files(i).name);
         path = fullfile(files(i).folder, files(i).name);
 
-        try
-        tracker = Camera.load_data(path);
-        catch
-            keyboard
-        end
+        [tracker, stray] = Camera.load_data(path);
         if isempty(tracker)
             continue
         end
         trackers(:, i) = tracker;
         landmark = clean_specimen_condition(parent_path);
         trackers(:, i).add_landmark(landmark);
+
+        strays{i} = Option.Some(stray);
     end
     
     trackers.add_labels(config.camera_labels);

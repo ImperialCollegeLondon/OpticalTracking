@@ -1,4 +1,4 @@
-function [transforms, bones] = calculate_transforms(trackers, loading_condition, digitisation_transforms, config)
+function [transforms, bones] = calculate_transforms(trackers, strays, loading_condition, digitisation_transforms, config)
     %% Apply the tracker transforms to the data
     data.name = loading_condition;
     config.specimen.loading_condition = loading_condition;

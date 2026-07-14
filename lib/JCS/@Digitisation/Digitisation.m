@@ -95,7 +95,7 @@ function digitisation = from_specimen(specimen_name, path_folder, config, module
 
     if root.is_none(), return; end
 
-    trackers = load_data(folder.unwrap(), config);
+    trackers = load_dir(folder.unwrap(), config);
     if trackers.is_none(), return; end
     digitisation = Digitisation(specimen_name, trackers.unwrap(), root.unwrap(), config, module);
 
