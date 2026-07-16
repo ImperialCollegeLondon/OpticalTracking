@@ -7,14 +7,27 @@ function [trackers, strays] = polaris(headers, fid)
 
     frewind(fid);
     fgetl(fid); % Skip header again
-    data = textscan(fid, fmt, 'Delimiter', ',', 'EmptyValue', NaN);
-    try
-    data = [data{:}];
-    catch
-        n = min(cellfun(@numel, data));
-        data = cellfun(@(c) c(1:n), data, 'UniformOutput', false);
-        data = [data{:}];
+
+    raw_text = fread(fid, '*char')';
+    lines = splitlines(raw_text);
+    n_fields = numel(headers);
+
+    for i = 1:numel(lines)
+        if isempty(lines{i})
+            continue
+        end
+
+        n = sum(lines{i} == ',') + 1;
+        if n < n_fields
+            lines{i} = [lines{i}, repmat(',', 1, n_fields - n)];
+        elseif n > n_fields
+            comma_pos = find(lines{i} == ',', n_fields);
+            lines{i} = lines{i}(1:comma_pos(end));
+        end
     end
+
+    data = textscan(strjoin(lines,newline), fmt, 'Delimiter', ',', 'EndOfLine', '\n', 'EmptyValue', NaN, 'ReturnOnError', false);
+    data = [data{:}];
     data(abs(data) > 1e20) = nan;
 
     stray_idx = find(strcmp(headers, 'Passive Strays'), 1);

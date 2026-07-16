@@ -23,6 +23,7 @@ pts_c = pot.map(@(x) -x.translations_mean + x.translations).unwrap();
 normal = V(:, end)';
 normal = normal/norm(normal);
 
+centroid = pot.map(@translations_mean).unwrap();
 if dot(normal, asis - centroid) < 0
     normal = -normal;
 end

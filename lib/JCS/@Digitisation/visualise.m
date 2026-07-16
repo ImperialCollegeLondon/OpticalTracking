@@ -50,7 +50,7 @@ function visualise_hip(landmarks, is_right_knee)
         text_mean(calc_means(h.pot), "  Pot (sagital plane)");
 
         % Medial-psis axis
-        o = (h.asis.translations_mean + h.psis.translations_mean)/2;
+        o = h.origin.translations_mean();
         scatter3(o(1), o(2), o(3), 8, 'b', 'filled')
         if is_right_knee
             med_lat = h.asis.translations_mean - h.psis.translations_mean;

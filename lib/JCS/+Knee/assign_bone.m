@@ -11,7 +11,7 @@ function digitisation = assign_bone(digitisation, previous_digitisation)
 
     trackers = digitisation.trackers;
     config = digitisation.config;
-    label = trackers.camera().get_possible_labels(config.camera_labels);
+    label = trackers.camera().get_possible_labels(config.labels());
     %                                             ^^^^^^^^^^^^^^^^^^^^
     %                                        Looks for label definitions here
 

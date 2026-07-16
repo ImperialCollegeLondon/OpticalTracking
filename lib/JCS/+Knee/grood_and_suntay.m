@@ -58,20 +58,20 @@ function result = tibiofemoral(relative_position, femur, tibia, right)
     result.anterior = anterior';
     result.superior = distal';
 
-    %Code to check between different notations
-    [angles,trfi]=rotationsAndTranslations(fTt,right);
-
-    trfi=-trfi;%which also equals gTti{i,1}\(grfi{i,1}-grti{i,1})
-
-    B=fTt;%B notation used in equations 18-20 in grood and suntay, note they use a matrix with translation rows 2-4 in column 1, here it is column 4 rows 1-3, and rotations are similarly mapped
-    q=B(1,4,:);
-    if ~right
-        q=-q;
-    end
-    q(2,:)=squeeze(B(2,4,:)).*cosd(angles(:,1)) - squeeze(B(3,4,:)) .* sind(angles(:,1));
-    q(3,:)=-squeeze(pagemtimes(B(1,3,:), B(1,4,:)) + pagemtimes(B(2,3,:), B(2,4,:)) + pagemtimes(B(3,3,:), B(3,4,:)));
-
-    q = squeeze(q)';
+    % %Code to check between different notations
+    % [angles,trfi]=rotationsAndTranslations(fTt,right);
+    % 
+    % trfi=-trfi;%which also equals gTti{i,1}\(grfi{i,1}-grti{i,1})
+    % 
+    % B=fTt;%B notation used in equations 18-20 in grood and suntay, note they use a matrix with translation rows 2-4 in column 1, here it is column 4 rows 1-3, and rotations are similarly mapped
+    % q=B(1,4,:);
+    % if ~right
+    %     q=-q;
+    % end
+    % q(2,:)=squeeze(B(2,4,:)).*cosd(angles(:,1)) - squeeze(B(3,4,:)) .* sind(angles(:,1));
+    % q(3,:)=-squeeze(pagemtimes(B(1,3,:), B(1,4,:)) + pagemtimes(B(2,3,:), B(2,4,:)) + pagemtimes(B(3,3,:), B(3,4,:)));
+    % 
+    % q = squeeze(q)';
 
     % fRtCheck{i,1}=[dot(femur.i,tibia.i) dot(femur.i,tibia.j) dot(femur.i,tibia.k)
     %     dot(femur.j,tibia.i) dot(femur.j,tibia.j) dot(femur.j,tibia.k)
