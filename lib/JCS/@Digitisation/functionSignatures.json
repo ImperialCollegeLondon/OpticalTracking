@@ -1,0 +1,9 @@
+{
+    "Digitisation.new": {
+        "inputs": [
+            {"name": "root", "kind": "required", "type":"folder"},
+            {"name": "config", "kind": "required", "type": "Config"},
+            {"name": "module", "kind": "required", "type":"choices={Module.Knee,Module.Hip}"}
+        ]
+    }
+}

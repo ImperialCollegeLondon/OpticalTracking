@@ -1,0 +1,15 @@
+{
+    "load_dir": {
+        "inputs": [
+            {"name": "folder_path", "kind": "required", "type": "folder"},
+            {"name": "config", "kind": "required", "type": "Config"}
+        ]
+    },
+    "load_data": {
+        "inputs": [
+            {"name":"path", "kind":"required", "type":"file=*.csv"}
+        ]
+    }
+}
+
+

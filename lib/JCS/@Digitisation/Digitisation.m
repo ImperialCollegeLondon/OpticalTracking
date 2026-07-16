@@ -13,14 +13,17 @@ classdef Digitisation < handle
         optimisation
     end
     methods (Static)
-        function digitisations = new(root, config, module) % => Digitisation
+        function digitisations = new(root, config) % => Digitisation
             arguments
                 root
-                config
-                module Module
+                config Config
             end
 
-            specimen_list = get_root_files(root, {'result', 'problem'}).unwrap(); % Get all files in root and exclude any folders that include `result`
+            specimen_list = get_root_files(root, {'result', 'problem'});% Get all files in root and exclude any folders that include `result`
+            if specimen_list.is_none()
+                error("No specimens found in provided directory: %s", root);
+            end
+            specimen_list = specimen_list.unwrap();
             specimen_list = specimen_list([specimen_list.isdir]);
             specimen_folders = fullfile({specimen_list.folder}, {specimen_list.name});
             prev_specimen = [];
@@ -29,8 +32,8 @@ classdef Digitisation < handle
                 specimen_name = get_specimen_name(specimen_list(i).name);
                 fprintf("%d. Specimen: %s\n", i, specimen_name);
 
-                digitisation = from_specimen(specimen_name, specimen_folders{i}, config, module);
-                switch module
+                digitisation = from_specimen(specimen_name, specimen_folders{i}, config);
+                switch config.module
                     case Module.Knee
                         if strcmp(specimen_name, prev_specimen)
                             prev_digit = digitisations(i-1);
@@ -65,12 +68,12 @@ classdef Digitisation < handle
     end
 
     methods (Access = private)
-        function self = Digitisation(specimen, trackers, filepath, config, module)
+        function self = Digitisation(specimen, trackers, filepath, config)
             self.specimen = string(specimen);
             self.trackers = trackers;
             self.config = config;
             self.filepath = filepath;
-            self.module = module;
+            self.module = config.module;
             self.optimisation = eye(4);
         end
     end
@@ -86,19 +89,20 @@ path = fullfile(filepath(mask).folder, filepath(mask).name);
 path = Option(path);
 end
 
-function digitisation = from_specimen(specimen_name, path_folder, config, module)
+function digitisation = from_specimen(specimen_name, path_folder, config)
     filepath = get_root_files(path_folder, {});
     if filepath.is_none, return; end
     filepath = filepath.unwrap();
-    folder = get_folder(filepath, config.digitisation);
+    folder = get_folder(filepath, config.digitisation_files());
     root = folder.map(@fileparts);
 
     if root.is_none(), return; end
 
     trackers = load_dir(folder.unwrap(), config);
     if trackers.is_none(), return; end
-    digitisation = Digitisation(specimen_name, trackers.unwrap(), root.unwrap(), config, module);
+    digitisation = Digitisation(specimen_name, trackers.unwrap(), root.unwrap(), config);
 
-    digitisation.is_right_knee = get_knee_side(root.unwrap(), config.right, config.left) ...
+    [right, left] = config.sides();
+    digitisation.is_right_knee = get_knee_side(root.unwrap(), right, left) ...
         .expect("Could not determine knee side. Check defaults.m => config.right and config.left for instructions");
 end

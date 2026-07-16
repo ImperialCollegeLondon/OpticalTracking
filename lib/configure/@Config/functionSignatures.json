@@ -1,0 +1,8 @@
+{
+    "Config.set_module": {
+        "inputs": [
+            {"name", "self", "kind": "required", "type": "Config"},
+            {"name", "module", "kind": "required", "type": "choices={Module.Knee,Module.Hip}"}
+        ]
+    }
+}

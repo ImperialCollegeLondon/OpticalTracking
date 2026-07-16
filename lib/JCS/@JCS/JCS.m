@@ -34,7 +34,7 @@ classdef JCS
                         tibia = self(i).bones.tibia;
                         patella = self(i).bones.patella;
 
-                        trajectory = Trajectory(self(i).digitisation.specimen, self(i).config.specimen.state, self(i).config.specimen.loading_condition, false, right);
+                        trajectory = Trajectory(self(i).specimen, self(i).state, self(i).loading_condition, false, right);
 
                         [tf, pf] = Knee.grood_and_suntay(femur, tibia, patella, fTt, hTf, right);
                         % if ~isempty(tf)
@@ -66,12 +66,28 @@ classdef JCS
                         femur = self(i).bones.femur;
                         tibia = self(i).bones.tibia;
                         hip = self(i).bones.hip;
+                        strays = self(i).bones.strays;
 
-                        trajectory = Trajectory(self(i).digitisation.specimen, self(i).config.specimen.state, self(i).config.specimen.loading_condition, false, right);
+                        trajectory = Trajectory(self(i).specimen, self(i).state, self(i).loading_condition, false, right);
 
                         [tf, fa] = Hip.grood_and_suntay(femur, tibia, hip, fTt, hTf, right);
                         trajectory.add_data('tibiofemoral', tf);
                         trajectory.add_data('femoracetabular', fa);
+
+                        if ~isempty(tf)
+                            flexion = tf.flexion;
+                        else
+                            flexion = fa.flexion;
+                        end
+
+                        if strays.is_some
+                            strays = strays.unwrap();
+                            for n = 1:numel(strays)
+                                str = strjoin(['stray_' string(n)], '');
+                                tab = stray_motion(strays(n), femur, right);
+                                trajectory.add_data(str, tab);
+                            end
+                        end
 
                         trajectory.add_transforms('gTfi', self(i).transforms.gTfi);
                         trajectory.add_transforms('gTti', self(i).transforms.gTti);
@@ -99,7 +115,7 @@ classdef JCS
                 config = digitisation.config;
                 digitisation_transforms = digitisation.transforms;
                 module = digitisation.module;
-                states = get_root_files(digitisation.filepath, config.digitisation).unwrap();
+                states = get_root_files(digitisation.filepath, config.digitisation_files()).unwrap();
                 states = states([states.isdir]);
                 for st = 1:numel(states)
                     state = states(st);
@@ -111,17 +127,14 @@ classdef JCS
                     end
                     trackers = trackers.unwrap();
 
-                    config.specimen.state = clean_specimen_condition(state.name);
-
                     loading_conditions = unique({trackers.Landmark});
                     for lc = 1:numel(loading_conditions)
                         loading_condition = loading_conditions{lc};
-                        config.specimen.loading_condition = loading_condition;
                         switch module
                             case Module.Knee
-                                [transforms, bones] = Knee.calculate_transforms(trackers(:, lc), strays{lc}, loading_condition, digitisation_transforms, config);
+                                [transforms, bones] = Knee.calculate_transforms(trackers(:, lc), strays{lc}, digitisation_transforms, config);
                             case Module.Hip
-                                [transforms, bones] = Hip.calculate_transforms(trackers(:, lc), strays{lc}, loading_condition, digitisation_transforms, config);
+                                [transforms, bones] = Hip.calculate_transforms(trackers(:, lc), strays{lc}, digitisation_transforms, config);
                         end
 
                         jcs(i) = JCS(transforms, bones, digitisation, config);

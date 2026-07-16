@@ -64,6 +64,7 @@ function transforms = bone_to_tracker_transform(digitisation)
 
 
     transforms.femur.gTft0 = gTft0;
+    transforms.femur.gTf0 = gTf0;
 
 end
 

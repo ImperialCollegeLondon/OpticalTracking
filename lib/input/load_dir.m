@@ -1,4 +1,8 @@
 function [trackers, strays] = load_dir(folder_path, config)
+    arguments
+        folder_path
+        config Config
+    end
     csv_files = dir(fullfile(folder_path, "*.csv"));
     csv_files = csv_files(~contains({csv_files.name}, {'3d.csv', 'tension', 'sensor'})); % Certus data files that shouldn't be used
     tsv_files = dir(fullfile(folder_path, "*.tsv"));
@@ -6,6 +10,7 @@ function [trackers, strays] = load_dir(folder_path, config)
 
     if isempty(files)
         trackers = Option.None;
+        strays = Option.None;
         return
     end
 
@@ -28,7 +33,7 @@ function [trackers, strays] = load_dir(folder_path, config)
         strays{i} = Option.Some(stray);
     end
     
-    trackers.add_labels(config.camera_labels);
+    trackers.add_labels(config.labels());
 
     trackers = Option.Some(trackers);
 end
