@@ -33,24 +33,28 @@
 % in naming (Reconstruction vs repair vs recon), or mistakes (esp instead of Sps)
 
 % clc; clear; close all;
+init()
 %% Load default configuration. Check ./lib/configure/defaults.m if you want to modify them.
+module = Module.Hip;
 
-config = defaults();
+config = create_default_config().set_module(module);
 
 disp("Choose the root folder where all the specimens are")
 root = uigetdir(".", "Choose the root folder");
-
 %%
-module = Module.Knee;
 
-config = pick_labels(config, module);
-
-digitisation = Digitisation.new(root, config, module);
+digitisation = Digitisation.new(root, config);
 % digitisation.visualise();
 
 disp("Now loading trajectories");
 jcs = JCS.new(digitisation);
 trajectories = jcs.solve();
+
+trajectories.plot_stray();
+trajectories.plot()
+
+
+%% COR stuff
 
 assignments(1) = Assignments("Anterior", "Neutral");
 assignments(2) = Assignments("External", "Neutral");
@@ -59,25 +63,21 @@ assignments(4) = Assignments("Anterior_External", "Anterior");
 assignments(5) = Assignments("Anterior_Internal", "Anterior");
 assignments(6) = Assignments("SPS", "Valgus");
 
-% trajectories = [
-%     trajectories.include_state("COR").split_piecewise(assignments),...
-%     trajectories.exclude_state("COR")
-% ];
 
 [traj_cor, angles] = trajectories...
     .include_state("COR")...
     .exclude_state("ACLR")...
     .split_piecewise(assignments)...
     .split_states("_COR");
+
 cor = traj_cor.centre_of_rotation(angles).correct_side();
 % cor.plot(digitisation)
-% cor.plot(digitisation);
-% Get widths for cor normalisation
+% % Get widths for cor normalisation
 widths = get_widths(cor, digitisation);
 cor_norm = cor.normalise(widths);
 cor_avg = cor_norm.average();
 
-%% Prepare stl model for centre of rotation average
+% Prepare stl model for centre of rotation average
 model = stlread("models/tibia2.stl");
 
 pts = model.Points;
@@ -96,65 +96,59 @@ model_shifted = triangulation(model.ConnectivityList, pts);
 cor_avg.plot(model_shifted, root);
 
 %% Kinematics
-keyboard
-% optimised = digitisation.optimise(trajectories.intact_neutral());
+% keyboard
+% % optimised = digitisation.optimise(trajectories.intact_neutral());
 path = trajectories.path();
 path_avg = path.average();
-norm = path.normalise("Neutral", "Intact_50N");
-ie = norm.exclude_state("COR").ie();
-norm_avg = path.normalise("Neutral", "Intact_50N").average();
-norm_avg.exclude_state("COR").plot
-
-% digitisation.visualise_surfaces;
-% hold on;
-% kinematics.trajectories.plot_centre_of_rotation();
-
-%%
-disp("Loading tension")
-kinematics.load_tension("**/*tension.csv");
-disp("Done loading data");
-%%
-% jcs.print_to_file();
-% jcs.plot()
-trajectories = kinematics.trajectories;
-path = trajectories.path;
-path.plot();
-
-
-kinematics.trajectories.intraspecimen_mean();
-kinematics.trajectories.set_flexion_min(-3);
-kinematics.trajectories.cp_sensor_to_kinematics();
-[flex, ext] = kinematics.trajectories.path.split_flex_ext;
-
-% flex.spm;
-
-normalised = flex.normalise("Neutral", "Intact", "ACL_recon");
-spm = normalised.spm();
-dunnett = spm.inference(0.05).dunnett(normalised, "ACL_recon");
-spm.between_subject.tibiofemoral.anterior.inference(0.05).plot('plot_threshold_label',true, 'plot_p_values',true, 'autoset_ylim',true);
-
-norm_avg = normalised.average();
-norm_avg.plot();
-
-
-% toc
-
-
-% %% Visualise stl
-% neutral = strcmpi({transforms.Intact.name}, "neutral");
-% visualise_stl(config, transforms.Intact(neutral).in_femur.tibia, transforms.Intact(neutral).in_femur.femur);
-% %% print to file
-% print_mean_std_to_file(stats, states, root);
-% %% Plot
-% truncate_min = -5;
-% truncate_max = 90;
+% norm = path.normalise("Neutral", "Intact_50N");
+% ie = norm.exclude_state("COR").ie();
+% norm_avg = path.normalise("Neutral", "Intact_50N").average();
+% norm_avg.exclude_state("COR").plot
 % 
-% % plot_interspecimen(config, stats, states, truncate_min, truncate_max)
-% plot_interspecimen(config, stats, stats_offset, states, truncate_min, truncate_max)
+% % digitisation.visualise_surfaces;
+% % hold on;
+% % kinematics.trajectories.plot_centre_of_rotation();
 % 
-% diary off;
-
-
+% %%
+% disp("Loading tension")
+% kinematics.load_tension("**/*tension.csv");
+% disp("Done loading data");
+% %%
+% % jcs.print_to_file();
+% % jcs.plot()
+% trajectories = kinematics.trajectories;
+% path = trajectories.path;
+% path.plot();
+% 
+% % flex.spm;
+% 
+% normalised = flex.normalise("Neutral", "Intact", "ACL_recon");
+% spm = normalised.spm();
+% dunnett = spm.inference(0.05).dunnett(normalised, "ACL_recon");
+% spm.between_subject.tibiofemoral.anterior.inference(0.05).plot('plot_threshold_label',true, 'plot_p_values',true, 'autoset_ylim',true);
+% 
+% norm_avg = normalised.average();
+% norm_avg.plot();
+% 
+% 
+% % toc
+% 
+% 
+% % %% Visualise stl
+% % neutral = strcmpi({transforms.Intact.name}, "neutral");
+% % visualise_stl(config, transforms.Intact(neutral).in_femur.tibia, transforms.Intact(neutral).in_femur.femur);
+% % %% print to file
+% % print_mean_std_to_file(stats, states, root);
+% % %% Plot
+% % truncate_min = -5;
+% % truncate_max = 90;
+% % 
+% % % plot_interspecimen(config, stats, states, truncate_min, truncate_max)
+% % plot_interspecimen(config, stats, stats_offset, states, truncate_min, truncate_max)
+% % 
+% % diary off;
+% 
+% 
 function widths = get_widths(cor, digitisation)
     arguments
         cor CentreOfRotation
