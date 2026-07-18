@@ -27,6 +27,14 @@ function [trackers, strays] = polaris(headers, fid)
     end
 
     data = textscan(strjoin(lines,newline), fmt, 'Delimiter', ',', 'EndOfLine', '\n', 'EmptyValue', NaN, 'ReturnOnError', false);
+    %% Fixes incomplete row when data stops streaming halfway through 
+    sizes = cellfun(@size, data, 'UniformOutput', false);
+    sizes = vertcat(sizes{:});
+    size_avg = mode(sizes);
+    is_right_size = all(sizes == size_avg, 2);
+    data = data(is_right_size);
+    
+    %%
     data = [data{:}];
     data(abs(data) > 1e20) = nan;
 
