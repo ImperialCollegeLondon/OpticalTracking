@@ -21,7 +21,7 @@ function [transforms, bones] = calculate_transforms(trackers, strays, digitisati
     ptThc = digitisation_transforms.patella.transform;
     ptrpc = digitisation_transforms.patella.origin;
 
-    tTts = digitisation_transforms.tibia_tracker.surface_relative_to_bone;
+    tTts = digitisation_transforms.tibia.surface_relative_to_bone;
 
     % If these are Option.None, it means that rigid body was not tracked.
     % They should be unwrap_or(eye(4)). i.e., if the body was not tracked,
