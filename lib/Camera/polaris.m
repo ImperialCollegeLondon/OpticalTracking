@@ -60,7 +60,7 @@ function [trackers, strays] = polaris(headers, fid)
 
     names = headers(idx_tracker);
     headers_numeric = headers(is_numeric);
-    idx_q0 = find(contains(headers_numeric(1:idx_stray_data), 'Q0'));
+    idx_q0 = find(contains(headers_numeric(1:idx_stray_data-1), 'Q0'));
     
     %% Assumes they are sequential and in this order: Q0, Qx, Qy, Qz, Tx, Ty, Tz, Error
     Q0 = 1;
@@ -87,22 +87,28 @@ function [trackers, strays] = polaris(headers, fid)
     end
 
     has_strays = ~isempty(stray_idx);
-    if has_strays
-        data_strays = data(:, idx_stray_data+1:end);
-        header_stray = headers_numeric(idx_stray_data+1:end);
-        stray_tz = find(strcmp(header_stray, 'Tz'));
-        idx_stray = stray_tz(:) - (0:2);
 
-        strays(numel(stray_tz)) = PassiveStrays();
-        for n = 1:numel(stray_tz)
-            tz = data_strays(:, idx_stray(n, 1));
-            ty = data_strays(:, idx_stray(n, 2));
-            tx = data_strays(:, idx_stray(n, 3));
-            strays(n) = PassiveStrays(tx, ty, tz);
-        end
-
-    else
+    if ~has_strays
         strays = [];
+        return
+    end
+
+    data_strays = data(:, idx_stray_data+1:end);
+    
+    if isempty(data_strays)
+        strays = [];
+        return
+    end
+    header_stray = headers_numeric(idx_stray_data+1:end);
+    stray_tz = find(strcmp(header_stray, 'Tz'));
+    idx_stray = stray_tz(:) - (0:2);
+
+    strays(numel(stray_tz)) = PassiveStrays();
+    for n = 1:numel(stray_tz)
+        tz = data_strays(:, idx_stray(n, 1));
+        ty = data_strays(:, idx_stray(n, 2));
+        tx = data_strays(:, idx_stray(n, 3));
+        strays(n) = PassiveStrays(tx, ty, tz);
     end
 
 end
