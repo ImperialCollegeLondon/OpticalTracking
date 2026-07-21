@@ -11,6 +11,7 @@ classdef PassiveStrays
                 tx = []
                 ty = []
                 tz = []
+                time = []
             end
             self.Tx = tx;
             self.Ty = ty;
