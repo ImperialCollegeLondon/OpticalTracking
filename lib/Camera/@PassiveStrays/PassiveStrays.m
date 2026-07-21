@@ -3,9 +3,10 @@ classdef PassiveStrays
         Tx
         Ty
         Tz
+        Timestamp
     end
     methods
-        function self = PassiveStrays(tx, ty, tz)
+        function self = PassiveStrays(tx, ty, tz, time)
             arguments
                 tx = []
                 ty = []
@@ -14,6 +15,7 @@ classdef PassiveStrays
             self.Tx = tx;
             self.Ty = ty;
             self.Tz = tz;
+            self.Timestamp = time;
         end
     end
 end
