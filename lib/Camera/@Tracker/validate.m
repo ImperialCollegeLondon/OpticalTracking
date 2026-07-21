@@ -10,6 +10,10 @@ function trimmed = validate(self)
     is_long = sizes > 2*median(sizes);
 
     surface = self(is_long);
+    if isempty(surface)
+        trimmed = self;
+        return
+    end
     h = surface.visualise();
     hold on;
     self(~is_long).visualise();

@@ -1,6 +1,5 @@
 function [trackers, strays] = polaris(headers, fid)
     % Manually reading files because strays caused malformed CSVs
-    fgetl(fid); % Discard the first empty line
     first_line = fgetl(fid);
 
     [fmt, is_numeric] = tokeniser(first_line, headers);
@@ -61,6 +60,9 @@ function [trackers, strays] = polaris(headers, fid)
     names = headers(idx_tracker);
     headers_numeric = headers(is_numeric);
     idx_q0 = find(contains(headers_numeric(1:idx_stray_data-1), 'Q0'));
+
+    time_col = find(contains(headers_numeric, 'Time'), 1);
+    time = data(:, time_col);
     
     %% Assumes they are sequential and in this order: Q0, Qx, Qy, Qz, Tx, Ty, Tz, Error
     Q0 = 1;
@@ -83,7 +85,7 @@ function [trackers, strays] = polaris(headers, fid)
         ty = data(:, idx(n, TY));
         tz = data(:, idx(n, TZ));
         err = data(:, idx(n, ERR));
-        trackers(n) = Tracker(name, q0, qx, qy, qz, tx, ty, tz, err);
+        trackers(n) = Tracker(name, q0, qx, qy, qz, tx, ty, tz, err, time);
     end
 
     has_strays = ~isempty(stray_idx);
@@ -108,7 +110,7 @@ function [trackers, strays] = polaris(headers, fid)
         tz = data_strays(:, idx_stray(n, 1));
         ty = data_strays(:, idx_stray(n, 2));
         tx = data_strays(:, idx_stray(n, 3));
-        strays(n) = PassiveStrays(tx, ty, tz);
+        strays(n) = PassiveStrays(tx, ty, tz, time);
     end
 
 end
