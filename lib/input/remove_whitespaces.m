@@ -7,6 +7,8 @@ fclose(fid);
 
 file_content = file_content{1};
 
+% Certus data always starts with Frame 1. We're looking for it to remove
+% whitespaces. In the future, maybe just do it for every numeric row.
 idx_start = 0;
 for i = 1:10
     line = file_content{i};
