@@ -35,7 +35,7 @@
 % clc; clear; close all;
 init()
 %% Load default configuration. Check ./lib/configure/defaults.m if you want to modify them.
-module = Module.Knee;
+module = Module.Hip;
 
 config = create_default_config().set_module(module);
 
@@ -49,6 +49,10 @@ digitisation = Digitisation.new(root, config);
 disp("Now loading trajectories");
 jcs = JCS.new(digitisation);
 trajectories = jcs.solve();
+
+trajectories.plot_stray();
+trajectories.plot()
+
 
 %% COR stuff
 
@@ -67,7 +71,7 @@ assignments(6) = Assignments("SPS", "Valgus");
     .split_states("_COR");
 
 cor = traj_cor.centre_of_rotation(angles).correct_side();
-cor.plot(digitisation)
+% cor.plot(digitisation)
 % % Get widths for cor normalisation
 widths = get_widths(cor, digitisation);
 cor_norm = cor.normalise(widths);
@@ -154,7 +158,7 @@ function widths = get_widths(cor, digitisation)
     widths = nan(numel(cor), 1);
     for n = 1:numel(cor)
         specimen = cor(n).specimen;
-        idx = find([digitisation.specimen] == specimen, 1);
+        idx = find(digitisation.specimen == specimen, 1);
         width = digitisation(idx).transforms.tibia.width.unwrap();
         widths(n) = width;
     end

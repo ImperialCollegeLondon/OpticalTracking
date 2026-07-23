@@ -72,7 +72,8 @@ function [trackers, strays] = polaris(headers, fid)
     TX = 5;
     TY = 6;
     TZ = 7;
-    idx = idx_q0(:) + (0:6);
+    ERR = 8;
+    idx = idx_q0(:) + (0:7);
 
     for n = 1:numel(idx_tracker)
         name = names{n};
@@ -83,7 +84,8 @@ function [trackers, strays] = polaris(headers, fid)
         tx = data(:, idx(n, TX));
         ty = data(:, idx(n, TY));
         tz = data(:, idx(n, TZ));
-        trackers(n) = Tracker(name, q0, qx, qy, qz, tx, ty, tz, time);
+        err = data(:, idx(n, ERR));
+        trackers(n) = Tracker(name, q0, qx, qy, qz, tx, ty, tz, err, time);
     end
 
     has_strays = ~isempty(stray_idx);

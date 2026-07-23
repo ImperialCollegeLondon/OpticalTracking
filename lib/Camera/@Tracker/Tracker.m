@@ -6,6 +6,7 @@ classdef Tracker < handle & matlab.mixin.Copyable
         Q0, Qx, Qy, Qz
         Rx, Ry, Rz,
         Tx, Ty, Tz,
+        Error
         Timestamp
     end
     properties (Access = private)
@@ -18,7 +19,7 @@ classdef Tracker < handle & matlab.mixin.Copyable
         end
     end
     methods
-        function self = Tracker(name, q0, qx, qy, qz, tx, ty, tz, timestamp)
+        function self = Tracker(name, q0, qx, qy, qz, tx, ty, tz, err, timestamp)
             self.Name  = name;
 
             self.Tx    = tx;
@@ -36,6 +37,7 @@ classdef Tracker < handle & matlab.mixin.Copyable
             self.Ry    = ry;
             self.Rz    = rz;
 
+            self.Error = err;
             self.Timestamp = timestamp;
         end
     end
@@ -53,6 +55,7 @@ classdef Tracker < handle & matlab.mixin.Copyable
             self.Tx    = self.Tx(mask);
             self.Ty    = self.Ty(mask);
             self.Tz    = self.Tz(mask);
+            self.Error = self.Error(mask);
             self.Timestamp = self.Timestamp(mask);
         end
     end
