@@ -60,10 +60,10 @@ config.camera_labels.knee.polaris.probe = 'Probe';
 
 % Cert.camera_labelsus laed for each tracker in the data files.
 % The .camera_labelsway wtus probe is defined in lib/configure/is_certus_probe.
-config.camera_labels.knee.certus.tibia = 'tibia';
-config.camera_labels.knee.certus.femur = 'femur';
-config.camera_labels.knee.certus.patella = 'patella';
-config.camera_labels.knee.certus.probe = 'Probe'; % Don't change this even if the probe is called something else.
+config.camera_labels.knee.generic.tibia = 'tibia';
+config.camera_labels.knee.generic.femur = 'femur';
+config.camera_labels.knee.generic.patella = 'patella';
+config.camera_labels.knee.generic.probe = 'Probe'; % Don't change this even if the probe is called something else.
 
 %%%%%%.camera_labels%%%%%% Hip labels %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 config.camera_labels.hip.polaris.tibia = 'T';
@@ -71,10 +71,10 @@ config.camera_labels.hip.polaris.femur = '';
 config.camera_labels.hip.polaris.hip = 'Y';
 config.camera_labels.hip.polaris.probe = 'Probe';
 
-config.camera_labels.hip.certus.tibia = 'tibia';
-config.camera_labels.hip.certus.femur = 'femur';
-config.camera_labels.hip.certus.hip = 'hip';
-config.camera_labels.hip.certus.probe = 'Probe'; % Don't change this even if the probe is called something else.
+config.camera_labels.hip.generic.tibia = 'tibia';
+config.camera_labels.hip.generic.femur = 'femur';
+config.camera_labels.hip.generic.hip = 'hip';
+config.camera_labels.hip.generic.probe = 'Probe'; % Don't change this even if the probe is called something else.
 
 %% STL files
 config.stl.femur_right = "models/femur2.stl";
