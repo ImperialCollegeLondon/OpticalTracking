@@ -32,16 +32,16 @@
 % clean up inconsistency in your folders. e.g., between cases (ACL vs acl),
 % in naming (Reconstruction vs repair vs recon), or mistakes (esp instead of Sps)
 
+%% Basic run. Check ./create_default_config.m if you want to modify tracker names, etc.
 % clc; clear; close all;
 init()
-%% Load default configuration. Check ./lib/configure/defaults.m if you want to modify them.
+
 module = Module.Knee;
 
 config = create_default_config().set_module(module);
 
 disp("Choose the root folder where all the specimens are")
 root = uigetdir(".", "Choose the root folder");
-%%
 
 digitisation = Digitisation.new(root, config);
 % digitisation.visualise();
@@ -50,52 +50,53 @@ disp("Now loading trajectories");
 jcs = JCS.new(digitisation);
 trajectories = jcs.solve();
 
-%% COR stuff
-
-assignments(1) = Assignments("Anterior", "Neutral");
-assignments(2) = Assignments("External", "Neutral");
-assignments(3) = Assignments("Internal", "Neutral");
-assignments(4) = Assignments("Anterior_External", "Anterior");
-assignments(5) = Assignments("Anterior_Internal", "Anterior");
-assignments(6) = Assignments("SPS", "Valgus");
-
-
-[traj_cor, angles] = trajectories...
-    .include_state("COR")...
-    .exclude_state("ACLR")...
-    .split_piecewise(assignments)...
-    .split_states("_COR");
-
-cor = traj_cor.centre_of_rotation(angles).correct_side();
-cor.plot(digitisation)
-% % Get widths for cor normalisation
-widths = get_widths(cor, digitisation);
-cor_norm = cor.normalise(widths);
-cor_avg = cor_norm.average();
-
-% Prepare stl model for centre of rotation average
-model = stlread("models/tibia2.stl");
-
-pts = model.Points;
-% Normalise
-x = pts(:, 1);
-width = max(x) - min(x);
-pts = pts/width;
-
-% Shift down
-z_max = max(pts(:, 3));
-pts(:, 3) = pts(:, 3) - (z_max + 1);
-pts(:, 2) = -pts(:, 2);
-pts(:, 1) = -pts(:, 1);
-model_shifted = triangulation(model.ConnectivityList, pts);
-
-cor_avg.plot(model_shifted, root);
+% %% COR stuff
+% 
+% assignments(1) = Assignments("Anterior", "Neutral");
+% assignments(2) = Assignments("External", "Neutral");
+% assignments(3) = Assignments("Internal", "Neutral");
+% assignments(4) = Assignments("Anterior_External", "Anterior");
+% assignments(5) = Assignments("Anterior_Internal", "Anterior");
+% assignments(6) = Assignments("SPS", "Valgus");
+% 
+% 
+% [traj_cor, angles] = trajectories...
+%     .include_state("COR")...
+%     .exclude_state("ACLR")...
+%     .split_piecewise(assignments)...
+%     .split_states("_COR");
+% 
+% cor = traj_cor.centre_of_rotation(angles).correct_side();
+% cor.plot(digitisation)
+% % % Get widths for cor normalisation
+% widths = get_widths(cor, digitisation);
+% cor_norm = cor.normalise(widths);
+% cor_avg = cor_norm.average();
+% 
+% % Prepare stl model for centre of rotation average
+% model = stlread("models/tibia2.stl");
+% 
+% pts = model.Points;
+% % Normalise
+% x = pts(:, 1);
+% width = max(x) - min(x);
+% pts = pts/width;
+% 
+% % Shift down
+% z_max = max(pts(:, 3));
+% pts(:, 3) = pts(:, 3) - (z_max + 1);
+% pts(:, 2) = -pts(:, 2);
+% pts(:, 1) = -pts(:, 1);
+% model_shifted = triangulation(model.ConnectivityList, pts);
+% 
+% cor_avg.plot(model_shifted, root);
 
 %% Kinematics
 % keyboard
 % % optimised = digitisation.optimise(trajectories.intact_neutral());
-path = trajectories.path();
-path_avg = path.average();
+path = trajectories.exclude_state("COR").set_flexion_max(100).intraspecimen_mean().path();
+path.plot_by_loading_condition([], [], root)
+% path_avg = path.average();
 % norm = path.normalise("Neutral", "Intact_50N");
 % ie = norm.exclude_state("COR").ie();
 % norm_avg = path.normalise("Neutral", "Intact_50N").average();
