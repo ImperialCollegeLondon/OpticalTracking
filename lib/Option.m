@@ -74,18 +74,53 @@ classdef Option
             end
             self = r;
         end
-        function r = filter_map(self, func)
-            if self.is_none
-                r = Option.None;
-                return
+        function r = filter(self, predicate)
+            keyboard
+            self = self(~self.is_none());
+
+            if isempty(self)
+                r = Option.None();
+                return;
             end
-            self = self(~self.is_none);
+
+            passes = cellfun(predicate, {self.value}, 'UniformOutput', true);
+            self = self(passes);
+
+            if isempty(self)
+                r = Option.None();
+                return;
+            end
+
+            r = self;
+        end
+        function r = filter_map(self, func)
+            self = self(~self.is_none());
+            if isempty(self)
+                r = Option.None();
+                return;
+            end
+
             val = {self.value};
-            r = cellfun(@(x) func(x), val, "UniformOutput", false);
+
+            % Apply func to each value — func returns an Option
+            results = cellfun(func, val, "UniformOutput", false);
+
+            % Keep only Some results
+            is_some = cellfun(@(x) x.is_some(), results);
+            results = results(is_some);
+
+            if isempty(results)
+                r = Option.None();
+                return;
+            end
+
+            % Unwrap the values from the remaining Somes
+            r = cellfun(@(x) x.value, results, "UniformOutput", false);
+
             if isscalar(r)
                 r = r{:};
             end
-            r = r.value;
+
         end
         function self = Option(val)
             if nargin == 0 || isempty(val)

@@ -30,9 +30,17 @@ function [transforms, bones] = calculate_transforms(trackers, strays, digitisati
     % If these are Option.None, it means that rigid body was not tracked.
     % They should be unwrap_or(eye(4)). i.e., if the body was not tracked,
     % assume it hasn't moved at all.
-    gTtti = findTrackerFixedFrames(tibia_tracker);
-    gTfti = findTrackerFixedFrames(femur_tracker);
-    gThti = findTrackerFixedFrames(hip_tracker);
+
+    no_translations = @(rb) ~all(isnan(rb.translations), "all");
+
+    gTtti = tibia_tracker.filter(no_translations).map(@(rb) findTrackerFixedFrames(rb.rotations, rb.translations));
+    gTfti = femur_tracker.filter(no_translations).map(@(rb) findTrackerFixedFrames(rb.rotations, rb.translations));
+    gThti = hip_tracker.filter(no_translations).map(@(rb) findTrackerFixedFrames(rb.rotations, rb.translations));
+
+    %
+    % gTtti = findTrackerFixedFrames(tibia_tracker);
+    % gTfti = findTrackerFixedFrames(femur_tracker);
+    % gThti = findTrackerFixedFrames(hip_tracker);
 
 
     %% Calculate transformation matricies from body fixed to global fixed frames and motion relative to initial position
