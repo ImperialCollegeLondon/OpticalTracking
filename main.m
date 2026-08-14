@@ -50,8 +50,8 @@ disp("Now loading trajectories");
 jcs = JCS.new(digitisation);
 trajectories = jcs.solve();
 
-% %% COR stuff
-% 
+%% COR stuff
+
 % assignments(1) = Assignments("Anterior", "Neutral");
 % assignments(2) = Assignments("External", "Neutral");
 % assignments(3) = Assignments("Internal", "Neutral");
@@ -95,7 +95,7 @@ trajectories = jcs.solve();
 % keyboard
 % % optimised = digitisation.optimise(trajectories.intact_neutral());
 path = trajectories.exclude_state("COR").set_flexion_max(100).intraspecimen_mean().path();
-path.plot_by_loading_condition([], [], root)
+path.plot([], [], root)
 % path_avg = path.average();
 % norm = path.normalise("Neutral", "Intact_50N");
 % ie = norm.exclude_state("COR").ie();
@@ -146,17 +146,3 @@ path.plot_by_loading_condition([], [], root)
 % % diary off;
 % 
 % 
-function widths = get_widths(cor, digitisation)
-    arguments
-        cor CentreOfRotation
-        digitisation Digitisation
-    end
-
-    widths = nan(numel(cor), 1);
-    for n = 1:numel(cor)
-        specimen = cor(n).specimen;
-        idx = find([digitisation.specimen] == specimen, 1);
-        width = digitisation(idx).transforms.tibia.width.unwrap();
-        widths(n) = width;
-    end
-end
