@@ -34,7 +34,6 @@
 
 %% Basic run. Check ./create_default_config.m if you want to modify tracker names, etc.
 % clc; clear; close all;
-init()
 
 module = Module.Knee;
 
