@@ -72,10 +72,8 @@ classdef Option
             if isscalar(r.value)
                 r.value = r.value{:};
             end
-            self = r;
         end
         function r = filter(self, predicate)
-            keyboard
             self = self(~self.is_none());
 
             if isempty(self)

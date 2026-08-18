@@ -7,10 +7,18 @@ classdef testImplementationParity < matlab.unittest.TestCase
     end
 
     methods (Test)
+        function testQuaternionToEuler(testCase)
+            qw = 4;
+            qx = 1;
+            qy = 2;
+            qz = 3;
+            T_ref = RvA.quaternion2euler([qw qx qy qz]);
+            [Rx, Ry, Rz] = quaternion2euler(qw, qx, qy, qz);
 
-        %% ============================================================
-        % Identity transform
-        %==============================================================
+            testCase.verifyEqual(T_ref(1), Rx, 'AbsTol', testCase.matrixTol)
+            testCase.verifyEqual(T_ref(2), Ry, 'AbsTol', testCase.matrixTol)
+            testCase.verifyEqual(T_ref(3), Rz, 'AbsTol', testCase.matrixTol)
+        end
 
         function testIdentityTransform(testCase)
 
@@ -23,29 +31,20 @@ classdef testImplementationParity < matlab.unittest.TestCase
             testCase.verifyEqual( ...
                 T_new, T_ref, ...
                 'AbsTol', testCase.matrixTol);
-
         end
 
-
-        %% ============================================================
-        % Canonical rotations
-        %==============================================================
-
         function testPureRotations(testCase)
-
             testAngles = [
-                 10   0    0
-                  0  10    0
-                  0   0   10
-                -30  45   60
-                180   0    0
-                  0  89    0
-            ];
+                10  0   0;
+                0   10  0;
+                0   0   10;
+                -27 20  10;
+                180 0   0;
+                0   89  0;
+                ];
 
             xyz = [0 0 0];
-
             for i = 1:size(testAngles,1)
-
                 angles = testAngles(i,:);
 
                 T_ref = RvA.defineTrackerFixedFrame_v2(angles, xyz);
@@ -55,24 +54,16 @@ classdef testImplementationParity < matlab.unittest.TestCase
                     T_new, T_ref, ...
                     'AbsTol', testCase.matrixTol, ...
                     sprintf('Rotation mismatch at case %d', i));
-
             end
-
         end
 
-
-        %% ============================================================
-        % Pure translations
-        %==============================================================
-
         function testPureTranslations(testCase)
-
             translations = [
-                 1   2   3
+                1   2   3
                 -5   0   8
-                 0   0   0
+                0   0   0
                 10 -10  20
-            ];
+                ];
 
             angles = [0 0 0];
 
@@ -86,15 +77,8 @@ classdef testImplementationParity < matlab.unittest.TestCase
                 testCase.verifyEqual( ...
                     T_new, T_ref, ...
                     'AbsTol', testCase.matrixTol);
-
             end
-
         end
-
-
-        %% ============================================================
-        % Randomized parity test
-        %==============================================================
 
         function testRandomizedParity(testCase)
 
@@ -138,16 +122,8 @@ classdef testImplementationParity < matlab.unittest.TestCase
                     xyz_new, xyz_ref, ...
                     'AbsTol', testCase.translationTol, ...
                     sprintf('Translation mismatch at iteration %d', i));
-
             end
-
         end
-
-
-        %% ============================================================
-        % Left/right convention handling
-        %==============================================================
-
         function testLeftRightConvention(testCase)
 
             angles = [20 -15 35];
@@ -183,18 +159,13 @@ classdef testImplementationParity < matlab.unittest.TestCase
 
         end
 
-
-        %% ============================================================
-        % Near-singular configurations
-        %==============================================================
-
         function testNearGimbalLock(testCase)
 
             testAngles = [
-                 0   89.9    0
-                 0  -89.9    0
+                0   89.9    0
+                0  -89.9    0
                 45   89.99  30
-            ];
+                ];
 
             xyz = [1 2 3];
 
@@ -208,10 +179,7 @@ classdef testImplementationParity < matlab.unittest.TestCase
                 testCase.verifyEqual( ...
                     T_new, T_ref, ...
                     'AbsTol', 1e-8);
-
             end
-
         end
-
     end
 end

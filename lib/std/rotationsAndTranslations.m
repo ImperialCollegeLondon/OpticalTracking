@@ -1,4 +1,4 @@
-function [ angles,XYZ ] = rotationsAndTranslations( T,right )
+function [angles, XYZ] = rotationsAndTranslations( T,right )
 %Takes a transformation matrix and outputs rotations and translations
 R = T;
 R(1:3, 4, :) = 0; %T is translation of the femur to the tibia in the femoral reference frame

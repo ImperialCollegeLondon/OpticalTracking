@@ -63,10 +63,10 @@ classdef RotationsAndTranslations < matlab.unittest.TestCase
     end
 
     methods (Access = private)
-        function verify_round_trip(self, motion, is_right_knee)
+        function verify_round_trip(self, rotations, translations, is_right_knee)
             tol = 1e-5;
-            T = findTrackerFixedFrames(Option(motion));
-            [rxryrz,xyz] = rotationsAndTranslations(T, is_right_knee);
+            T = findTrackerFixedFrames(rotations, translations);
+            [rxryrz, xyz] = rotationsAndTranslations(T, is_right_knee);
             self.verifyEqual(-rxryrz(1), motion.rotations(1), 'AbsTol', tol)
         end
     end
