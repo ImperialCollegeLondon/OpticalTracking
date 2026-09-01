@@ -1,9 +1,9 @@
 # Optical Tracking using Polaris Vega
 
 ## Usage
-Take a look at `defaults.m`. These likely do not need to be changed, however you should look into the `Settings` and `Run flags` sections.
+Take a look at `create_default_config.m`. These likely do not need to be changed, however you should look into the `Settings` and `Run flags` sections.
 
-Add `lib/` to path, then run `main.m`.
+Start the program by runnin `main.m`.
 A window will popup to the root folder where all specimen folders are.
 Every specimen must include a folder `Digitisation` or `Calibration` with landmark that are reasonably identifiable: e.g., `tibia-medial`, `Tibia lateral`, `femur_proximal`, `fem_med`, `patella sup`, `TD`.
 
