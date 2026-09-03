@@ -31,8 +31,10 @@ function result = tibiofemoral(relative_position, femur, tibia, right)
     e3_=tibia.k;%Tibial z axis in global reference frame, Grood and Suntay definition
     e2_=ucross(e3_,e1_);%Floating axis in global reference frame, Grood and Suntay definition
 
-    flexion = asind(dot(-e2_,femur.k));
-    beta = acosd(dot(femur.i,tibia.k));
+    % Correction as per Dabirrahmani & Hogg, 2017 eq 6
+    % flexion = asind(dot(-e2_,femur.k));
+    flexion = atan2d(-dot(cross(femur.j, e2_), femur.i), dot(femur.j, e2_));
+    beta = acosd(dot(e1_, e3_));
     if right
         external = asind(dot(-e2_,tibia.i));
         varus = 90-beta;
